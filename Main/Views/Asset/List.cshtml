@@ -1,0 +1,17 @@
+﻿@using Main.ViewModels;
+@model AssetListViewModel
+
+<h2 align="center">@ViewBag.Title</h2>
+<div>
+    <h2>All assets are shown here</h2>
+</div>
+@{ 
+    foreach(var asset in Model.Assets)
+    {
+        <div>
+            <h3>Asset Id : @asset.AssetId.ToString()</h3>
+            <h4>Asset Name : @asset.Name</h4>
+            <p>Asset Description : @asset.ShortDescription</p>
+        </div>
+    }
+}
