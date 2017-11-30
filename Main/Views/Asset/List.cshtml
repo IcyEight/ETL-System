@@ -1,17 +1,61 @@
 ﻿@using Main.ViewModels;
 @model AssetListViewModel
 
-<h2 align="center">@ViewBag.Title</h2>
-<div>
-    <h2>All assets are shown here</h2>
-</div>
-@{ 
-    foreach(var asset in Model.Assets)
-    {
-        <div>
-            <h3>Asset Id : @asset.AssetId.ToString()</h3>
-            <h4>Asset Name : @asset.Name</h4>
-            <p>Asset Description : @asset.ShortDescription</p>
-        </div>
+
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+</head>
+
+    <body>
+        <h2 align="center">@ViewBag.Title</h2>
+
+        <br/>
+
+        <div id="allAssetGrid"></div>
+
+    </body>
+</html>
+
+<script>
+    var assetList;
+    $(document).ready(function () {
+        $.ajax({
+            url: "/Asset/GetAssets",
+            dataType: 'application/json',
+            complete: function (data) {
+                console.log(data["responseText"]);
+                assetList = JSON.parse(data["responseText"]);
+                buildAssetGrid(assetList);
+            },
+            success: function (data) {
+                alert(data)
+            }
+        });
+    });
+
+    function buildAssetGrid(allAssets) {
+        $("#allAssetGrid").jsGrid({
+            width: "100%",
+            height: "auto",
+
+            //autoload: true,
+            paging: true,
+            pageSize: 5,
+            pageButtonCount: 5,
+            pageIndex: 1,
+            data: allAssets,
+            fields: [
+                { name: "name", width: 50 },
+                { name: "shortDescription", width: 100 },
+                { name: "longDescription", width: 100 },
+                { name: "isPreferredAsset", width: 50 },
+                { name: "assetType", width: 50 }
+            ]
+        });
     }
-}
+</script>

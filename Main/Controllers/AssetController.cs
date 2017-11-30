@@ -27,5 +27,10 @@ namespace Main.Controllers
 			vm.Assets = _assetRepository.Assets;
             return View(vm);
         }
+
+        public JsonResult GetAssets()
+        {
+            return Json(_assetRepository.Assets);
+        }
     }
 }
