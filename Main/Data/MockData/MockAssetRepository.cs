@@ -47,7 +47,18 @@ namespace Main.Data.MockData
 		}
 		public IEnumerable<Asset> PreferredAssets
 		{
-			get => throw new NotImplementedException();
+			get
+			{
+				List<Asset> preferredAssets = new List<Asset>();
+				foreach(Asset asset in Assets)
+				{
+					if (asset.isPreferredAsset)
+					{
+						preferredAssets.Add(asset);
+					}
+				}
+				return preferredAssets;
+			}
 			set => throw new NotImplementedException();
 		}
 		public Asset GetAssetById(int assetId)
