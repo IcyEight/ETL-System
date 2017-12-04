@@ -11,6 +11,8 @@ namespace Main.Data.Interfaces
 		IEnumerable<Asset> Assets { get; set; }
 		IEnumerable<Asset> PreferredAssets { get; set; }
 		Asset GetAssetById(int assetId);
-
+        Boolean DeleteAssetFromRepo(int assetId);
+        Boolean ModifyAssetFromRepo(Asset asset);
+        void AddAssetToRepo(Asset asset);
 	}
 }
