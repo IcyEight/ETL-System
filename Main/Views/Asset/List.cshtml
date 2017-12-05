@@ -185,6 +185,7 @@
         });
     });
 
+    var deletedItem;
     function buildAssetGrid(allAssets) {
         $("#allAssetGrid").jsGrid({
             width: "100%",
@@ -199,14 +200,16 @@
                 showDetailsDialog("Edit", args.item);
             },
             deleteConfirm: function (item) {
+                deletedItem = item;
                 return "The asset \"" + item.name + "\" will be removed. Are you sure?";
             },
             onItemDeleted: function (item) {
+                console.log(item);
                 $.ajax({
                     async: false,
                     url: "/Asset/DeleteAsset",
                     dataType: 'application/json',
-                    data: { assetId: item.assetId },
+                    data: { assetId: deletedItem.assetId },
                     complete: function (data) {
                         $("#allAssetGrid").jsGrid("refresh");
                     }
@@ -271,11 +274,11 @@
             },
             fields: [
                 { name: "assetId", visible: false, width: 0 },
-                { name: "name", width: 50 },
-                { name: "shortDescription", width: 100 },
-                { name: "longDescription", width: 100 },
-                { name: "isPreferredAsset", width: 50 },
-                { name: "assetType", width: 50 },
+                { name: "name", title: "Name", width: 50 },
+                { name: "shortDescription", title: "Short Description", width: 100 },
+                { name: "longDescription", title: "Long Description", width: 100 },
+                { name: "isPreferredAsset", title: "Is Preferred Asset", width: 50 },
+                { name: "assetType", width: 0, visible: false },
                 {
                     type: "control",
                     modeSwitchButton: false,
