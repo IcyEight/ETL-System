@@ -16,9 +16,9 @@ namespace Main.Data.MockData
             Asset asset1 = new Asset
             {
                 AssetId = 1,
-                Name = "Asset 1",
-                ShortDescription = "Asset 1 Short Description",
-                LongDescription = "Asset 1 Long Description",
+                Name = "VM Server",
+                ShortDescription = "The Server which controls access to a number of virtual machines",
+                LongDescription = "Reports on statuses of different instances.",
                 isPreferredAsset = true,
                 assetType = null
             };
@@ -26,9 +26,9 @@ namespace Main.Data.MockData
             Asset asset2 = new Asset
             {
                 AssetId = 2,
-                Name = "Asset 2",
-                ShortDescription = "Asset 2 Short Description",
-                LongDescription = "Asset 2 Long Description",
+                Name = "Vulnerabily Analyzer",
+                ShortDescription = "Gains information from the Vulnerability Analysis Service",
+                LongDescription = "Information on particular Vulnerabilities which are present on our systems.",
                 isPreferredAsset = true,
                 assetType = null
             };
@@ -36,9 +36,9 @@ namespace Main.Data.MockData
             Asset asset3 = new Asset
             {
                 AssetId = 3,
-                Name = "Asset 3",
-                ShortDescription = "Asset 3 Short Description",
-                LongDescription = "Asset 3 Long Description",
+                Name = "Certificates Manager",
+                ShortDescription = "Gives information on the current Status of Various Certificates",
+                LongDescription = "Lists system certificates and all of their statuses.",
                 isPreferredAsset = true,
                 assetType = null
             };
