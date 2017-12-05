@@ -17,7 +17,7 @@ namespace Main
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-			services.AddTransient<IAssetRepository, MockAssetRepository>();
+			services.AddSingleton<IAssetRepository, MockAssetRepository>();
 			services.AddTransient<IAssetModuleRepository, MockAssetModuleRepository>();
 			services.AddTransient<IAssetTypeRepository, MockAssetTypeRepository>();
 			services.AddTransient<IDatabase_Repository, MockDatabase_Repository>();
