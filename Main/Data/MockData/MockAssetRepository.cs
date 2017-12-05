@@ -26,7 +26,7 @@ namespace Main.Data.MockData
             Asset asset2 = new Asset
             {
                 AssetId = 2,
-                Name = "Vulnerabily Analyzer",
+                Name = "Vulnerability Analyzer",
                 ShortDescription = "Gains information from the Vulnerability Analysis Service",
                 LongDescription = "Information on particular Vulnerabilities which are present on our systems.",
                 isPreferredAsset = true,
