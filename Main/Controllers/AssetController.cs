@@ -7,8 +7,6 @@ using Main.Data.Interfaces;
 using Main.ViewModels;
 using Main.Models;
 
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Main.Controllers
 {
     public class AssetController : Controller
@@ -23,7 +21,7 @@ namespace Main.Controllers
         // GET: /<controller>/
         public ViewResult List()
         {
-			ViewBag.Title = "Asset View Title";
+			ViewBag.Title = "All Assets";
 			AssetListViewModel vm = new AssetListViewModel();
 			vm.Assets = _assetRepository.Assets;
             return View(vm);
@@ -32,23 +30,50 @@ namespace Main.Controllers
         public JsonResult GetAssets()
         {
             Asset newAsset = new Asset();
-            AddAsset(newAsset);
             return Json(_assetRepository.Assets);
         }
 
-        public void DeleteAsset(int assetId)
+        public JsonResult DeleteAsset(int assetId)
         {
             _assetRepository.DeleteAssetFromRepo(assetId);
+
+            JsonResult updatedAssetList = GetAssets();
+
+            return Json(updatedAssetList);
         }
 
-        public void ModifyAsset(Asset modifiedAsset)
+        public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
+            Asset modifiedAsset = new Asset();
+            modifiedAsset.AssetId = assetId;
+            modifiedAsset.Name = name;
+            modifiedAsset.ShortDescription = shortDescription;
+            modifiedAsset.LongDescription = longDescription;
+            modifiedAsset.isPreferredAsset = isPreferredAsset;
+            modifiedAsset.assetType = null;
+
             _assetRepository.ModifyAssetFromRepo(modifiedAsset);
+
+            JsonResult updatedAssetList = GetAssets();
+
+            return Json(updatedAssetList);
         }
 
-        public void AddAsset(Asset newAsset)
+        public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
+            Asset newAsset = new Asset();
+            newAsset.AssetId = assetId;
+            newAsset.Name = name;
+            newAsset.ShortDescription = shortDescription;
+            newAsset.LongDescription = longDescription;
+            newAsset.isPreferredAsset = isPreferredAsset;
+            newAsset.assetType = null;
+
             _assetRepository.AddAssetToRepo(newAsset);
+
+            JsonResult updatedAssetList = GetAssets();
+
+            return Json(updatedAssetList);
         }
     }
 }

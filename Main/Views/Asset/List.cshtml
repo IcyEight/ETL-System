@@ -9,6 +9,11 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+
+    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
 </head>
 
 <body>
@@ -37,11 +42,9 @@
 
     <br />
 
-    <!--
     <div id="allAssetGrid"></div>
-    -->
 
-    <div class="container">
+    @*<div class="container">
         <div class="row" style="padding-top:30px;padding-bottom:30px">
             <div class="col-lg-6">
                 <div class="btn-group btn-group-lg pull-left" role="group">
@@ -130,6 +133,41 @@
             </div>
 
         </form>
+    </div>*@
+
+    <div id="assetDialog">
+        <form id="assetForm">
+            <div class="details-form-field">
+                <input type="hidden" value="" id="assetId" name="assetId">
+            </div>
+            <div class="details-form-field">
+                <label for="name">Asset Name</label>
+                <input id="name" name="name" type="text" />
+            </div>
+            <div class="details-form-field">
+                <label for="shortDescription">Short Description</label>
+                <input id="shortDescription" name="shortDescription" type="text" />
+            </div>
+            <div class="details-form-field">
+                <label for="longDescription">Long Description</label>
+                <input id="longDescription" name="longDescription" type="text" />
+            </div>
+            <div class="details-form-field">
+                <label for="assetType">Asset Type</label>
+                <select id="assetType" name="assetType" />
+                    <option value="">Select..</option>
+                    <option value="1">Database</option>
+                    <option value="2">Server</option>
+                </select>
+            </div>
+            <div class="details-form-field">
+                <label for="isPreferredAsset"> Is Preferred Asset</label>
+                <input type="checkbox" id="isPreferredAsset" name="isPreferredAsset">
+            </div>
+            <div class="details-form-field">
+                <button type="submit" id="save">Save</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>
@@ -141,12 +179,8 @@
             url: "/Asset/GetAssets",
             dataType: 'application/json',
             complete: function (data) {
-                console.log(data["responseText"]);
                 assetList = JSON.parse(data["responseText"]);
                 buildAssetGrid(assetList);
-            },
-            success: function (data) {
-                alert(data)
             }
         });
     });
@@ -155,20 +189,152 @@
         $("#allAssetGrid").jsGrid({
             width: "100%",
             height: "auto",
-
-            //autoload: true,
+            autoload: false,
             paging: true,
             pageSize: 5,
             pageButtonCount: 5,
             pageIndex: 1,
             data: allAssets,
+            rowClick: function (args) {
+                showDetailsDialog("Edit", args.item);
+            },
+            deleteConfirm: function (item) {
+                return "The asset \"" + item.name + "\" will be removed. Are you sure?";
+            },
+            onItemDeleted: function (item) {
+                $.ajax({
+                    async: false,
+                    url: "/Asset/DeleteAsset",
+                    dataType: 'application/json',
+                    data: { assetId: item.assetId },
+                    complete: function (data) {
+                        $("#allAssetGrid").jsGrid("refresh");
+                    }
+                });
+            },
+            onItemUpdated: function (item) {
+                var assetID = $("#assetId").val();
+                var assetName = $("#name").val();
+                var assetShortDescription = $("#shortDescription").val();
+                var assetLongDescription = $("#longDescription").val();
+                var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
+                var assetType = $("#assetType").val();
+
+                $.ajax({
+                    url: "/Asset/ModifyAsset",
+                    dataType: 'application/json',
+                    data: {
+                        assetId: assetID,
+                        name: assetName,
+                        shortDescription: assetShortDescription,
+                        longDescription: assetLongDescription,
+                        isPreferredAsset: isPreferredAsset,
+                        assetType: assetType
+                    },
+                    complete: function (data) {
+                        $("#assetDialog").dialog("close");
+
+                        var updatedAssetList = JSON.parse(data["responseText"]);
+                        var uAL = updatedAssetList["value"];
+                        buildAssetGrid(uAL);
+                    }
+                });
+            },
+            onItemInserted: function (item) {
+                var assetID = 4;
+                var assetName = $("#name").val();
+                var assetShortDescription = $("#shortDescription").val();
+                var assetLongDescription = $("#longDescription").val();
+                var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
+                var assetType = $("#assetType").val();
+
+
+                $.ajax({
+                    url: "/Asset/AddAsset",
+                    dataType: 'application/json',
+                    data: {
+                        assetId: assetID,
+                        name: assetName,
+                        shortDescription: assetShortDescription,
+                        longDescription: assetLongDescription,
+                        isPreferredAsset: isPreferredAsset,
+                        assetType: assetType
+                    },
+                    complete: function (data) {
+                        $("#assetDialog").dialog("close");
+
+                        var updatedAssetList = JSON.parse(data["responseText"]);
+                        var uAL = updatedAssetList["value"];
+                        buildAssetGrid(uAL);
+                    }
+                });
+            },
             fields: [
+                { name: "assetId", visible: false, width: 0 },
                 { name: "name", width: 50 },
                 { name: "shortDescription", width: 100 },
                 { name: "longDescription", width: 100 },
                 { name: "isPreferredAsset", width: 50 },
-                { name: "assetType", width: 50 }
+                { name: "assetType", width: 50 },
+                {
+                    type: "control",
+                    modeSwitchButton: false,
+                    editButton: false,
+                    headerTemplate: function () {
+                        return $("<button>").attr("type", "button").text("Add")
+                            .on("click", function () {
+                                showDetailsDialog("Add", {});
+                            });
+                    }
+                }
             ]
+        });
+
+        var showDetailsDialog = function(dialogType, arg) {
+            $("#assetId").val(arg.assetId);
+            $("#name").val(arg.name);
+            $("#shortDescription").val(arg.shortDescription);
+            $("#longDescription").val(arg.longDescription);
+            document.getElementById("isPreferredAsset").checked = arg.isPreferredAsset;
+            $("#assetType").val(arg.assetType);
+
+
+            formSubmitHandler = function () {
+                saveClient(arg, dialogType === "Add");
+            };
+
+            $("#assetDialog").dialog("option", "title", dialogType + " Asset")
+                .dialog("open");
+
+        };
+
+        var saveClient = function (client, isNew) {
+            $("#allAssetGrid").jsGrid(isNew ? "onItemInserted" : "onItemUpdated", client);
+        };
+
+        $("#assetDialog").dialog({
+            autoOpen: false,
+            width: 400,
+            close: function () {
+                $("#assetForm").validate().resetForm();
+                $("#assetForm").find(".error").removeClass("error");
+            }
+        });
+
+        $("#assetForm").validate({
+            rules: {
+                name: "required",
+                shortDescription: "required",
+                longDescription: "required"
+            },
+            messages: {
+                description: "Please enter name",
+                unit: "Please enter short description",
+                aisle: "Please enter long description"
+            },
+            submitHandler: function () {
+                formSubmitHandler();
+            }
         });
     }
 </script>
