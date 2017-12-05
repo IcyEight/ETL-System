@@ -117,5 +117,10 @@ namespace Main.Data.MockData
         {
             allAssets.Add(asset);
         }
+
+        public List<Asset> GetAllCurrentAssets()
+        {
+            return allAssets;
+        }
     }
 }

@@ -33,11 +33,19 @@ namespace Main.Controllers
             return Json(_assetRepository.Assets);
         }
 
+        // for getting assets without refreshing the repo to initial assets
+        public JsonResult GetCurrentAssets()
+        {
+            List<Asset> assets = _assetRepository.GetAllCurrentAssets();
+
+            return Json(assets);
+        }
+
         public JsonResult DeleteAsset(int assetId)
         {
             _assetRepository.DeleteAssetFromRepo(assetId);
 
-            JsonResult updatedAssetList = GetAssets();
+            JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
         }
@@ -54,7 +62,7 @@ namespace Main.Controllers
 
             _assetRepository.ModifyAssetFromRepo(modifiedAsset);
 
-            JsonResult updatedAssetList = GetAssets();
+            JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
         }
@@ -71,7 +79,7 @@ namespace Main.Controllers
 
             _assetRepository.AddAssetToRepo(newAsset);
 
-            JsonResult updatedAssetList = GetAssets();
+            JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
         }

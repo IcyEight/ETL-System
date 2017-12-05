@@ -14,5 +14,6 @@ namespace Main.Data.Interfaces
         Boolean DeleteAssetFromRepo(int assetId);
         Boolean ModifyAssetFromRepo(Asset asset);
         void AddAssetToRepo(Asset asset);
-	}
+        List<Asset> GetAllCurrentAssets();
+    }
 }
