@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Main.Data.Interfaces;
 using Main.Data.MockData;
-using Microsoft.AspNetCore.Http;
 using React.AspNet;
 
 namespace Main
