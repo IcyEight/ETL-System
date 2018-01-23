@@ -20,7 +20,6 @@ namespace Main.Controllers
 
         public ViewResult Index()
         {
-			//ViewBag.Title = "Preferred Asset";
 			var homeViewModel = new HomeViewModel
 			{
 				PreferredAssets = _assetRepository.PreferredAssets

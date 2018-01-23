@@ -25,6 +25,7 @@ namespace Main
 			services.AddTransient<IDatabaseServerRepository, MockDatabaseServerRepository>();
 			services.AddTransient<IDataLoaderAPIRepository, MockDataLoaderAPIRepository>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITaskQueueRepository, MockTaskQueueRepository>();
             services.AddReact();
             services.AddMvc();
         }

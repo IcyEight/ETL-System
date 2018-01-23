@@ -33,6 +33,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Index","Home")">Home</a></li>
                     <li class="active"><a href="@Url.Action("List","Asset")">Asset <span class="sr-only">(current)</span></a></li>
+                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -43,97 +44,6 @@
     <br />
 
     <div id="allAssetGrid"></div>
-
-    @*<div class="container">
-        <div class="row" style="padding-top:30px;padding-bottom:30px">
-            <div class="col-lg-6">
-                <div class="btn-group btn-group-lg pull-left" role="group">
-                    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Existing Assets
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                        <a class="dropdown-item" href="#">Asset 1</a>
-                        <a class="dropdown-item" href="#">Asset 2</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="btn-group btn-group-lg" role="group" aria-label="Button group with nested dropdown">
-                    <div class="btn-group btn-group-lg pull-right" role="group">
-                        <button type="button" class="btn btn-primary">New</button>
-                        <button type="button" class="btn btn-primary">Edit</button>
-                        <button type="button" class="btn btn-danger">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="container">
-        <form>
-            <div class="form-row">
-                <div class="form-group col-lg-4">
-                    <input class="form-control" id="inputAssetName" placeholder="Name">
-                </div>
-                <div class="form-group col-lg-8">
-                    <input class="form-control" id="inputShortDesc" placeholder="Short description">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col-lg-12">
-                    <input class="form-control" id="inputLongDesc" placeholder="Long description">
-                </div>
-            </div>
-
-
-            <div class="form-row">
-                <div class="form-group col-lg-4">
-                    <select id="inputState" class="form-control">
-                        <option selected>Choose Asset Type</option>
-                        <option>...</option>
-                    </select>
-                </div>
-
-                <div class="form-group col-lg-4">
-                    <select id="inputState" class="form-control">
-                        <option selected>Choose Data Loader API</option>
-                        <option>...</option>
-                    </select>
-                </div>
-
-                <div class="form-group col-lg-4">
-                    <select id="inputState" class="form-control">
-                        <option selected>Choose Asset Module</option>
-                        <option>...</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-
-                <div class="form-group col-lg-6">
-                    <select id="inputState" class="form-control">
-                        <option selected>Choose Server</option>
-                        <option>...</option>
-                    </select>
-                </div>
-
-                <div class="form-group col-lg-6">
-                    <select id="inputState" class="form-control">
-                        <option selected>Choose Database</option>
-                        <option>...</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row col-lg-offset-10">
-                <button type="submit" class="btn btn-block btn-primary">Add</button>
-            </div>
-
-        </form>
-    </div>*@
 
     <div id="assetDialog">
         <form id="assetForm">
@@ -204,7 +114,6 @@
                 return "The asset \"" + item.name + "\" will be removed. Are you sure?";
             },
             onItemDeleted: function (item) {
-                console.log(item);
                 $.ajax({
                     async: false,
                     url: "/Asset/DeleteAsset",

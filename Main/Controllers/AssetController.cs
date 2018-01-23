@@ -29,7 +29,6 @@ namespace Main.Controllers
 
         public JsonResult GetAssets()
         {
-            Asset newAsset = new Asset();
             return Json(_assetRepository.Assets);
         }
 
