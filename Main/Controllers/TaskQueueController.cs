@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Main.Data.Interfaces;
+using Main.Data;
 using Main.ViewModels;
 using Main.Models;
 
@@ -11,24 +11,24 @@ namespace Main.Controllers
 {
     public class TaskQueueController : Controller
     {
-        private readonly ITaskQueueRepository _taskQueueRepository;
+        private readonly BamsDbContext _dbcontext;
 
-        public TaskQueueController(ITaskQueueRepository taskQueueRepository)
+        public TaskQueueController(BamsDbContext dbcontext)
         {
-            _taskQueueRepository = taskQueueRepository;
+            _dbcontext = dbcontext;
         }
 
         public ViewResult Index()
         {
             ViewBag.Title = "Task Queue";
             TaskQueueViewModel vm = new TaskQueueViewModel();
-            vm.TaskQueue = _taskQueueRepository.TaskQueues;
+            vm.TaskQueue = _dbcontext.TaskQueues;
             return View(vm);
         }
 
         public JsonResult GetTasks()
         {
-            return Json(_taskQueueRepository.TaskQueues);
+            return Json(_dbcontext.TaskQueues);
         }
 
         // for getting assets in the task queue without refreshing the repo to initial assets

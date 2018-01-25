@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Main.Data.Interfaces;
 using Main.ViewModels;
 using Main.Models;
+using Main.Data;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Controllers
 {
     public class AssetController : Controller
     {
-		private readonly IAssetRepository _assetRepository;
+		private readonly BamsDbContext _dbcontext;
 
-		public AssetController(IAssetRepository assetRepository)
+		public AssetController(BamsDbContext dbcontext)
 		{
-			_assetRepository = assetRepository;
+			_dbcontext = dbcontext;
 		}
 
         // GET: /<controller>/
@@ -23,26 +23,28 @@ namespace Main.Controllers
         {
 			ViewBag.Title = "All Assets";
 			AssetListViewModel vm = new AssetListViewModel();
-			vm.Assets = _assetRepository.Assets;
+			vm.Assets = _dbcontext.Assets;
             return View(vm);
         }
 
         public JsonResult GetAssets()
         {
-            return Json(_assetRepository.Assets);
+            return Json(_dbcontext.Assets);
         }
 
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
-            List<Asset> assets = _assetRepository.GetAllCurrentAssets();
+            List<Asset> assets = _dbcontext.Assets.ToList();
 
             return Json(assets);
         }
 
         public JsonResult DeleteAsset(int assetId)
         {
-            _assetRepository.DeleteAssetFromRepo(assetId);
+            var asset = _dbcontext.Assets.AsNoTracking().SingleOrDefault(m => m.AssetId == assetId);
+            _dbcontext.Assets.Remove(asset);
+            _dbcontext.SaveChanges();
 
             JsonResult updatedAssetList = GetCurrentAssets();
 
@@ -59,7 +61,8 @@ namespace Main.Controllers
             modifiedAsset.isPreferredAsset = isPreferredAsset;
             modifiedAsset.assetType = null;
 
-            _assetRepository.ModifyAssetFromRepo(modifiedAsset);
+            _dbcontext.Update(modifiedAsset);
+            _dbcontext.SaveChanges();
 
             JsonResult updatedAssetList = GetCurrentAssets();
 
@@ -76,7 +79,8 @@ namespace Main.Controllers
             newAsset.isPreferredAsset = isPreferredAsset;
             newAsset.assetType = null;
 
-            _assetRepository.AddAssetToRepo(newAsset);
+            _dbcontext.Assets.Add(newAsset);
+            _dbcontext.SaveChanges();
 
             JsonResult updatedAssetList = GetCurrentAssets();
 
