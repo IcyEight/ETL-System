@@ -1,6 +1,5 @@
-﻿@using Main.ViewModels;
-
-
+﻿
+@using Main.ViewModels
 <html>
 <head>
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
@@ -14,7 +13,6 @@
     <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
 </head>
-
 <body>
     <nav class="navbar navbar-inverse  navbar-default">
         <div class="container-fluid">
@@ -31,10 +29,10 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Index","Home")">Home</a></li>
-                    <li class="active"><a href="@Url.Action("List","Asset")">Asset <span class="sr-only">)</span></a></li>
-                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a>(currentz)</li>
-                    <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
-                </ul>""
+                    <li class="active"><a href="@Url.Action("List","Asset")">Asset <span class="sr-only"></span></a></li>
+                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
+                    <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only">(current)</span></a></li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -42,27 +40,42 @@
     <h2 align="center">@ViewBag.Title</h2>
 
     <br />
+    <div class="row">
+        <div class="col-md-1"><strong>Select Report</strong></div>
+        <div class="dropdown">
+            <button class="btn btn-secondary btb-sm dropdown-toggle col-md-7" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown button
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+        </div>
+        <div class="col-md-4">Add new report</div>
+    </div>
 
-    <div id="taskQueueGrid" style="padding-left:15px;padding-right:15px !important"></div>
+    <br/>
+    <div id="reportingGrid" style="padding-left:15px;padding-right:15px !important"></div>
 
 </body>
 </html>
 
 <script>
-    var tasksList;
+    var reportingList;
     $(document).ready(function () {
         $.ajax({
-            url: "/TaskQueue/GetTasks",
+            url: "/Reporting/GetReports",
             dataType: 'application/json',
             complete: function (data) {
-                tasksList = JSON.parse(data["responseText"]);
-                buildTaskQueueGrid(tasksList);
+                reportingList = JSON.parse(data["responseText"]);
+                buildReportingGrid(reportingList);
             }
         });
     });
 
-    function buildTaskQueueGrid(allTasks) {
-        $("#taskQueueGrid").jsGrid({
+    function buildReportingGrid(allReports) {
+        $("#reportingGrid").jsGrid({
             width: "100%",
             height: "auto",
             autoload: false,
@@ -70,14 +83,17 @@
             pageSize: 5,
             pageButtonCount: 5,
             pageIndex: 1,
-            data: allTasks,
+            data: allReports,
             fields: [
                 { name: "assetId", visible: false, width: 0 },
                 { name: "name", title: "Name", width: 50 },
-                { name: "alertMessage", title: "Action Required", width: 100 },
-                { name: "isComplete", title: "Complete", width: 50 },
-                { name: "longDescription", title: "Completed By", width: 100 }
+                { name: "DateCreated", title: "Created on", width: 100 },
+                { name: "DateModified", title: "Modified on", width: 100 },
+
             ]
         });
     }
 </script>
+
+
+

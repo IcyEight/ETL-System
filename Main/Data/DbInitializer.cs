@@ -82,6 +82,34 @@ namespace Main.Data
             context.TaskQueues.Add(task2);
             context.TaskQueues.Add(task3);
 
+            Reporting report1 = new Reporting
+            {
+                ReportID = 1,
+                Name = "Report 1",
+                DateCreate = "1/30/18 12:32:30",
+                DateModified = "1/31/18 12:32:30"
+            };
+
+            Reporting report2 = new Reporting
+            {
+                ReportID = 2,
+                Name = "Report 2",
+                DateCreate = "1/30/18 12:32:30",
+                DateModified = "1/31/18 12:32:30"
+            };
+
+            Reporting report3 = new Reporting
+            {
+                ReportID = 3,
+                Name = "Report 3",
+                DateCreate = "1/30/18 12:32:30",
+                DateModified = "1/31/18 12:32:30"
+            };
+
+            context.Reportings.Add(report1);
+            context.Reportings.Add(report2);
+            context.Reportings.Add(report3);
+
             context.SaveChanges();
         }
     }

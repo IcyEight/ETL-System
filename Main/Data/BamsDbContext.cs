@@ -8,6 +8,7 @@ namespace Main.Data
     {
         public DbSet<Asset> Assets { get; set; }
         public DbSet<TaskQueue> TaskQueues { get; set; }
+        public DbSet<Reporting> Reportings { get; set; }
 
         public BamsDbContext(DbContextOptions<BamsDbContext> options) : base(options)
         { }
@@ -16,6 +17,7 @@ namespace Main.Data
         {
             modelBuilder.Entity<Asset>().ToTable("Asset");
             modelBuilder.Entity<TaskQueue>().ToTable("TaskQueue");
+            modelBuilder.Entity<Reporting>().ToTable("Reporting");
         }
     }
 }
