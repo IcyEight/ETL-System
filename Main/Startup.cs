@@ -6,6 +6,7 @@ using Main.Data;
 using Microsoft.EntityFrameworkCore;
 using React.AspNet;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace Main
 {
@@ -20,12 +21,13 @@ namespace Main
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddDbContext<BamsDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddReact();
             services.AddMvc();
+            return services.BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
