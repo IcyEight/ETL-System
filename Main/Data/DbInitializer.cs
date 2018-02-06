@@ -57,7 +57,8 @@ namespace Main.Data
                 Name = "BAYVM800",
                 alertMessage = "Needs software patches applied",
                 resolvedBy = "",
-                isComplete = false
+                isComplete = false,
+                dateComplete = null
             };
 
             TaskQueue task2 = new TaskQueue
@@ -66,7 +67,8 @@ namespace Main.Data
                 Name = "HRDATA500",
                 alertMessage = "Data not in sync with HRDATABU500 - number of employees not equal",
                 resolvedBy = "",
-                isComplete = false
+                isComplete = false,
+                dateComplete = null
             };
 
             TaskQueue task3 = new TaskQueue
@@ -75,7 +77,8 @@ namespace Main.Data
                 Name = "CERTMGMT500",
                 alertMessage = "Update server version",
                 resolvedBy = "",
-                isComplete = false
+                isComplete = false,
+                dateComplete = null
             };
 
             context.TaskQueues.Add(task1);

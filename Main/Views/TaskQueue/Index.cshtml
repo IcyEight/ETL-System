@@ -1,4 +1,5 @@
 ﻿@using Main.ViewModels;
+@model TaskQueueViewModel
 
 
 <html>
@@ -24,7 +25,6 @@
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                 </button>
-
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -51,7 +51,7 @@
     var tasksList;
     $(document).ready(function () {
         $.ajax({
-            url: "/TaskQueue/GetTasks",
+            url: "/TaskQueue/GetTasksWebView",
             dataType: 'application/json',
             complete: function (data) {
                 tasksList = JSON.parse(data["responseText"]);
@@ -74,9 +74,34 @@
                 { name: "assetId", visible: false, width: 0 },
                 { name: "name", title: "Name", width: 50 },
                 { name: "alertMessage", title: "Action Required", width: 100 },
-                { name: "isComplete", title: "Complete", width: 50 },
-                { name: "longDescription", title: "Completed By", width: 100 }
+                { name: "isComplete", title: "Status", width: 50 },
+                { name: "resolvedBy", title: "Completed By", width: 100 },
+                { name: "dateComplete", title: "Date Completed", width: 50 },
+                {
+                    itemTemplate: function (_, item) {
+                        return $("<button>").text("Mark Complete")
+                            .on("click", function () {
+                                markTaskComplete(item);
+                            });
+                    }
+                }
             ]
+        });
+    }
+
+    function markTaskComplete(item) {
+        var id = item.assetId;
+        $.ajax({
+            url: "/TaskQueue/MarkTaskAsComplete",
+            dataType: 'application/json',
+            data: {
+                assetId: id
+            },
+            complete: function (data) {
+                // refresh data in grid to reflect changes
+                //$("#taskQueueGrid").jsGrid("loadData");
+                window.location.reload();
+            }
         });
     }
 </script>

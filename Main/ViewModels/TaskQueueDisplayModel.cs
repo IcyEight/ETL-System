@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Main.Models
+namespace Main.ViewModels
 {
-    public class TaskQueue
+    public class TaskQueueDisplayModel
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Key]
         public int AssetId { get; set; }
         public String Name { get; set; }
         public String alertMessage { get; set; }
         public String resolvedBy { get; set; }
-        public bool isComplete { get; set; }
+        public string isComplete { get; set; }
         public DateTime? dateComplete { get; set; }
     }
 }
