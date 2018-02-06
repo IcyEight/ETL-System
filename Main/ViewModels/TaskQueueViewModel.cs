@@ -8,6 +8,6 @@ namespace Main.ViewModels
 {
     public class TaskQueueViewModel
     {
-        public IEnumerable<TaskQueue> TaskQueue { get; set; }
+        public IEnumerable<TaskQueueDisplayModel> TaskQueue { get; set; }
     }
 }
