@@ -23,12 +23,12 @@ namespace Main.Controllers
             ViewBag.Title = "Reporting";
             ReportingViewModel vm = new ReportingViewModel();
             vm.Reporting = _dbcontext.Reportings;
-            return View();
+            return View(vm);
         }
 
         public JsonResult GetReports()
         {
-            return Json(_dbcontext.Reportings);
+            return Json(_dbcontext.TaskQueues);
         }
 
     }
