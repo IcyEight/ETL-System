@@ -28,7 +28,7 @@ namespace Main.Controllers
 
         public JsonResult GetReports()
         {
-            return Json(_dbcontext.TaskQueues);
+            return Json(_dbcontext.Reportings);
         }
 
     }
