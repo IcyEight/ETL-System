@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.IO;
+using Main.Data;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Main.Data;
 using Microsoft.EntityFrameworkCore;
-using React.AspNet;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using React.AspNet;
 
 namespace Main
 {
