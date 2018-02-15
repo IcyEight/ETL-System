@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using React.AspNet;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.IO;
 
 namespace Main
 {
@@ -24,7 +25,11 @@ namespace Main
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddDbContext<BamsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            string connectionKey = "DefaultConnection";
+            if (DetectOS() == 2) connectionKey = "MacOSX_DefaultConnection";               
+            services.AddDbContext<BamsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(connectionKey)));
+
             services.AddReact();
             services.AddMvc();
             return services.BuildServiceProvider();
@@ -56,6 +61,29 @@ namespace Main
             });
             app.UseStaticFiles();
 			app.UseMvcWithDefaultRoute();
+        }
+
+        public int DetectOS(){
+            string windir = Environment.GetEnvironmentVariable("windir");
+            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
+            {
+                return 0; // windows
+            }
+            else if (File.Exists(@"/proc/sys/kernel/ostype"))
+            {
+                string osType = File.ReadAllText(@"/proc/sys/kernel/ostype");
+                if (osType.StartsWith("Linux", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Note: Android gets here too
+                    return 1; // Linux
+                }
+            }
+            else if (File.Exists(@"/System/Library/CoreServices/SystemVersion.plist"))
+            {
+                // Note: iOS gets here too
+                return 2; //MaxOSX
+            }
+            return -1;
         }
     }
 }
