@@ -31,68 +31,32 @@ namespace Main.Controllers
 
         public List<TaskQueueDisplayModel> GetTasksList()
         {
-            DataTable table = new DataTable();
-            using (SqlConnection conn = new SqlConnection())
+            List<TaskQueueDisplayModel> taskList = _dbcontext.TaskQueues.Where(x => x.dateComplete == null || x.dateComplete > DateTime.Now.AddDays(-7)).Select(x => new TaskQueueDisplayModel
             {
-                conn.ConnectionString =
-                "Data Source=(localdb)\\MSSQLLocalDB;" +
-                "Initial Catalog=Bams;" +
-                "Integrated Security=SSPI;";
-                conn.Open();
-                // Creates a SQL command
-                using (var command = new SqlCommand("SELECT * FROM v_GetTasksForGrid", conn))
-                {
-                    // Loads the query results into the table
-                    table.Load(command.ExecuteReader());
-                }
-            }
+                AssetId = x.AssetId,
+                Name = x.Name,
+                alertMessage = x.alertMessage,
+                resolvedBy = x.resolvedBy,
+                dateComplete = x.dateComplete,
+                isComplete = x.isComplete == true ? "complete" : "incomplete"
+            }).ToList();
 
-            List<TaskQueueDisplayModel> clslist = new List<TaskQueueDisplayModel>();
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                TaskQueueDisplayModel cls = new TaskQueueDisplayModel();
-                cls.AssetId = Convert.ToInt32(table.Rows[i]["AssetId"]);
-                cls.Name = table.Rows[i]["Name"].ToString();
-                cls.alertMessage = table.Rows[i]["alertMessage"].ToString();
-                cls.resolvedBy = table.Rows[i]["resolvedBy"].ToString();
-                cls.dateComplete = (table.Rows[i]["dateComplete"] == System.DBNull.Value) ? null : (DateTime?)table.Rows[i]["dateComplete"];
-                cls.isComplete = Convert.ToBoolean(table.Rows[i]["isComplete"]) == true ? "complete" : "incomplete";
-                clslist.Add(cls);
-            }
-            return clslist;
+            return taskList;
         }
 
         public JsonResult GetTasksWebView()
         {
-            DataTable table = new DataTable();
-            using (SqlConnection conn = new SqlConnection())
+            List<TaskQueueDisplayModel> taskList = _dbcontext.TaskQueues.Where(x => x.dateComplete == null || x.dateComplete > DateTime.Now.AddDays(-7)).Select(x => new TaskQueueDisplayModel
             {
-                conn.ConnectionString =
-                "Data Source=(localdb)\\MSSQLLocalDB;" +
-                "Initial Catalog=Bams;" +
-                "Integrated Security=SSPI;";
-                conn.Open();
-                // Creates a SQL command
-                using (var command = new SqlCommand("SELECT * FROM v_GetTasksForGrid", conn))
-                {
-                    // Loads the query results into the table
-                    table.Load(command.ExecuteReader());
-                }
-            }
+                AssetId = x.AssetId,
+                Name = x.Name,
+                alertMessage = x.alertMessage,
+                resolvedBy = x.resolvedBy,
+                dateComplete = x.dateComplete,
+                isComplete = x.isComplete == true ? "complete" : "incomplete"
+            }).ToList();
 
-            List<TaskQueueDisplayModel> clslist = new List<TaskQueueDisplayModel>();
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                TaskQueueDisplayModel cls = new TaskQueueDisplayModel();
-                cls.AssetId = Convert.ToInt32(table.Rows[i]["AssetId"]);
-                cls.Name = table.Rows[i]["Name"].ToString();
-                cls.alertMessage = table.Rows[i]["alertMessage"].ToString();
-                cls.resolvedBy = table.Rows[i]["resolvedBy"].ToString();
-                cls.dateComplete = (table.Rows[i]["dateComplete"] == System.DBNull.Value) ? null : (DateTime?)table.Rows[i]["dateComplete"];
-                cls.isComplete = Convert.ToBoolean(table.Rows[i]["isComplete"]) == true ? "complete" : "incomplete";
-                clslist.Add(cls);
-            }
-            return Json(clslist);
+            return Json(taskList);
         }
 
         // for getting assets in the task queue without refreshing the repo to initial assets
