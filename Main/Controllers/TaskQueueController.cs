@@ -37,7 +37,7 @@ namespace Main.Controllers
                 Name = x.Name,
                 alertMessage = x.alertMessage,
                 resolvedBy = x.resolvedBy,
-                dateComplete = x.dateComplete,
+                dateComplete = x.dateComplete == null ? null : x.dateComplete.Value.ToShortDateString(),
                 isComplete = x.isComplete == true ? "complete" : "incomplete"
             }).ToList();
 
@@ -52,51 +52,27 @@ namespace Main.Controllers
                 Name = x.Name,
                 alertMessage = x.alertMessage,
                 resolvedBy = x.resolvedBy,
-                dateComplete = x.dateComplete,
+                dateComplete = x.dateComplete == null ? null : x.dateComplete.Value.ToShortDateString(),
                 isComplete = x.isComplete == true ? "complete" : "incomplete"
             }).ToList();
 
             return Json(taskList);
         }
 
-        // for getting assets in the task queue without refreshing the repo to initial assets
-        public JsonResult GetUpdatedTasks()
-        {
-            return null;
-        }
-
         // mark task from the task queue as complete
-        public void MarkTaskAsComplete(int assetId)
+        public void MarkTaskAsComplete(int assetId, string alertMsg, string tName)
         {
-            using (SqlConnection conn = new SqlConnection())
-            {
-                conn.ConnectionString =
-                "Data Source=(localdb)\\MSSQLLocalDB;" +
-                "Initial Catalog=Bams;" +
-                "Integrated Security=SSPI;";
-                conn.Open();
-                // Creates a SQL command
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.Connection = conn;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "MarkTaskComplete";
+            // create modified task object
+            TaskQueue modifiedTask = new TaskQueue();
+            modifiedTask.AssetId = assetId;
+            modifiedTask.isComplete = true;
+            modifiedTask.resolvedBy = "Cashel, Bridget";    // hardcoding until we get user context with authentication working
+            modifiedTask.dateComplete = DateTime.Now;
+            modifiedTask.alertMessage = alertMsg;
+            modifiedTask.Name = tName;
 
-                    SqlParameter param = new SqlParameter("@assetId", assetId);
-                    param.Direction = ParameterDirection.Input;
-                    param.DbType = DbType.String;
-                    cmd.Parameters.Add(param);
-
-                    // temporarily passing my name for dummy data until we get user auth working
-                    SqlParameter param2 = new SqlParameter("@resolvedBy", "Cashel, Bridget");
-                    param2.Direction = ParameterDirection.Input;
-                    param2.DbType = DbType.String;
-                    cmd.Parameters.Add(param2);
-
-                    cmd.ExecuteNonQuery();
-                }
-                conn.Close();
-            }
+            _dbcontext.Update(modifiedTask);
+            _dbcontext.SaveChanges();
         }
     }
 }

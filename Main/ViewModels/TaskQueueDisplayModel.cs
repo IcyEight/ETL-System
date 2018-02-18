@@ -12,6 +12,6 @@ namespace Main.ViewModels
         public String alertMessage { get; set; }
         public String resolvedBy { get; set; }
         public string isComplete { get; set; }
-        public DateTime? dateComplete { get; set; }
+        public string dateComplete { get; set; }
     }
 }

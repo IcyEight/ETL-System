@@ -91,11 +91,15 @@
 
     function markTaskComplete(item) {
         var id = item.assetId;
+        var alertMessage = item.alertMessage;
+        var taskName = item.name;
         $.ajax({
             url: "/TaskQueue/MarkTaskAsComplete",
             dataType: 'application/json',
             data: {
-                assetId: id
+                assetId: id,
+                alertMsg: alertMessage,
+                tName: taskName
             },
             complete: function (data) {
                 // refresh data in grid to reflect changes
