@@ -16,6 +16,7 @@ namespace Main.Models
 		public String ShortDescription { get; set; }
 		public String LongDescription { get; set; }
 		public bool isPreferredAsset { get; set; }
-		public AssetType assetType { get; set; }		 
+		public AssetType assetType { get; set; }	
+        public bool isDeleted { get; set; }
     }
 }

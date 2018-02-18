@@ -23,27 +23,35 @@ namespace Main.Controllers
         {
 			ViewBag.Title = "All Assets";
 			AssetListViewModel vm = new AssetListViewModel();
-			vm.Assets = _dbcontext.Assets;
+			vm.Assets = _dbcontext.Assets.Where(x => x.isDeleted == false);
             return View(vm);
         }
 
         public JsonResult GetAssets()
         {
-            return Json(_dbcontext.Assets);
+            return Json(_dbcontext.Assets.Where(x => x.isDeleted == false));
         }
 
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
-            List<Asset> assets = _dbcontext.Assets.ToList();
+            List<Asset> assets = _dbcontext.Assets.Where(x => x.isDeleted == false).ToList();
 
             return Json(assets);
         }
 
-        public JsonResult DeleteAsset(int assetId)
+        public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
-            var asset = _dbcontext.Assets.AsNoTracking().SingleOrDefault(m => m.AssetId == assetId);
-            _dbcontext.Assets.Remove(asset);
+            Asset deletedAsset = new Asset();
+            deletedAsset.AssetId = assetId;
+            deletedAsset.Name = name;
+            deletedAsset.ShortDescription = shortDescription;
+            deletedAsset.LongDescription = longDescription;
+            deletedAsset.isPreferredAsset = isPreferredAsset;
+            deletedAsset.assetType = null;
+            deletedAsset.isDeleted = true;
+
+            _dbcontext.Update(deletedAsset);
             _dbcontext.SaveChanges();
 
             JsonResult updatedAssetList = GetCurrentAssets();
@@ -60,6 +68,7 @@ namespace Main.Controllers
             modifiedAsset.LongDescription = longDescription;
             modifiedAsset.isPreferredAsset = isPreferredAsset;
             modifiedAsset.assetType = null;
+            modifiedAsset.isDeleted = false;
 
             _dbcontext.Update(modifiedAsset);
             _dbcontext.SaveChanges();
@@ -78,6 +87,7 @@ namespace Main.Controllers
             newAsset.LongDescription = longDescription;
             newAsset.isPreferredAsset = isPreferredAsset;
             newAsset.assetType = null;
+            newAsset.isDeleted = false;
 
             _dbcontext.Assets.Add(newAsset);
             _dbcontext.SaveChanges();
