@@ -119,7 +119,14 @@
                     async: false,
                     url: "/Asset/DeleteAsset",
                     dataType: 'application/json',
-                    data: { assetId: deletedItem.assetId },
+                    data: {
+                        assetId: deletedItem.assetId,
+                        name: deletedItem.name,
+                        shortDescription: deletedItem.shortDescription,
+                        longDescription: deletedItem.longDescription,
+                        isPreferredAsset: deletedItem.isPreferredAsset,
+                        assetType: deletedItem.assetType
+                    },
                     complete: function (data) {
                         $("#allAssetGrid").jsGrid("refresh");
                     }

@@ -31,10 +31,9 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Index","Home")">Home</a></li>
-                    <li class="active"><a href="@Url.Action("List","Asset")">Asset <span class="sr-only">)</span></a></li>
-                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a>(currentz)</li>
-                    <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
-                </ul>""
+                    <li><a href="@Url.Action("List","Asset")">Asset</a></li>
+                    <li class="active"><a href="@Url.Action("Index","TaskQueue")">Task Queue<span class="sr-only">(current)</span></a></li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -92,11 +91,15 @@
 
     function markTaskComplete(item) {
         var id = item.assetId;
+        var alertMessage = item.alertMessage;
+        var taskName = item.name;
         $.ajax({
             url: "/TaskQueue/MarkTaskAsComplete",
             dataType: 'application/json',
             data: {
-                assetId: id
+                assetId: id,
+                alertMsg: alertMessage,
+                tName: taskName
             },
             complete: function (data) {
                 // refresh data in grid to reflect changes
