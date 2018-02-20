@@ -89,24 +89,24 @@ namespace Main.Data
             {
                 ReportID = 1,
                 Name = "Report 1",
-                DateCreate = "1/30/18 12:32:30",
-                DateModified = "1/31/18 12:32:30"
+                DateCreate = null,
+                DateModified = null
             };
 
             Reporting report2 = new Reporting
             {
                 ReportID = 2,
                 Name = "Report 2",
-                DateCreate = "1/30/18 12:32:30",
-                DateModified = "1/31/18 12:32:30"
+                DateCreate = null,
+                DateModified = null
             };
 
             Reporting report3 = new Reporting
             {
                 ReportID = 3,
                 Name = "Report 3",
-                DateCreate = "1/30/18 12:32:30",
-                DateModified = "1/31/18 12:32:30"
+                DateCreate = null,
+                DateModified = null
             };
 
             context.Reportings.Add(report1);

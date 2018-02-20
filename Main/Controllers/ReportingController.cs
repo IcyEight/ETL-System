@@ -26,9 +26,30 @@ namespace Main.Controllers
             return View(vm);
         }
 
-        public JsonResult GetReports()
+        public List<ReportingDisplayModel> GetReports()
         {
-            return Json(_dbcontext.Reportings);
+            List<ReportingDisplayModel> reportList = _dbcontext.Reportings.Where(x => x.DateCreate == null || x.DateCreate > DateTime.Now.AddDays(-1)).Select(x => new ReportingDisplayModel
+            {
+                ReportID = x.ReportID,
+                Name = x.Name,
+                DateCreate = x.DateCreate.Value.ToShortDateString(),
+                DateModified = x.DateModified.Value.ToShortDateString()
+            }).ToList();
+
+            return reportList;
+        }
+
+        public JsonResult GetReportsView()
+        {
+            List<ReportingDisplayModel> reportList = _dbcontext.Reportings.Where(x => x.DateCreate == null || x.DateCreate > DateTime.Now.AddDays(-1)).Select(x => new ReportingDisplayModel
+            {
+                ReportID = x.ReportID,
+                Name = x.Name,
+                DateCreate = x.DateCreate == null ? null : x.DateCreate.Value.ToShortDateString(),
+                DateModified = x.DateModified == null ? null : x.DateModified.Value.ToShortDateString(),
+            }).ToList();
+
+            return Json(reportList);
         }
 
     }
