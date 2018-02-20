@@ -44,11 +44,11 @@ namespace Main.Controllers
         {
             Asset deletedAsset = new Asset();
             deletedAsset.AssetId = assetId;
-            deletedAsset.Name = name;
+            deletedAsset.AssetName = name;
             deletedAsset.ShortDescription = shortDescription;
             deletedAsset.LongDescription = longDescription;
             deletedAsset.isPreferredAsset = isPreferredAsset;
-            deletedAsset.assetType = null;
+            deletedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.Name.Equals(assetType)).First();
             deletedAsset.isDeleted = true;
 
             _dbcontext.Update(deletedAsset);
@@ -63,11 +63,11 @@ namespace Main.Controllers
         {
             Asset modifiedAsset = new Asset();
             modifiedAsset.AssetId = assetId;
-            modifiedAsset.Name = name;
+            modifiedAsset.AssetName = name;
             modifiedAsset.ShortDescription = shortDescription;
             modifiedAsset.LongDescription = longDescription;
             modifiedAsset.isPreferredAsset = isPreferredAsset;
-            modifiedAsset.assetType = null;
+            modifiedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.Name.Equals(assetType)).First();
             modifiedAsset.isDeleted = false;
 
             _dbcontext.Update(modifiedAsset);
@@ -82,11 +82,11 @@ namespace Main.Controllers
         {
             Asset newAsset = new Asset();
             newAsset.AssetId = assetId;
-            newAsset.Name = name;
+            newAsset.AssetName = name;
             newAsset.ShortDescription = shortDescription;
             newAsset.LongDescription = longDescription;
             newAsset.isPreferredAsset = isPreferredAsset;
-            newAsset.assetType = null;
+            newAsset.assetType = _dbcontext.AssetTypes.Where(x => x.Name.Equals(assetType)).First();
             newAsset.isDeleted = false;
 
             _dbcontext.Assets.Add(newAsset);
@@ -95,6 +95,18 @@ namespace Main.Controllers
             JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
+        }
+
+        public void fetchAssetData(int AssetID)
+        {
+           List<AssetModule> modules = _dbcontext.AssetModules.Where(A => A.assetID.Equals(AssetID)).ToList();
+           if ( modules.Count() > 0)
+            {
+                foreach(AssetModule mod in modules)
+                {
+
+                }
+            }
         }
     }
 }

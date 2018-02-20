@@ -9,14 +9,14 @@ namespace Main.Models
 {
     public class Asset
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int AssetId { get; set; }
-		public String Name { get; set; }
+        public String AssetName { get; set; }
 		public String ShortDescription { get; set; }
 		public String LongDescription { get; set; }
 		public bool isPreferredAsset { get; set; }
-		public AssetType assetType { get; set; }	
+		public AssetType assetType { get; set; }
         public bool isDeleted { get; set; }
     }
 }

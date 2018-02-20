@@ -52,7 +52,7 @@
             </div>
             <div class="details-form-field">
                 <label for="name">Asset Name</label>
-                <input id="name" name="name" type="text" />
+                <input id="assetName" name="assetName" type="text" />
             </div>
             <div class="details-form-field">
                 <label for="shortDescription">Short Description</label>
@@ -65,6 +65,7 @@
             <div class="details-form-field">
                 <label for="assetType">Asset Type</label>
                 <select id="assetType" name="assetType" />
+                <!-- these options should be pulled in as the names of the AssetTypes of the DB-->
                     <option value="">Select..</option>
                     <option value="1">Database</option>
                     <option value="2">Server</option>
@@ -120,7 +121,7 @@
                     dataType: 'application/json',
                     data: {
                         assetId: deletedItem.assetId,
-                        name: deletedItem.name,
+                        assetName: deletedItem.name,
                         shortDescription: deletedItem.shortDescription,
                         longDescription: deletedItem.longDescription,
                         isPreferredAsset: deletedItem.isPreferredAsset,
@@ -133,7 +134,7 @@
             },
             onItemUpdated: function (item) {
                 var assetID = $("#assetId").val();
-                var assetName = $("#name").val();
+                var assetName = $("#assetName").val();
                 var assetShortDescription = $("#shortDescription").val();
                 var assetLongDescription = $("#longDescription").val();
                 var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
@@ -144,7 +145,7 @@
                     dataType: 'application/json',
                     data: {
                         assetId: assetID,
-                        name: assetName,
+                        assetName: assetName,
                         shortDescription: assetShortDescription,
                         longDescription: assetLongDescription,
                         isPreferredAsset: isPreferredAsset,
@@ -160,8 +161,8 @@
                 });
             },
             onItemInserted: function (item) {
-                var assetID = 4;
-                var assetName = $("#name").val();
+                var assetID = $("#assetId").val();
+                var assetName = $("#assetName").val();
                 var assetShortDescription = $("#shortDescription").val();
                 var assetLongDescription = $("#longDescription").val();
                 var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
@@ -173,7 +174,7 @@
                     dataType: 'application/json',
                     data: {
                         assetId: assetID,
-                        name: assetName,
+                        assetName: assetName,
                         shortDescription: assetShortDescription,
                         longDescription: assetLongDescription,
                         isPreferredAsset: isPreferredAsset,
@@ -190,7 +191,7 @@
             },
             fields: [
                 { name: "assetId", visible: false, width: 0 },
-                { name: "name", title: "Name", width: 50 },
+                { name: "assetName", title: "Name", width: 50 },
                 { name: "shortDescription", title: "Short Description", width: 100 },
                 { name: "longDescription", title: "Long Description", width: 100 },
                 { name: "isPreferredAsset", title: "Is Preferred Asset", width: 50 },
@@ -211,7 +212,7 @@
 
         var showDetailsDialog = function(dialogType, arg) {
             $("#assetId").val(arg.assetId);
-            $("#name").val(arg.name);
+            $("#assetName").val(arg.assetName);
             $("#shortDescription").val(arg.shortDescription);
             $("#longDescription").val(arg.longDescription);
             document.getElementById("isPreferredAsset").checked = arg.isPreferredAsset;

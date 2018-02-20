@@ -11,11 +11,14 @@ namespace Main.Models
 	{
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
-        public int assetTypeId { get; set; }
-		public String name { get; set; }
-		public AssetModule assetModule { get; set; }
-		public DataLoaderAPI dataLoaderAPI { get; set; }
-		public Database_ dbServer { get; set; }
+		public String Name { get; set; }
+        public AssetType()
+        {
+        }
 
+        public AssetType(String n)
+        {
+            Name = n;
+        }
 	}
 }

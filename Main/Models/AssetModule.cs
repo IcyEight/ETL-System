@@ -9,8 +9,17 @@ namespace Main.Models
 {
 	public class AssetModule
 	{
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Key]
-        public string name { get; set; }
-	}
+        public int assetID { get; set; }
+        public int moduleID { get; set; }
+        public virtual Asset asset { get; set; }
+        public virtual Module module { get; set; }
+
+        public AssetModule(int aID, int mID, Asset a, Module m)
+        {
+            assetID = aID;
+            moduleID = mID;
+            asset = a;
+            module = m;
+        }
+    }
 }
