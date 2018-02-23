@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Main.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Main.Data
 {
-    public class BamsDbContext : DbContext
+    public class BamsDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Asset> Assets { get; set; }
         public DbSet<AssetModule> AssetModules { get; set; }
@@ -20,6 +22,8 @@ namespace Main.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<AssetModule>().HasKey(A => new { A.assetID, A.moduleID });
             modelBuilder.Entity<AssetData>().HasKey(A => new { A.assetID, A.fieldName });
 

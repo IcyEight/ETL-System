@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using Main.Data;
+using Main.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +32,10 @@ namespace Main
             if (DetectOS() == 2) connectionKey = "MacOSX_DefaultConnection";               
             services.AddDbContext<BamsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(connectionKey)));
 
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<BamsDbContext>()
+            .AddDefaultTokenProviders();
+
             services.AddReact();
             services.AddMvc();
             return services.BuildServiceProvider();
@@ -40,6 +46,8 @@ namespace Main
         {
 			app.UseDeveloperExceptionPage();
 			app.UseStatusCodePages();
+            app.UseAuthentication();
+
             // Initialise ReactJS.NET. Must be before static files.
             app.UseReact(config =>
             {
