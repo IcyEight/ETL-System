@@ -7,7 +7,7 @@ namespace Main.Models
 {
     public class DataElements
     {
-        public List<Dictionary<String, String>> rowEntries;
+        public List<Dictionary<String, String>> rowEntries = new List<Dictionary<String, String>>();
 
         public void AddRow(Dictionary<String, String> rowIn)
         {

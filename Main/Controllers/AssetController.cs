@@ -23,18 +23,21 @@ namespace Main.Controllers
         {
 			ViewBag.Title = "All Assets";
 			AssetListViewModel vm = new AssetListViewModel();
-			vm.Assets = _dbcontext.Assets.Where(x => x.isDeleted == false);
+            fetchAssetData();
+            vm.Assets = _dbcontext.Assets.Where(x => x.isDeleted == false);
             return View(vm);
         }
 
         public JsonResult GetAssets()
         {
+            fetchAssetData();
             return Json(_dbcontext.Assets.Where(x => x.isDeleted == false));
         }
 
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
+            fetchAssetData();
             List<Asset> assets = _dbcontext.Assets.Where(x => x.isDeleted == false).ToList();
 
             return Json(assets);
@@ -48,7 +51,7 @@ namespace Main.Controllers
             deletedAsset.ShortDescription = shortDescription;
             deletedAsset.LongDescription = longDescription;
             deletedAsset.isPreferredAsset = isPreferredAsset;
-            deletedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.Name.Equals(assetType)).First();
+            deletedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType)).First();
             deletedAsset.isDeleted = true;
 
             _dbcontext.Update(deletedAsset);
@@ -67,7 +70,7 @@ namespace Main.Controllers
             modifiedAsset.ShortDescription = shortDescription;
             modifiedAsset.LongDescription = longDescription;
             modifiedAsset.isPreferredAsset = isPreferredAsset;
-            modifiedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.Name.Equals(assetType)).First();
+            modifiedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType)).First();
             modifiedAsset.isDeleted = false;
 
             _dbcontext.Update(modifiedAsset);
@@ -86,7 +89,7 @@ namespace Main.Controllers
             newAsset.ShortDescription = shortDescription;
             newAsset.LongDescription = longDescription;
             newAsset.isPreferredAsset = isPreferredAsset;
-            newAsset.assetType = _dbcontext.AssetTypes.Where(x => x.Name.Equals(assetType)).First();
+            newAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType)).First();
             newAsset.isDeleted = false;
 
             _dbcontext.Assets.Add(newAsset);
@@ -97,15 +100,12 @@ namespace Main.Controllers
             return Json(updatedAssetList);
         }
 
-        public void fetchAssetData(int AssetID)
+        public void fetchAssetData()
         {
-           List<AssetModule> modules = _dbcontext.AssetModules.Where(A => A.assetID.Equals(AssetID)).ToList();
+           List<AssetModule> modules = _dbcontext.AssetModules.ToList();
            if ( modules.Count() > 0)
             {
-                foreach(AssetModule mod in modules)
-                {
-
-                }
+                DataAPIConnect.PerformDataProcessing(_dbcontext);
             }
         }
     }

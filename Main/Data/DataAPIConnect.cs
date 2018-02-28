@@ -3,38 +3,32 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Main.Data
 {
     public class DataAPIConnect
     {
-        List<AssetModule> modules = new List<AssetModule>();
-
-        public void registerModule(AssetModule newModule)
+        public static void loadModules(BamsDbContext context)
         {
-            modules.Add(newModule);
-        }
-
-        public void loadModules(BamsDbContext context)
-        {
-            List<Module> moduleLoad = new List<Module>();
+            List<Models.Module> moduleLoad = new List<Models.Module>();
 
             //Read in Config details _ currently Dummy Load
             AssetType server = new AssetType("Server");
             AssetType db = new AssetType("Database");
             AssetType csv = new AssetType("CSV File");
 
-            moduleLoad.Add(new Module("VM Server", server, "www.abc.com", "user:user,pw:password"));
-            moduleLoad.Add(new Module("Vulnerability Checker", server, "www.vulCheck.com", "user:user,pw:password"));
-            moduleLoad.Add(new Module("Certificate Database", db, "connectionString", "user:user,pw:password"));
-            moduleLoad.Add(new Module("CSVImporter", csv, "/Data/test.csv", "/Data/testSchema.txt"));
+            moduleLoad.Add(new Models.Module("VM Server", server, "www.abc.com", "user:user,pw:password"));
+            moduleLoad.Add(new Models.Module("Vulnerability Checker", server, "www.vulCheck.com", "user:user,pw:password"));
+            moduleLoad.Add(new Models.Module("Certificate Database", db, "connectionString", "user:user,pw:password"));
+            moduleLoad.Add(new Models.Module("CSVImporter", csv, Directory.GetCurrentDirectory() + "/Data/test.csv", Directory.GetCurrentDirectory() + "/Data/testSchema.txt"));
 
             //End Dummy Load 
 
-            foreach (Module mod in moduleLoad)
+            foreach (Models.Module mod in moduleLoad)
             {
-                if(context.Modules.Where(M => M.name.Equals(mod.name)).Count() == 0)
+                if(context.Modules.Where(M => M.moduleName.Equals(mod.moduleName)).Count() == 0)
                 {
                     context.Modules.Add(mod);
                 }
@@ -42,33 +36,47 @@ namespace Main.Data
             context.SaveChanges();
         }
 
-        public void PerformDataProcessing(BamsDbContext context)
+        public static void PerformDataProcessing(BamsDbContext context)
         {
-            foreach (AssetModule module in modules) { 
-                if (module.module.name.Equals("CSVImporter"))
+            List<AssetModule> modules = context.AssetModules.ToList();
+            foreach (AssetModule module in modules) {
+                Models.Module temp = context.Modules.Where(M => M.moduleID == module.moduleID).First();
+                if (temp.moduleName.Equals("CSVImporter"))
                 {
                     StreamReader csv = File.OpenText(module.module.detail1);
                     StreamReader schema = File.OpenText(module.module.detail2);
                     LoadCSV(module, context, csv, schema); 
                 }
+                else
+                {
+                    //Normal Data API Connection formation and data fetch
+                }
             }
         }
 
-        public void GenerateDatabaseEntries(AssetModule module, BamsDbContext context, DataElements input, List<DataSchema> inputSch)
+        public static void GenerateDatabaseEntries(AssetModule module, BamsDbContext context, DataElements input, List<DataSchema> inputSch)
         {
             context.Schemas.AddRange(inputSch);
+            int i = 0;
             foreach(Dictionary<String, String> row in input.rowEntries)
             {
                 foreach(DataSchema s in inputSch)
                 {
-                    context.AssetData.Add(new AssetData(module.assetID, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary));
+                    if (context.AssetData.Any(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName))){
+                        context.AssetData.Update(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, module.asset));
+                    } else
+                    {
+                        context.AssetData.Add(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, module.asset));
+                    }
+
                 }
+                i++;
             }
 
             context.SaveChanges();
         }
 
-        public void LoadCSV(AssetModule module, BamsDbContext context, StreamReader csv, StreamReader importSchema)
+        public static void LoadCSV(AssetModule module, BamsDbContext context, StreamReader csv, StreamReader importSchema)
         {
             DataElements dataImport = new DataElements();
             String[] colNames = null;
@@ -101,8 +109,8 @@ namespace Main.Data
            int count = 0;
            AssetType assetType = module.module.type;
 
-            while (importSchema.Peek() >= 0)
-            {
+           while (importSchema.Peek() >= 0)
+           {
                 String tempLine = importSchema.ReadLine();
                 String[] cols = tempLine.Split(":");
                 if (count == 0)
@@ -120,7 +128,7 @@ namespace Main.Data
                 }
                 count++;
 
-            }
+           }
 
             GenerateDatabaseEntries(module, context, dataImport, entries);
         }

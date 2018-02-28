@@ -11,14 +11,14 @@ namespace Main.Models
 	{
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
-		public String Name { get; set; }
+		public String typeName { get; set; }
         public AssetType()
         {
         }
 
         public AssetType(String n)
         {
-            Name = n;
+            typeName = n;
         }
 	}
 }

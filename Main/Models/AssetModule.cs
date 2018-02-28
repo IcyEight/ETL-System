@@ -14,6 +14,11 @@ namespace Main.Models
         public virtual Asset asset { get; set; }
         public virtual Module module { get; set; }
 
+        public AssetModule()
+        {
+
+        }
+
         public AssetModule(int aID, int mID, Asset a, Module m)
         {
             assetID = aID;

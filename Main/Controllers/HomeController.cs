@@ -14,10 +14,10 @@ namespace Main.Controllers
     {
 		private readonly BamsDbContext _dbcontext;
 
-		public HomeController(BamsDbContext dbcontext)
+        public HomeController(BamsDbContext dbcontext)
 		{
             _dbcontext = dbcontext;
-		}
+        }
 
         public ViewResult Index()
         {

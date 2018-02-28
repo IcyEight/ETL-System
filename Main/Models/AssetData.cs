@@ -10,7 +10,9 @@ namespace Main.Models
     public class AssetData
     {
         public int assetID { get; set; }
+        public int dataEntryID { get; set; }
         public String fieldName { get; set; }
+        public virtual Asset asset { get; set; }
         public String fieldType { get; set; }
         public String strValue { get; set; }
         public long intValue { get; set; }
@@ -19,26 +21,64 @@ namespace Main.Models
         public Boolean boolValue { get; set; }
         public Boolean isPrimaryKey { get; set; }
 
-        public AssetData(int aID, String name, String type, String value, Boolean primary)
+        public AssetData(int aID, int dID, String name, String type, String value, Boolean primary, Asset a)
         {
             assetID = aID;
+            dataEntryID = dID;
+            asset = a;
             fieldName = name;
             fieldType = type;
+
             if (fieldType.Equals("String"))
             {
-                strValue = value;
+                if (value.Equals(""))
+                {
+                    strValue = null;
+                }
+                else
+                {
+                    strValue = value;
+                }
             } else if (fieldType.Equals("Integer"))
             {
-                intValue = long.Parse(value);
+                if (value.Equals(""))
+                {
+                    strValue = null;
+                }
+                else
+                {
+                    intValue = long.Parse(value);
+                }
             } else if (fieldType.Equals("Decimal"))
             {
-                floatValue = Double.Parse(value);
+                if (value.Equals(""))
+                {
+                    strValue = null;
+                }
+                else
+                {
+                    floatValue = Double.Parse(value);
+                }
             } else if (fieldType.Equals("Date"))
             {
-                dateValue = DateTime.Parse(value);
+                if (value.Equals(""))
+                {
+                    strValue = null;
+                }
+                else
+                {
+                    dateValue = DateTime.Parse(value);
+                }
             } else if (fieldType.Equals("Boolean"))
             {
-                boolValue = Boolean.Parse(value);
+                if (value.Equals(""))
+                {
+                    strValue = null;
+                }
+                else
+                {
+                    boolValue = Boolean.Parse(value);
+                }
             }
 
             isPrimaryKey = primary;

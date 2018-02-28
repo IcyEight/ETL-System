@@ -11,8 +11,7 @@ namespace Main.Data
         public static void Seed(BamsDbContext context)
         {
             context.Database.EnsureCreated();
-            DataAPIConnect apiContext = new DataAPIConnect();
-            apiContext.loadModules(context);
+            DataAPIConnect.loadModules(context);
             if (context.Assets.Any())
             {
                 return;   // DB has been seeded
@@ -24,7 +23,7 @@ namespace Main.Data
                 ShortDescription = "The Server which controls access to a number of virtual machines",
                 LongDescription = "Reports on statuses of different instances.",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.Name.Equals("Server")).First()
+                assetType = context.AssetTypes.Where(A => A.typeName.Equals("Server")).First()
             };
 
             Asset asset2 = new Asset
@@ -33,7 +32,7 @@ namespace Main.Data
                 ShortDescription = "Gains information from the Vulnerability Analysis Service",
                 LongDescription = "Information on particular Vulnerabilities which are present on our systems.",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.Name.Equals("Server")).First()
+                assetType = context.AssetTypes.Where(A => A.typeName.Equals("Server")).First()
             };
 
             Asset asset3 = new Asset
@@ -42,12 +41,27 @@ namespace Main.Data
                 ShortDescription = "Gives information on the current Status of Various Certificates",
                 LongDescription = "Lists system certificates and all of their statuses.",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.Name.Equals("Database")).First()
+                assetType = context.AssetTypes.Where(A => A.typeName.Equals("Database")).First()
             };
+
+            Asset asset4 = new Asset
+            {
+                AssetName = "Fantasy Football Manager",
+                ShortDescription = "Gives NFL passing stats because it's a CSV I had handy.",
+                LongDescription = "Throwing a Football",
+                isPreferredAsset = true,
+                assetType = context.AssetTypes.Where(A => A.typeName.Equals("CSV File")).First()
+            };
+
+            Module csvModule = context.Modules.Where(M => M.moduleName.Equals("CSVImporter")).First();
+            AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID, asset4, csvModule);
 
             context.Assets.Add(asset1);
             context.Assets.Add(asset2);
             context.Assets.Add(asset3);
+            context.Assets.Add(asset4);
+
+            context.AssetModules.Add(csvTestModule);
 
             TaskQueue task1 = new TaskQueue
             {

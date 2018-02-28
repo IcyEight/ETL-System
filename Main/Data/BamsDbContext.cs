@@ -21,7 +21,7 @@ namespace Main.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AssetModule>().HasKey(A => new { A.assetID, A.moduleID });
-            modelBuilder.Entity<AssetData>().HasKey(A => new { A.assetID, A.fieldName });
+            modelBuilder.Entity<AssetData>().HasKey(A => new { A.assetID, A.dataEntryID, A.fieldName });
 
             modelBuilder.Entity<Asset>().ToTable("Asset");
             modelBuilder.Entity<AssetData>().ToTable("AssetData");
@@ -30,9 +30,6 @@ namespace Main.Data
             modelBuilder.Entity<TaskQueue>().ToTable("TaskQueue");
             modelBuilder.Entity<DataSchema>().ToTable("DataSchema");
             modelBuilder.Entity<Reporting>().ToTable("Reporting");
-
         }
-
-        
     }
 }
