@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Main.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Data
 {
@@ -10,8 +11,10 @@ namespace Main.Data
     {
         public static void Seed(BamsDbContext context)
         {
-            context.Database.EnsureCreated();
-            DataAPIConnect.loadModules(context);
+            context.Database.Migrate();
+            DataAPIConnect apiContext = new DataAPIConnect();
+            apiContext.loadModules(context);
+            
             if (context.Assets.Any())
             {
                 return;   // DB has been seeded
