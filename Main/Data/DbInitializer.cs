@@ -25,7 +25,7 @@ namespace Main.Data
                 ShortDescription = "The Server which controls access to a number of virtual machines",
                 LongDescription = "Reports on statuses of different instances.",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.typeID.Equals("Server")).First()
+                typeID = context.AssetTypes.Where(A => A.typeID.Equals("Server")).First().typeID
             };
 
             Asset asset2 = new Asset
@@ -34,7 +34,7 @@ namespace Main.Data
                 ShortDescription = "Gains information from the Vulnerability Analysis Service",
                 LongDescription = "Information on particular Vulnerabilities which are present on our systems.",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.typeID.Equals("Server")).First()
+                typeID = context.AssetTypes.Where(A => A.typeID.Equals("Server")).First().typeID
             };
 
             Asset asset3 = new Asset
@@ -43,7 +43,7 @@ namespace Main.Data
                 ShortDescription = "Gives information on the current Status of Various Certificates",
                 LongDescription = "Lists system certificates and all of their statuses.",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.typeID.Equals("Database")).First()
+                typeID = context.AssetTypes.Where(A => A.typeID.Equals("Database")).First().typeID
             };
 
             Asset asset4 = new Asset
@@ -52,18 +52,18 @@ namespace Main.Data
                 ShortDescription = "Gives NFL passing stats because it's a CSV I had handy.",
                 LongDescription = "Throwing a Football",
                 isPreferredAsset = true,
-                assetType = context.AssetTypes.Where(A => A.typeID.Equals("CSV File")).First()
+                typeID = context.AssetTypes.Where(A => A.typeID.Equals("CSV File")).First().typeID
             };
 
             Module csvModule = context.Modules.Where(M => M.moduleName.Equals("CSVImporter")).First();
-            AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID);
+            //AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID);
 
             context.Assets.Add(asset1);
             context.Assets.Add(asset2);
             context.Assets.Add(asset3);
             context.Assets.Add(asset4);
 
-            context.AssetModules.Add(csvTestModule);
+            //context.AssetModules.Add(csvTestModule);
 
             TaskQueue task1 = new TaskQueue
             {

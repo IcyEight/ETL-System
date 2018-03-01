@@ -19,6 +19,8 @@ namespace Main.Data
             AssetType db = new AssetType("Database");
             AssetType csv = new AssetType("CSV File");
 
+
+
             moduleLoad.Add(new Models.Module("VM Server", server.typeID, "www.abc.com", "user:user,pw:password"));
             moduleLoad.Add(new Models.Module("Vulnerability Checker", server.typeID, "www.vulCheck.com", "user:user,pw:password"));
             moduleLoad.Add(new Models.Module("Certificate Database", db.typeID, "connectionString", "user:user,pw:password"));
@@ -30,6 +32,9 @@ namespace Main.Data
             {
                 if(context.Modules.Where(M => M.moduleName.Equals(mod.moduleName)).Count() == 0)
                 {
+                    context.AssetTypes.Add(server);
+                    context.AssetTypes.Add(db);
+                    context.AssetTypes.Add(csv);
                     context.Modules.Add(mod);
                 }
             }
