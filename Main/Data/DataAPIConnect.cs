@@ -19,10 +19,10 @@ namespace Main.Data
             AssetType db = new AssetType("Database");
             AssetType csv = new AssetType("CSV File");
 
-            moduleLoad.Add(new Models.Module("VM Server", server, "www.abc.com", "user:user,pw:password"));
-            moduleLoad.Add(new Models.Module("Vulnerability Checker", server, "www.vulCheck.com", "user:user,pw:password"));
-            moduleLoad.Add(new Models.Module("Certificate Database", db, "connectionString", "user:user,pw:password"));
-            moduleLoad.Add(new Models.Module("CSVImporter", csv, Directory.GetCurrentDirectory() + "/Data/test.csv", Directory.GetCurrentDirectory() + "/Data/testSchema.txt"));
+            moduleLoad.Add(new Models.Module("VM Server", server.typeID, "www.abc.com", "user:user,pw:password"));
+            moduleLoad.Add(new Models.Module("Vulnerability Checker", server.typeID, "www.vulCheck.com", "user:user,pw:password"));
+            moduleLoad.Add(new Models.Module("Certificate Database", db.typeID, "connectionString", "user:user,pw:password"));
+            moduleLoad.Add(new Models.Module("CSVImporter", csv.typeID, Directory.GetCurrentDirectory() + "/Data/test.csv", Directory.GetCurrentDirectory() + "/Data/testSchema.txt"));
 
             //End Dummy Load 
 
@@ -43,8 +43,8 @@ namespace Main.Data
                 Models.Module temp = context.Modules.Where(M => M.moduleID == module.moduleID).First();
                 if (temp.moduleName.Equals("CSVImporter"))
                 {
-                    StreamReader csv = File.OpenText(module.module.detail1);
-                    StreamReader schema = File.OpenText(module.module.detail2);
+                    StreamReader csv = File.OpenText(temp.detail1);
+                    StreamReader schema = File.OpenText(temp.detail2);
                     LoadCSV(module, context, csv, schema); 
                 }
                 else
@@ -56,6 +56,7 @@ namespace Main.Data
 
         public static void GenerateDatabaseEntries(AssetModule module, BamsDbContext context, DataElements input, List<DataSchema> inputSch)
         {
+            Asset tempAsset = context.Assets.Where(A => A.AssetId == module.assetID).First();
             context.Schemas.AddRange(inputSch);
             int i = 0;
             foreach(Dictionary<String, String> row in input.rowEntries)
@@ -63,10 +64,10 @@ namespace Main.Data
                 foreach(DataSchema s in inputSch)
                 {
                     if (context.AssetData.Any(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName))){
-                        context.AssetData.Update(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, module.asset));
+                        context.AssetData.Update(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
                     } else
                     {
-                        context.AssetData.Add(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, module.asset));
+                        context.AssetData.Add(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
                     }
 
                 }
@@ -78,6 +79,7 @@ namespace Main.Data
 
         public static void LoadCSV(AssetModule module, BamsDbContext context, StreamReader csv, StreamReader importSchema)
         {
+            Models.Module tempModule = context.Modules.Where(M => M.moduleID == module.moduleID).First();
             DataElements dataImport = new DataElements();
             String[] colNames = null;
             List<DataSchema> entries = new List<DataSchema>();
@@ -107,7 +109,7 @@ namespace Main.Data
 
            String schemaName = null;
            int count = 0;
-           AssetType assetType = module.module.type;
+           String assetTypeID = tempModule.typeID;
 
            while (importSchema.Peek() >= 0)
            {
@@ -119,12 +121,12 @@ namespace Main.Data
                 }
                 else if (count == 1)
                 {
-                    entries.Add(new DataSchema(schemaName, cols[0], cols[1], true, assetType));
+                    entries.Add(new DataSchema(schemaName, cols[0], cols[1], true, assetTypeID));
 
                 }
                 else
                 {
-                    entries.Add(new DataSchema(schemaName, cols[0], cols[1], false, assetType));
+                    entries.Add(new DataSchema(schemaName, cols[0], cols[1], false, assetTypeID));
                 }
                 count++;
 

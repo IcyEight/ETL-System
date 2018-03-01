@@ -51,7 +51,7 @@ namespace Main.Controllers
             deletedAsset.ShortDescription = shortDescription;
             deletedAsset.LongDescription = longDescription;
             deletedAsset.isPreferredAsset = isPreferredAsset;
-            deletedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType)).First();
+            deletedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType)).First();
             deletedAsset.isDeleted = true;
 
             _dbcontext.Update(deletedAsset);
@@ -70,7 +70,7 @@ namespace Main.Controllers
             modifiedAsset.ShortDescription = shortDescription;
             modifiedAsset.LongDescription = longDescription;
             modifiedAsset.isPreferredAsset = isPreferredAsset;
-            modifiedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType)).First();
+            modifiedAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType)).First();
             modifiedAsset.isDeleted = false;
 
             _dbcontext.Update(modifiedAsset);
@@ -89,7 +89,7 @@ namespace Main.Controllers
             newAsset.ShortDescription = shortDescription;
             newAsset.LongDescription = longDescription;
             newAsset.isPreferredAsset = isPreferredAsset;
-            newAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType)).First();
+            newAsset.assetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType)).First();
             newAsset.isDeleted = false;
 
             _dbcontext.Assets.Add(newAsset);

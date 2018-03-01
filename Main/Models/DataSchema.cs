@@ -16,15 +16,15 @@ namespace Main.Models
         public String fieldName { get; set; }
         public String fieldType { get; set; }
         public Boolean isPrimary { get; set; }
-        public AssetType assetType { get; set; }
+        public String assetTypeID { get; set; }
 
-        public DataSchema(String schName, String name, String type, Boolean primary, AssetType assetT)
+        public DataSchema(String schName, String name, String type, Boolean primary, String typeID)
         {
             schemaName = schName;
             fieldName = name;
             fieldType = type;
             isPrimary = primary;
-            assetType = assetT;
+            assetTypeID = typeID;
         }
     }
 }

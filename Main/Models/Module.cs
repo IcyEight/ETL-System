@@ -12,7 +12,7 @@ namespace Main.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int moduleID { get; set; }
-        public AssetType type { get; set; }
+        public String typeID { get; set; }
         public String moduleName { get; set; }
         public String detail1 { get; set; }
         public String detail2 { get; set; }
@@ -25,10 +25,10 @@ namespace Main.Models
 
         }
 
-        public Module(String n, AssetType assetT, String det1, String det2)
+        public Module(String n, String assetTypeID, String det1, String det2)
         {
             moduleName = n;
-            type = assetT;
+            typeID = assetTypeID;
             detail1 = det1;
             detail2 = det2;
         }
