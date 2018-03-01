@@ -25,14 +25,14 @@ namespace Main.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            ViewBag.Title = "Registration";
+            ViewBag.Title = "Registration Page";
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel vm)
         {
-            ViewBag.Title = "Registration";
+            ViewBag.Title = "Registration Page";
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { Email = vm.Email, UserName = vm.Email };
@@ -56,14 +56,14 @@ namespace Main.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            ViewBag.Title = "Login";
+            ViewBag.Title = "Login Page";
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel vm)
         {
-            ViewBag.Title = "Login";
+            ViewBag.Title = "Login Page";
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, false); // false means don’t lock user out if log in is invalid
