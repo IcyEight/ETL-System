@@ -6,21 +6,28 @@ using Main.Models;
 using Main.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Main.Controllers
 {
     public class AssetController : Controller
     {
 		private readonly BamsDbContext _dbcontext;
+        private readonly ILogger _logger;
 
-		public AssetController(BamsDbContext dbcontext)
+        public AssetController(BamsDbContext dbcontext, ILogger<AssetController> logger)
 		{
 			_dbcontext = dbcontext;
+            _logger = logger;
 		}
 
         // GET: /<controller>/
         public ViewResult List()
         {
+            _logger.LogTrace("TRACE");
+            _logger.LogDebug("DEBUG");
+            _logger.LogInformation("INFORMATION");
+            _logger.LogError("ERROR");
 			ViewBag.Title = "All Assets";
 			AssetListViewModel vm = new AssetListViewModel();
             fetchAssetData();
