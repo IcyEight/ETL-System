@@ -26,8 +26,8 @@ namespace Main
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>);
+(
             string connectionKey = "DefaultConnection";
             if (DetectOS() == 2) connectionKey = "MacOSX_DefaultConnection";               
             services.AddDbContext<BamsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(connectionKey)));
