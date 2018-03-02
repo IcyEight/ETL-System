@@ -52,13 +52,22 @@ namespace Main.Controllers
 
         public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
+            IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType));
+
             Asset deletedAsset = new Asset();
             deletedAsset.AssetId = assetId;
             deletedAsset.AssetName = name;
             deletedAsset.ShortDescription = shortDescription;
             deletedAsset.LongDescription = longDescription;
             deletedAsset.isPreferredAsset = isPreferredAsset;
-            deletedAsset.typeID = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType)).First().typeID;
+            if (findAssetType.Any())
+            {
+                deletedAsset.typeID = findAssetType.First().typeID;
+            } else
+            {
+                deletedAsset.typeID = null;
+            }
+            
             deletedAsset.isDeleted = true;
 
             _dbcontext.Update(deletedAsset);
@@ -71,13 +80,22 @@ namespace Main.Controllers
 
         public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
+            IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType));
+
             Asset modifiedAsset = new Asset();
             modifiedAsset.AssetId = assetId;
             modifiedAsset.AssetName = name;
             modifiedAsset.ShortDescription = shortDescription;
             modifiedAsset.LongDescription = longDescription;
             modifiedAsset.isPreferredAsset = isPreferredAsset;
-            modifiedAsset.typeID = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType)).First().typeID;
+            if (findAssetType.Any())
+            {
+                modifiedAsset.typeID = findAssetType.First().typeID;
+            }
+            else
+            {
+                modifiedAsset.typeID = null;
+            }
             modifiedAsset.isDeleted = false;
 
             _dbcontext.Update(modifiedAsset);
@@ -90,13 +108,22 @@ namespace Main.Controllers
 
         public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
+            IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType));
+
             Asset newAsset = new Asset();
             newAsset.AssetId = assetId;
             newAsset.AssetName = name;
             newAsset.ShortDescription = shortDescription;
             newAsset.LongDescription = longDescription;
             newAsset.isPreferredAsset = isPreferredAsset;
-            newAsset.typeID = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType)).First().typeID;
+            if (findAssetType.Any())
+            {
+                newAsset.typeID = findAssetType.First().typeID;
+            }
+            else
+            {
+                newAsset.typeID = null;
+            }
             newAsset.isDeleted = false;
 
             _dbcontext.Assets.Add(newAsset);
