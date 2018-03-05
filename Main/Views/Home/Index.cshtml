@@ -1,63 +1,56 @@
 ﻿@model HomeViewModel
 
-<html>
-<head></head>
-<body>
-    <nav class="navbar navbar-inverse  navbar-default">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
+<nav class="navbar navbar-inverse  navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="active"><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
-                    <li><a href="@Url.Action("List","Asset")">Asset</a></li>
-                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
-                    <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
-                </ul>
-            </div><!-- /.navbar-collapse -->
-        </div><!-- /.container-fluid -->
-    </nav>
-
-    <div class="page-header no-padding no-margin">
-        <div class="container">
-            <img src="http://www.careerarc.com/blog/wp-content/uploads/2013/11/bayada_logo.jpg"
-                 class="img-responsive center-block"
-                 style="max-width:500px;max-height:100px;margin-top:-7px" />
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="active"><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
+                <li><a href="@Url.Action("List","Asset")">Asset</a></li>
+                <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
+                <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
+            </ul>
         </div>
     </div>
-    <div>
-        @{
-            <!-- <h2 align="center">@ViewBag.Title</h2> --> 
-            foreach (var asset in Model.PreferredAssets)
-            {
-                <div class="col-sm-4 col-lg-4 col-md-4">
-                    <div class="thumbnail">
-                        <div class="caption">
-                            <h3 class="pull-right">@asset.AssetId.ToString()</h3>
-                            <h3>
-                                <a>@asset.AssetName</a>
-                            </h3>
-                            <p>@asset.ShortDescription</p>
-                        </div>
+</nav>
+<div class="no-padding no-margin">
+    <div class="container">
+        <img src="http://www.careerarc.com/blog/wp-content/uploads/2013/11/bayada_logo.jpg"
+                class="img-responsive center-block"
+                style="max-width:500px;max-height:100px;margin-top:-7px" />
+    </div>
+</div>
+<br />
+
+<div class="row" style="margin-left:1px !important; margin-right:1px !important">
+    @{
+        foreach (var asset in Model.PreferredAssets)
+        {
+            <div class="col-sm-4 col-lg-4 col-md-4">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3 class="pull-right">@asset.AssetId.ToString()</h3>
+                        <h3>
+                            <a>@asset.AssetName</a>
+                        </h3>
+                        <p>@asset.ShortDescription</p>
                     </div>
                 </div>
-            }
+            </div>
         }
-    </div>
-</body>
-</html>
+    }
+</div>
 
 
 <script type="text/javascript">
-    $('#buttonid').click(function () {
-        document.location = '@Url.Action("ActionName","ControllerName")';
-    });
+
 </script>
 
