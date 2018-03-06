@@ -103,9 +103,16 @@
                 tName: taskName
             },
             complete: function (data) {
-                // refresh data in grid to reflect changes
-                //$("#taskQueueGrid").jsGrid("loadData");
-                window.location.reload();
+                var response = JSON.parse(data.responseText);
+
+                if (response.wasComplete == true) {
+                    // task already complete message to user
+                    window.alert(response.message);
+                }
+                else {
+                    // refresh page
+                    window.location.reload();
+                }
             }
         });
     }

@@ -9,6 +9,7 @@ using Main.Models;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Controllers
 {
@@ -60,19 +61,44 @@ namespace Main.Controllers
         }
 
         // mark task from the task queue as complete
-        public void MarkTaskAsComplete(int assetId, string alertMsg, string tName)
+        public JsonResult MarkTaskAsComplete(int assetId, string alertMsg, string tName)
         {
-            // create modified task object
-            TaskQueue modifiedTask = new TaskQueue();
-            modifiedTask.AssetId = assetId;
-            modifiedTask.isComplete = true;
-            modifiedTask.resolvedBy = "Cashel, Bridget";    // hardcoding until we get user context with authentication working
-            modifiedTask.dateComplete = DateTime.Now;
-            modifiedTask.alertMessage = alertMsg;
-            modifiedTask.Name = tName;
+            bool isComplete = CheckIfTaskComplete(assetId);
 
-            _dbcontext.Update(modifiedTask);
-            _dbcontext.SaveChanges();
+            if (isComplete == true)
+            {
+                return Json(new { wasComplete = true, message = "The task you selected has already been marked complete.  Please select another task." });
+            }
+            else
+            {
+                // create modified task object
+                TaskQueue modifiedTask = new TaskQueue();
+                modifiedTask.AssetId = assetId;
+                modifiedTask.isComplete = true;
+                modifiedTask.resolvedBy = "Cashel, Bridget";    // hardcoding until we get user context with authentication working
+                modifiedTask.dateComplete = DateTime.Now;
+                modifiedTask.alertMessage = alertMsg;
+                modifiedTask.Name = tName;
+
+                _dbcontext.Update(modifiedTask);
+                _dbcontext.SaveChanges();
+
+                return Json(new { wasComplete = false, message = "Successfully marked task as complete." });
+            }
+        }
+
+        public bool CheckIfTaskComplete(int assetId)
+        {
+            var task = _dbcontext.TaskQueues.AsNoTracking().Where(x => x.AssetId == assetId).FirstOrDefault();
+
+            if (task != null)
+            {
+                return task.isComplete;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
