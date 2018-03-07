@@ -10,6 +10,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Main.Controllers
 {
@@ -71,11 +73,16 @@ namespace Main.Controllers
             }
             else
             {
+                // get current user
+                var user = User.Identity.GetUserId();
+                var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+                string resolvingUser = userDetails.UserName;
+
                 // create modified task object
                 TaskQueue modifiedTask = new TaskQueue();
                 modifiedTask.AssetId = assetId;
                 modifiedTask.isComplete = true;
-                modifiedTask.resolvedBy = "Cashel, Bridget";    // hardcoding until we get user context with authentication working
+                modifiedTask.resolvedBy = resolvingUser;
                 modifiedTask.dateComplete = DateTime.Now;
                 modifiedTask.alertMessage = alertMsg;
                 modifiedTask.Name = tName;
