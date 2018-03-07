@@ -8,6 +8,7 @@ namespace Main.ViewModels
 {
     public class TaskQueueViewModel
     {
+        // Display model converts all fields to strings to be displayed on the grid
         public IEnumerable<TaskQueueDisplayModel> TaskQueue { get; set; }
     }
 }

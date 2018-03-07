@@ -13,5 +13,6 @@ namespace Main.ViewModels
         public String resolvedBy { get; set; }
         public string isComplete { get; set; }
         public string dateComplete { get; set; }
+        public string assignee { get; set; }
     }
 }

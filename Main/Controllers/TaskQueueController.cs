@@ -34,14 +34,21 @@ namespace Main.Controllers
 
         public List<TaskQueueDisplayModel> GetTasksList()
         {
-            List<TaskQueueDisplayModel> taskList = _dbcontext.TaskQueues.Where(x => x.dateComplete == null || x.dateComplete > DateTime.Now.AddDays(-7)).Select(x => new TaskQueueDisplayModel
+            // get current user
+            var user = User.Identity.GetUserId();
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            string currentUser = userDetails.UserName;
+
+            // get tasks assigned to current user that are either not complete or have been completed within the past week
+            List<TaskQueueDisplayModel> taskList = _dbcontext.TaskQueues.Where(x => (x.assignee == currentUser) && (x.dateComplete == null || x.dateComplete > DateTime.Now.AddDays(-7))).Select(x => new TaskQueueDisplayModel
             {
                 AssetId = x.AssetId,
                 Name = x.Name,
                 alertMessage = x.alertMessage,
                 resolvedBy = x.resolvedBy,
                 dateComplete = x.dateComplete == null ? null : x.dateComplete.Value.ToShortDateString(),
-                isComplete = x.isComplete == true ? "complete" : "incomplete"
+                isComplete = x.isComplete == true ? "complete" : "incomplete",
+                assignee = x.assignee
             }).ToList();
 
             return taskList;
@@ -49,21 +56,28 @@ namespace Main.Controllers
 
         public JsonResult GetTasksWebView()
         {
-            List<TaskQueueDisplayModel> taskList = _dbcontext.TaskQueues.Where(x => x.dateComplete == null || x.dateComplete > DateTime.Now.AddDays(-7)).Select(x => new TaskQueueDisplayModel
+            // get current user
+            var user = User.Identity.GetUserId();
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            string currentUser = userDetails.UserName;
+
+            // get tasks assigned to current user that are either not complete or have been completed within the past week
+            List<TaskQueueDisplayModel> taskList = _dbcontext.TaskQueues.Where(x => (x.assignee == currentUser) && (x.dateComplete == null || x.dateComplete > DateTime.Now.AddDays(-7))).Select(x => new TaskQueueDisplayModel
             {
                 AssetId = x.AssetId,
                 Name = x.Name,
                 alertMessage = x.alertMessage,
                 resolvedBy = x.resolvedBy,
                 dateComplete = x.dateComplete == null ? null : x.dateComplete.Value.ToShortDateString(),
-                isComplete = x.isComplete == true ? "complete" : "incomplete"
+                isComplete = x.isComplete == true ? "complete" : "incomplete",
+                assignee = x.assignee
             }).ToList();
 
             return Json(taskList);
         }
 
         // mark task from the task queue as complete
-        public JsonResult MarkTaskAsComplete(int assetId, string alertMsg, string tName)
+        public JsonResult MarkTaskAsComplete(int assetId, string alertMsg, string tName, string tAssignee)
         {
             bool isComplete = CheckIfTaskComplete(assetId);
 
@@ -73,7 +87,7 @@ namespace Main.Controllers
             }
             else
             {
-                // get current user
+                // get current user (user resolving the task)
                 var user = User.Identity.GetUserId();
                 var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
                 string resolvingUser = userDetails.UserName;
@@ -86,6 +100,7 @@ namespace Main.Controllers
                 modifiedTask.dateComplete = DateTime.Now;
                 modifiedTask.alertMessage = alertMsg;
                 modifiedTask.Name = tName;
+                modifiedTask.assignee = tAssignee;
 
                 _dbcontext.Update(modifiedTask);
                 _dbcontext.SaveChanges();

@@ -75,8 +75,9 @@
                 { name: "assetId", visible: false, width: 0 },
                 { name: "name", title: "Name", width: 50 },
                 { name: "alertMessage", title: "Action Required", width: 100 },
+                { name: "assignee", title: "Assignee", width: 75},
                 { name: "isComplete", title: "Status", width: 50 },
-                { name: "resolvedBy", title: "Completed By", width: 100 },
+                { name: "resolvedBy", title: "Completed By", width: 75 },
                 { name: "dateComplete", title: "Date Completed", width: 50 },
                 {
                     itemTemplate: function (_, item) {
@@ -94,13 +95,16 @@
         var id = item.assetId;
         var alertMessage = item.alertMessage;
         var taskName = item.name;
+        var assignee = item.assignee;
+
         $.ajax({
             url: "/TaskQueue/MarkTaskAsComplete",
             dataType: 'application/json',
             data: {
                 assetId: id,
                 alertMsg: alertMessage,
-                tName: taskName
+                tName: taskName,
+                tAssignee: assignee
             },
             complete: function (data) {
                 var response = JSON.parse(data.responseText);

@@ -17,5 +17,6 @@ namespace Main.Models
         public String resolvedBy { get; set; }
         public bool isComplete { get; set; }
         public DateTime? dateComplete { get; set; }
+        public String assignee { get; set; }
     }
 }
