@@ -18,5 +18,6 @@ namespace Main.Models
 		public bool isPreferredAsset { get; set; }
 		public String typeID { get; set; }
         public bool isDeleted { get; set; }
+        public String Owner { get; set; }
     }
 }

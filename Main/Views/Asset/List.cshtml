@@ -67,14 +67,18 @@
                 <label for="assetType">Asset Type</label>
                 <select id="assetType" name="assetType" />
                 <!-- these options should be pulled in as the names of the AssetTypes of the DB-->
-                    <option value="">Select..</option>
-                    <option value="1">Database</option>
-                    <option value="2">Server</option>
+                <option value="">Select..</option>
+                <option value="1">Database</option>
+                <option value="2">Server</option>
                 </select>
             </div>
             <div class="details-form-field">
                 <label for="isPreferredAsset"> Is Preferred Asset</label>
                 <input type="checkbox" id="isPreferredAsset" name="isPreferredAsset">
+            </div>
+            <div class="details-form-field">
+                <label for="owner">Owner</label>
+                <input id="owner" name="owner" type="text" />
             </div>
             <div class="details-form-field">
                 <button type="submit" id="save">Save</button>
@@ -113,7 +117,7 @@
             },
             deleteConfirm: function (item) {
                 deletedItem = item;
-                return "The asset \"" + item.name + "\" will be removed. Are you sure?";
+                return "The asset \"" + item.assetName + "\" will be removed. Are you sure?";
             },
             onItemDeleted: function (item) {
                 $.ajax({
@@ -122,7 +126,7 @@
                     dataType: 'application/json',
                     data: {
                         assetId: deletedItem.assetId,
-                        assetName: deletedItem.name,
+                        assetName: deletedItem.assetName,
                         shortDescription: deletedItem.shortDescription,
                         longDescription: deletedItem.longDescription,
                         isPreferredAsset: deletedItem.isPreferredAsset,
@@ -140,6 +144,7 @@
                 var assetLongDescription = $("#longDescription").val();
                 var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
                 var assetType = $("#assetType").val();
+                var ownerName = $("#owner").val();
 
                 $.ajax({
                     url: "/Asset/ModifyAsset",
@@ -150,14 +155,24 @@
                         shortDescription: assetShortDescription,
                         longDescription: assetLongDescription,
                         isPreferredAsset: isPreferredAsset,
-                        assetType: assetType
+                        assetType: assetType,
+                        owner: ownerName
                     },
                     complete: function (data) {
-                        $("#assetDialog").dialog("close");
+                        var response = JSON.parse(data.responseText);
 
-                        var updatedAssetList = JSON.parse(data["responseText"]);
-                        var uAL = updatedAssetList["value"];
-                        buildAssetGrid(uAL);
+                        if (response.validOwner == false) {
+                            // invalid owner message to user
+                            window.alert(response.message);
+                        }
+                        else {
+                            // refresh assets list
+                            $("#assetDialog").dialog("close");
+
+                            var updatedAssetList = JSON.parse(data["responseText"]);
+                            var uAL = updatedAssetList["value"];
+                            buildAssetGrid(uAL);
+                        }
                     }
                 });
             },
@@ -168,6 +183,7 @@
                 var assetLongDescription = $("#longDescription").val();
                 var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
                 var assetType = $("#assetType").val();
+                var ownerName = $("#owner").val();
 
 
                 $.ajax({
@@ -179,14 +195,24 @@
                         shortDescription: assetShortDescription,
                         longDescription: assetLongDescription,
                         isPreferredAsset: isPreferredAsset,
-                        assetType: assetType
+                        assetType: assetType,
+                        owner: ownerName
                     },
                     complete: function (data) {
-                        $("#assetDialog").dialog("close");
+                        var response = JSON.parse(data.responseText);
 
-                        var updatedAssetList = JSON.parse(data["responseText"]);
-                        var uAL = updatedAssetList["value"];
-                        buildAssetGrid(uAL);
+                        if (response.validOwner == false) {
+                            // invalid owner message to user
+                            window.alert(response.message);
+                        }
+                        else {
+                            // refresh assets list
+                            $("#assetDialog").dialog("close");
+
+                            var updatedAssetList = JSON.parse(data["responseText"]);
+                            var uAL = updatedAssetList["value"];
+                            buildAssetGrid(uAL);
+                        }
                     }
                 });
             },
@@ -197,6 +223,7 @@
                 { name: "longDescription", title: "Long Description", width: 100 },
                 { name: "isPreferredAsset", title: "Is Preferred Asset", width: 50 },
                 { name: "assetType", width: 0, visible: false },
+                {name: "owner", title: "Owner", width:50},
                 {
                     type: "control",
                     modeSwitchButton: false,
@@ -211,13 +238,14 @@
             ]
         });
 
-        var showDetailsDialog = function(dialogType, arg) {
+        var showDetailsDialog = function (dialogType, arg) {
             $("#assetId").val(arg.assetId);
             $("#assetName").val(arg.assetName);
             $("#shortDescription").val(arg.shortDescription);
             $("#longDescription").val(arg.longDescription);
             document.getElementById("isPreferredAsset").checked = arg.isPreferredAsset;
             $("#assetType").val(arg.assetType);
+            $("#owner").val(arg.owner);
 
 
             formSubmitHandler = function () {
@@ -244,14 +272,10 @@
 
         $("#assetForm").validate({
             rules: {
-                name: "required",
+                assetName: "required",
                 shortDescription: "required",
-                longDescription: "required"
-            },
-            messages: {
-                description: "Please enter name",
-                unit: "Please enter short description",
-                aisle: "Please enter long description"
+                longDescription: "required",
+                owner: "required"
             },
             submitHandler: function () {
                 formSubmitHandler();

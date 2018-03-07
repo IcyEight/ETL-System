@@ -78,8 +78,15 @@ namespace Main.Controllers
             return Json(updatedAssetList);
         }
 
-        public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
+        public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner)
         {
+            // check provided owner is a registered user in the database
+            var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
+            if (userDetails == null)
+            {
+                return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
+            }
+
             IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType));
 
             Asset modifiedAsset = new Asset();
@@ -88,6 +95,8 @@ namespace Main.Controllers
             modifiedAsset.ShortDescription = shortDescription;
             modifiedAsset.LongDescription = longDescription;
             modifiedAsset.isPreferredAsset = isPreferredAsset;
+            modifiedAsset.Owner = owner;
+
             if (findAssetType.Any())
             {
                 modifiedAsset.typeID = findAssetType.First().typeID;
@@ -106,8 +115,15 @@ namespace Main.Controllers
             return Json(updatedAssetList);
         }
 
-        public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
+        public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner)
         {
+            // check provided owner is a registered user in the database
+            var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
+            if (userDetails == null)
+            {
+                return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
+            }
+
             IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID.Equals(assetType));
 
             Asset newAsset = new Asset();
@@ -116,6 +132,8 @@ namespace Main.Controllers
             newAsset.ShortDescription = shortDescription;
             newAsset.LongDescription = longDescription;
             newAsset.isPreferredAsset = isPreferredAsset;
+            newAsset.Owner = owner;
+
             if (findAssetType.Any())
             {
                 newAsset.typeID = findAssetType.First().typeID;
