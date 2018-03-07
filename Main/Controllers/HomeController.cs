@@ -24,7 +24,7 @@ namespace Main.Controllers
         {
             var homeViewModel = new HomeViewModel
             {
-                PreferredAssets = _dbcontext.Assets.Where(m => m.isPreferredAsset).ToList()
+                PreferredAssets = _dbcontext.Assets.Where(m => m.isPreferredAsset &&  !m.isDeleted).ToList()
             };
             return View(homeViewModel);
         }
