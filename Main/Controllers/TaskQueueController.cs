@@ -10,8 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using System.Security.Claims;
 
 namespace Main.Controllers
 {
@@ -35,7 +34,7 @@ namespace Main.Controllers
         public List<TaskQueueDisplayModel> GetTasksList()
         {
             // get current user
-            var user = User.Identity.GetUserId();
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
             string currentUser = userDetails.UserName;
 
@@ -57,7 +56,7 @@ namespace Main.Controllers
         public JsonResult GetTasksWebView()
         {
             // get current user
-            var user = User.Identity.GetUserId();
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
             string currentUser = userDetails.UserName;
 
@@ -88,7 +87,7 @@ namespace Main.Controllers
             else
             {
                 // get current user (user resolving the task)
-                var user = User.Identity.GetUserId();
+                var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
                 string resolvingUser = userDetails.UserName;
 

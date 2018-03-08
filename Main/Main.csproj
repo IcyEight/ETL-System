@@ -8,11 +8,11 @@
   <ItemGroup>
     <Compile Remove="Migrations\20180223000239_Test.cs" />
     <Compile Remove="Migrations\20180223000239_Test.Designer.cs" />
+    <Compile Remove="Migrations\20180308214522_UserId.cs" />
+    <Compile Remove="Migrations\20180308214522_UserId.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
