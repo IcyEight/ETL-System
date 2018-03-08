@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Main.Data;
 using Main.ViewModels;
-using Main.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Controllers
 {
+    [Authorize]
     public class ReportingController : Controller
     {
         private readonly BamsDbContext _dbcontext;

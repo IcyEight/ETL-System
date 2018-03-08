@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using Main.ViewModels;
-using Main.Models;
-using Main.Data;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using Main.Data;
+using Main.Models;
+using Main.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Controllers
 {
+    [Authorize]
     public class AssetController : Controller
     {
 		private readonly BamsDbContext _dbcontext;

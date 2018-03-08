@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Main.Data;
-using Main.ViewModels;
-using Main.Models;
-using System.Data;
-using System.Data.SqlClient;
-using System.Configuration;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Main.Data;
+using Main.Models;
+using Main.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Controllers
 {
+    [Authorize]
     public class TaskQueueController : Controller
     {
         private readonly BamsDbContext _dbcontext;
