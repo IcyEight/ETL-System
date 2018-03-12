@@ -1,0 +1,29 @@
+﻿<Config>
+  <AssetTypes>
+    <AssetType name="Server"/>
+    <AssetType name="Database"/>
+    <AssetType name="CSV File"/>
+  </AssetTypes>
+  <Modules>
+    <Module name="VM Server">
+      <Type>Server</Type>
+      <Detail id="1">www.abc.com</Detail>
+      <Detail id="2">user:user, pw:password</Detail>
+    </Module>
+    <Module name="Vulnerability Checker">
+      <Type>Server</Type>
+      <Detail id="1">www.abc.com</Detail>
+      <Detail id="2">user:user, pw:password</Detail>
+    </Module>
+    <Module name="Certificate Database">
+      <Type>Database</Type>
+      <Detail id="1">www.abc.com</Detail>
+      <Detail id="2">user:user, pw:password</Detail>
+    </Module>
+    <Module name="CSVImporter">
+      <Type>CSV File</Type>
+      <Detail id="1">/Data/test.csv</Detail>
+      <Detail id="2">/Data/testSchema.txt</Detail>
+    </Module>
+  </Modules>
+</Config>

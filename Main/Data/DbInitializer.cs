@@ -12,8 +12,8 @@ namespace Main.Data
         public static void Seed(BamsDbContext context)
         {
             context.Database.Migrate();
-            DataAPIConnect.loadModules(context);
-            
+
+            DataAPIConnect.loadConfigurationXml(context);
             if (context.Assets.Any())
             {
                 return;   // DB has been seeded
@@ -55,15 +55,10 @@ namespace Main.Data
                 typeID = context.AssetTypes.Where(A => A.typeID.Equals("CSV File")).First().typeID
             };
 
-            Module csvModule = context.Modules.Where(M => M.moduleName.Equals("CSVImporter")).First();
-            //AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID);
-
             context.Assets.Add(asset1);
             context.Assets.Add(asset2);
             context.Assets.Add(asset3);
             context.Assets.Add(asset4);
-
-            //context.AssetModules.Add(csvTestModule);
 
             TaskQueue task1 = new TaskQueue
             {
@@ -126,6 +121,13 @@ namespace Main.Data
             context.Reportings.Add(report1);
             context.Reportings.Add(report2);
             context.Reportings.Add(report3);
+
+            context.SaveChanges();
+
+            Module csvModule = context.Modules.Where(M => M.moduleName.Equals("CSVImporter")).First();
+            AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID);
+
+            context.AssetModules.Add(csvTestModule);
 
             context.SaveChanges();
         }

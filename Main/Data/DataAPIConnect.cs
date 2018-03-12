@@ -5,37 +5,69 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Main.Data
 {
+    /**
+     * So the AssetTypes and Modules are defined in 
+     * config.xml where they are registered. 
+     * Then the Asset is associated to a module using an AssetModule 
+     * Element and this is done for the pre-seeded Assets in DbInitializer.seed()
+     * and you can see how that is done so we can add it to the Asset Screen logic. 
+     */
     public class DataAPIConnect
     {
-        public static void loadModules(BamsDbContext context)
+        public static void loadConfigurationXml(BamsDbContext context)
         {
-            List<Models.Module> moduleLoad = new List<Models.Module>();
+            List<AssetType> assetTypes = new List<AssetType>();
+            List<Models.Module> modules = new List<Models.Module>();
+            XmlDocument config = new XmlDocument();
 
-            //Read in Config details _ currently Dummy Load
-            AssetType server = new AssetType("Server");
-            AssetType db = new AssetType("Database");
-            AssetType csv = new AssetType("CSV File");
+            config.Load("config.xml");
 
+            XmlNodeList typeEle = config.GetElementsByTagName("AssetType");
+            XmlNodeList modEle = config.GetElementsByTagName("Module");
 
+            foreach (XmlNode tEle in typeEle)
+            {
+                assetTypes.Add(new AssetType(tEle.Attributes["name"].Value));
+            }
+            registerAssetTypes(context, assetTypes);
 
-            moduleLoad.Add(new Models.Module("VM Server", server.typeID, "www.abc.com", "user:user,pw:password"));
-            moduleLoad.Add(new Models.Module("Vulnerability Checker", server.typeID, "www.vulCheck.com", "user:user,pw:password"));
-            moduleLoad.Add(new Models.Module("Certificate Database", db.typeID, "connectionString", "user:user,pw:password"));
-            moduleLoad.Add(new Models.Module("CSVImporter", csv.typeID, Directory.GetCurrentDirectory() + "/Data/test.csv", Directory.GetCurrentDirectory() + "/Data/testSchema.txt"));
+            foreach (XmlNode mEle in modEle)
+            {
+                Models.Module temp = new Models.Module(mEle.Attributes["name"].Value, mEle.SelectSingleNode("./Type").InnerText, mEle.SelectSingleNode("./Detail[@id=1]").InnerText, mEle.SelectSingleNode("./Detail[@id=2]").InnerText);
+                modules.Add(temp);
+            }
+            registerModules(context, modules);
+        }
 
-            //End Dummy Load 
+        public static void registerAssetTypes(BamsDbContext context, List<AssetType> typeList)
+        {
+            foreach (AssetType asset in typeList)
+            {
+                if (context.AssetTypes.Where(M => M.typeID.Equals(asset.typeID)).Count() == 0)
+                {
+                    context.AssetTypes.Add(asset);
+                } else
+                {
+                    context.AssetTypes.Update(asset);
+                }
+            }
+            context.SaveChanges();
+        }
 
+        public static void registerModules(BamsDbContext context, List<Models.Module> moduleLoad)
+        {
             foreach (Models.Module mod in moduleLoad)
             {
                 if(context.Modules.Where(M => M.moduleName.Equals(mod.moduleName)).Count() == 0)
                 {
-                    context.AssetTypes.Add(server);
-                    context.AssetTypes.Add(db);
-                    context.AssetTypes.Add(csv);
                     context.Modules.Add(mod);
+                } else
+                {
+                    context.Modules.Update(mod);
                 }
             }
             context.SaveChanges();
@@ -48,8 +80,8 @@ namespace Main.Data
                 Models.Module temp = context.Modules.Where(M => M.moduleID == module.moduleID).First();
                 if (temp.moduleName.Equals("CSVImporter"))
                 {
-                    StreamReader csv = File.OpenText(temp.detail1);
-                    StreamReader schema = File.OpenText(temp.detail2);
+                    StreamReader csv = File.OpenText(Directory.GetCurrentDirectory() + temp.detail1);
+                    StreamReader schema = File.OpenText(Directory.GetCurrentDirectory() + temp.detail2);
                     LoadCSV(module, context, csv, schema); 
                 }
                 else
