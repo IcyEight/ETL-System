@@ -68,7 +68,14 @@
                 <label for="assetType">Asset Type</label>
                 <select id="assetType" name="assetType" ; />
                 <!-- these options are pulled in as the names of the AssetTypes from the database -->
-                    <option value="">Select..</option>
+                <option value="">Select..</option>
+                </select>
+            </div>
+            <div class="details-form-field">
+                <label for="assetModule">Asset Module</label>
+                <select id="assetModule" name="assetModule" ; />
+                <!-- these options are pulled in as the names of the Modules from the database -->
+                <option value="">Select..</option>
                 </select>
             </div>
             <div class="details-form-field">
@@ -99,8 +106,9 @@
             }
         });
 
-        // add all asset types to form dynamically from database table on page load
+        // add all asset types and modules to form dynamically from database table on page load
         addAssetTypesToForm();
+        addAssetModulesToForm();
     });
 
     var deletedItem;
@@ -147,6 +155,7 @@
                 var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
                 var assetType = $("#assetType").val();
                 var ownerName = $("#owner").val();
+                var moduleNameSelection = $("#assetModule").val();
 
                 $.ajax({
                     url: "/Asset/ModifyAsset",
@@ -158,7 +167,8 @@
                         longDescription: assetLongDescription,
                         isPreferredAsset: isPreferredAsset,
                         assetType: assetType,
-                        owner: ownerName
+                        owner: ownerName,
+                        moduleName: moduleNameSelection
                     },
                     complete: function (data) {
                         var response = JSON.parse(data.responseText);
@@ -186,6 +196,7 @@
                 var isPreferredAsset = document.getElementById("isPreferredAsset").checked;
                 var assetType = $("#assetType").val();
                 var ownerName = $("#owner").val();
+                var moduleNameSelection = $("#assetModule").val();
 
 
                 $.ajax({
@@ -198,7 +209,8 @@
                         longDescription: assetLongDescription,
                         isPreferredAsset: isPreferredAsset,
                         assetType: assetType,
-                        owner: ownerName
+                        owner: ownerName,
+                        moduleName: moduleNameSelection
                     },
                     complete: function (data) {
                         var response = JSON.parse(data.responseText);
@@ -224,8 +236,9 @@
                 { name: "shortDescription", title: "Short Description", width: 100 },
                 { name: "longDescription", title: "Long Description", width: 100 },
                 { name: "isPreferredAsset", title: "Is Preferred Asset", width: 50 },
-                { name: "assetType", width: 0, visible: false },
-                {name: "owner", title: "Owner", width:50},
+                { name: "typeID", width: 0, visible: false },
+                { name: "owner", title: "Owner", width: 50 },
+                { name: "moduleID", title: "Module", width: 0, visible: false},
                 {
                     type: "control",
                     modeSwitchButton: false,
@@ -246,8 +259,9 @@
             $("#shortDescription").val(arg.shortDescription);
             $("#longDescription").val(arg.longDescription);
             document.getElementById("isPreferredAsset").checked = arg.isPreferredAsset;
-            $("#assetType").val(arg.assetType);
+            $("#assetType").val(arg.typeID);
             $("#owner").val(arg.owner);
+            $("#assetModule").val(arg.moduleID);
 
 
             formSubmitHandler = function () {
@@ -298,6 +312,24 @@
                     // add each asset type to dropdown selection
                     var value = i + 1;
                     $('<option>').val(value).text(assetType).appendTo('#assetType');
+                }
+            }
+        });
+    }
+
+    function addAssetModulesToForm() {
+        $.ajax({
+            url: "/Asset/GetAssetModules",
+            dataType: 'application/json',
+            complete: function (data) {
+                var response = JSON.parse(data.responseText);
+
+                for (var i = 0; i < response.length; i++) {
+                    var assetModule = response[i]["moduleName"];
+
+                    // add each asset type to dropdown selection
+                    var value = i + 1;
+                    $('<option>').val(value).text(assetModule).appendTo('#assetModule');
                 }
             }
         });
