@@ -66,7 +66,7 @@
             </div>
             <div class="details-form-field">
                 <label for="assetType">Asset Type</label>
-                <select id="assetType" name="assetType" onchange="testFunc()" ; />
+                <select id="assetType" name="assetType" ; />
                 <!-- these options are pulled in as the names of the AssetTypes from the database -->
                     <option value="">Select..</option>
                 </select>
@@ -283,11 +283,6 @@
                 formSubmitHandler();
             }
         });
-    }
-
-    function testFunc() {
-        window.alert("FUCK YEAH BITCHES")
-
     }
 
     function addAssetTypesToForm() {
