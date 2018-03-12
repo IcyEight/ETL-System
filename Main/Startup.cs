@@ -31,7 +31,18 @@ namespace Main
             if (DetectOS() == 2) connectionKey = "MacOSX_DefaultConnection";               
             services.AddDbContext<BamsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(connectionKey)));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                // Password settings following NIST guidelines
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                //should probably be true in actual use scenarios
+                //options.SignIn.RequireConfirmedEmail = true;
+                //options.User.RequireUniqueEmail = true;
+            })
             .AddEntityFrameworkStores<BamsDbContext>()
             .AddDefaultTokenProviders();
 
