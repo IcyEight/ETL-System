@@ -161,5 +161,12 @@ namespace Main.Controllers
                 DataAPIConnect.PerformDataProcessing(_dbcontext);
             }
         }
+
+        public JsonResult GetAssetTypes()
+        {
+            var assetTypes = _dbcontext.AssetTypes.ToList();
+
+            return Json(assetTypes);
+        }
     }
 }
