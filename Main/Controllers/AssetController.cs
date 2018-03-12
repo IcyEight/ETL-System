@@ -7,6 +7,7 @@ using Main.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace Main.Controllers
 {
@@ -32,25 +33,74 @@ namespace Main.Controllers
             _logger.LogError("ERROR");
             _logger.LogCritical("CRITICAL");
 			ViewBag.Title = "All Assets";
-			AssetListViewModel vm = new AssetListViewModel();
+            AssetListViewModel vm = new AssetListViewModel();
             fetchAssetData();
-            vm.Assets = _dbcontext.Assets.Where(x => x.isDeleted == false);
+            vm.Assets = GetAssetsList();
             return View(vm);
         }
 
         public JsonResult GetAssets()
         {
             fetchAssetData();
-            return Json(_dbcontext.Assets.Where(x => x.isDeleted == false));
+
+            List<AssetDisplayModel> assetList = _dbcontext.Assets.Where(x => x.isDeleted == false).Select(x => new AssetDisplayModel
+            {
+                AssetId = x.AssetId,
+                AssetName = x.AssetName,
+                ShortDescription = x.ShortDescription,
+                LongDescription = x.LongDescription,
+                isPreferredAsset = x.isPreferredAsset,
+                typeID = x.typeID,
+                isDeleted = x.isDeleted,
+                Owner = x.Owner,
+                moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
+                    ? null : _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault().moduleID.ToString()
+            }).ToList();
+
+            return Json(assetList);
+        }
+
+        public List<AssetDisplayModel> GetAssetsList()
+        {
+            fetchAssetData();
+
+            List<AssetDisplayModel> assetList = _dbcontext.Assets.Where(x => x.isDeleted == false).Select(x => new AssetDisplayModel
+            {
+                AssetId = x.AssetId,
+                AssetName = x.AssetName,
+                ShortDescription = x.ShortDescription,
+                LongDescription = x.LongDescription,
+                isPreferredAsset = x.isPreferredAsset,
+                typeID = x.typeID,
+                isDeleted = x.isDeleted,
+                Owner = x.Owner,
+                moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
+                    ? null : _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault().moduleID.ToString()
+            }).ToList();
+
+            return assetList;
         }
 
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
             fetchAssetData();
-            List<Asset> assets = _dbcontext.Assets.Where(x => x.isDeleted == false).ToList();
 
-            return Json(assets);
+            List<AssetDisplayModel> assetList = _dbcontext.Assets.Where(x => x.isDeleted == false).Select(x => new AssetDisplayModel
+            {
+                AssetId = x.AssetId,
+                AssetName = x.AssetName,
+                ShortDescription = x.ShortDescription,
+                LongDescription = x.LongDescription,
+                isPreferredAsset = x.isPreferredAsset,
+                typeID = x.typeID,
+                isDeleted = x.isDeleted,
+                Owner = x.Owner,
+                moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
+                    ? null : _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault().moduleID.ToString()
+            }).ToList();
+
+            return Json(assetList);
         }
 
         public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
@@ -81,7 +131,7 @@ namespace Main.Controllers
             return Json(updatedAssetList);
         }
 
-        public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner)
+        public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner, string moduleName)
         {
             // check provided owner is a registered user in the database
             var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
@@ -113,12 +163,21 @@ namespace Main.Controllers
             _dbcontext.Update(modifiedAsset);
             _dbcontext.SaveChanges();
 
+            // get recently modified asset and update module linked to that asset if the asset was assigned a module
+            if (moduleName != null)
+            {
+                AssetModule assetModuleLink = new AssetModule();
+                assetModuleLink.assetID = assetId;
+                assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
+                UpdateAssetsModule(assetModuleLink);
+            }
+
             JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
         }
 
-        public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner)
+        public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner, string moduleName)
         {
             // check provided owner is a registered user in the database
             var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
@@ -150,6 +209,21 @@ namespace Main.Controllers
             _dbcontext.Assets.Add(newAsset);
             _dbcontext.SaveChanges();
 
+            // find recently added asset and update module linked to that asset if the asset was assigned a module
+            if (moduleName != null)
+            {
+                var newlyAddedAsset = _dbcontext.Assets.Where(x => x.AssetName == name 
+                    && x.LongDescription == longDescription && x.ShortDescription == shortDescription 
+                    && x.isPreferredAsset == isPreferredAsset && x.Owner == owner).FirstOrDefault();
+
+                var newAssetId = newlyAddedAsset.AssetId;
+
+                AssetModule assetModuleLink = new AssetModule();
+                assetModuleLink.assetID = newAssetId;
+                assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
+                AddAssetsModule(assetModuleLink);
+            }
+
             JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
@@ -171,9 +245,43 @@ namespace Main.Controllers
             return Json(assetTypes);
         }
 
+        public JsonResult GetAssetModules()
+        {
+            var assetModules = _dbcontext.Modules.ToList();
+
+            return Json(assetModules);
+        }
+
+        public void AddAssetsModule(AssetModule amLink)
+        {
+            _dbcontext.AssetModules.Add(amLink);
+            _dbcontext.SaveChanges();
+        }
+
+        public void UpdateAssetsModule(AssetModule amLink)
+        {
+            // look for pair in table, if exists update otherwise add new row
+            var assetModulePair = _dbcontext.AssetModules.Where(x => x.assetID == amLink.assetID && x.moduleID == amLink.moduleID).FirstOrDefault();
+            if (assetModulePair != null)
+            {
+                // update existing record
+                _dbcontext.Update(amLink);
+                _dbcontext.SaveChanges();
+            }
+            else
+            {
+                // module added to existing asset, create new record
+                _dbcontext.AssetModules.Add(amLink);
+                _dbcontext.SaveChanges();
+            }
+        }
+
         public void SaveUsersPreferredAsset(int assetId, Boolean isPreferredAsset)
         {
             // get current user to save preferred asset under
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            string currentUser = userDetails.UserName;
 
             // determine whether to create new row in table (new asset as preferred asset) or modify an existing row
             // in the table (change in preferred asset preference)

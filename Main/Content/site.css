@@ -14,3 +14,7 @@
 .push {
     height: 50px;
 }
+
+.hide {
+    display: none;
+}
