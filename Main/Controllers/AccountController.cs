@@ -40,6 +40,7 @@ namespace Main.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, false); // not caching
+                    //Redirect(Request.UrlReferrer.ToString()); redirect to attempted access
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -69,6 +70,7 @@ namespace Main.Controllers
                 var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, false); // false means don’t lock user out if log in is invalid
                 if (result.Succeeded)
                 {
+                    //Redirect(Request.UrlReferrer.ToString()); redirect to attempted access
                     return RedirectToAction("Index","Home");
                 }
                 ModelState.AddModelError("","Invalid Login Attempt");
