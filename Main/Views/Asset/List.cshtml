@@ -35,6 +35,7 @@
                     <li class="active"><a href="@Url.Action("List","Asset")">Asset <span class="sr-only">(current)</span></a></li>
                     <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
                     <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
+                    <li><a href="@Url.Action("Index", "UserProfile")">User Profile</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -65,11 +66,9 @@
             </div>
             <div class="details-form-field">
                 <label for="assetType">Asset Type</label>
-                <select id="assetType" name="assetType" />
-                <!-- these options should be pulled in as the names of the AssetTypes of the DB-->
-                <option value="">Select..</option>
-                <option value="1">Database</option>
-                <option value="2">Server</option>
+                <select id="assetType" name="assetType" ; />
+                <!-- these options are pulled in as the names of the AssetTypes from the database -->
+                    <option value="">Select..</option>
                 </select>
             </div>
             <div class="details-form-field">
@@ -99,6 +98,9 @@
                 buildAssetGrid(assetList);
             }
         });
+
+        // add all asset types to form dynamically from database table on page load
+        addAssetTypesToForm();
     });
 
     var deletedItem;
@@ -279,6 +281,24 @@
             },
             submitHandler: function () {
                 formSubmitHandler();
+            }
+        });
+    }
+
+    function addAssetTypesToForm() {
+        $.ajax({
+            url: "/Asset/GetAssetTypes",
+            dataType: 'application/json',
+            complete: function (data) {
+                var response = JSON.parse(data.responseText);
+
+                for (var i = 0; i < response.length; i++) {
+                    var assetType = response[i]["typeID"];
+
+                    // add each asset type to dropdown selection
+                    var value = i + 1;
+                    $('<option>').val(value).text(assetType).appendTo('#assetType');
+                }
             }
         });
     }
