@@ -78,7 +78,7 @@ namespace Main.Data
             List<AssetModule> modules = context.AssetModules.ToList();
             foreach (AssetModule module in modules) {
                 Models.Module temp = context.Modules.Where(M => M.moduleID == module.moduleID).First();
-                if (temp.moduleName.Equals("CSVImporter"))
+                if (temp.typeID.Equals("CSV File"))
                 {
                     StreamReader csv = File.OpenText(Directory.GetCurrentDirectory() + temp.detail1);
                     StreamReader schema = File.OpenText(Directory.GetCurrentDirectory() + temp.detail2);
