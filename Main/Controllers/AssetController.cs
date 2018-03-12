@@ -161,5 +161,20 @@ namespace Main.Controllers
                 DataAPIConnect.PerformDataProcessing(_dbcontext);
             }
         }
+
+        public JsonResult GetAssetTypes()
+        {
+            var assetTypes = _dbcontext.AssetTypes.ToList();
+
+            return Json(assetTypes);
+        }
+
+        public void SaveUsersPreferredAsset(int assetId, Boolean isPreferredAsset)
+        {
+            // get current user to save preferred asset under
+
+            // determine whether to create new row in table (new asset as preferred asset) or modify an existing row
+            // in the table (change in preferred asset preference)
+        }
     }
 }
