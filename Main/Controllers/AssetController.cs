@@ -28,7 +28,9 @@ namespace Main.Controllers
             _logger.LogTrace("TRACE");
             _logger.LogDebug("DEBUG");
             _logger.LogInformation("INFORMATION");
+            _logger.LogWarning("WARNING");
             _logger.LogError("ERROR");
+            _logger.LogCritical("CRITICAL");
 			ViewBag.Title = "All Assets";
 			AssetListViewModel vm = new AssetListViewModel();
             fetchAssetData();
