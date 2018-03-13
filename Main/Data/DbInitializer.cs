@@ -25,7 +25,7 @@ namespace Main.Data
                 ShortDescription = "The Server which controls access to a number of virtual machines",
                 LongDescription = "Reports on statuses of different instances.",
                 isPreferredAsset = true,
-                typeID = context.AssetTypes.Where(A => A.typeID.Equals("Server")).First().typeID
+                typeName = context.AssetTypes.Where(A => A.typeName.Equals("Server")).First().typeName
             };
 
             Asset asset2 = new Asset
@@ -34,7 +34,7 @@ namespace Main.Data
                 ShortDescription = "Gains information from the Vulnerability Analysis Service",
                 LongDescription = "Information on particular Vulnerabilities which are present on our systems.",
                 isPreferredAsset = true,
-                typeID = context.AssetTypes.Where(A => A.typeID.Equals("Server")).First().typeID
+                typeName = context.AssetTypes.Where(A => A.typeName.Equals("Server")).First().typeName
             };
 
             Asset asset3 = new Asset
@@ -43,7 +43,7 @@ namespace Main.Data
                 ShortDescription = "Gives information on the current Status of Various Certificates",
                 LongDescription = "Lists system certificates and all of their statuses.",
                 isPreferredAsset = true,
-                typeID = context.AssetTypes.Where(A => A.typeID.Equals("Database")).First().typeID
+                typeName = context.AssetTypes.Where(A => A.typeName.Equals("Database")).First().typeName
             };
 
             Asset asset4 = new Asset
@@ -52,7 +52,7 @@ namespace Main.Data
                 ShortDescription = "Gives NFL passing stats because it's a CSV I had handy.",
                 LongDescription = "Throwing a Football",
                 isPreferredAsset = true,
-                typeID = context.AssetTypes.Where(A => A.typeID.Equals("CSV File")).First().typeID
+                typeName = context.AssetTypes.Where(A => A.typeName.Equals("CSV File")).First().typeName
             };
 
             context.Assets.Add(asset1);
