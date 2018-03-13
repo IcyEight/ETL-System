@@ -50,7 +50,8 @@ namespace Main.Controllers
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
                 isPreferredAsset = x.isPreferredAsset,
-                typeID = x.typeName,
+                typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
+                    ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
                 isDeleted = x.isDeleted,
                 Owner = x.Owner,
                 moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
@@ -71,7 +72,8 @@ namespace Main.Controllers
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
                 isPreferredAsset = x.isPreferredAsset,
-                typeID = x.typeName,
+                typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
+                    ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
                 isDeleted = x.isDeleted,
                 Owner = x.Owner,
                 moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
@@ -93,7 +95,8 @@ namespace Main.Controllers
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
                 isPreferredAsset = x.isPreferredAsset,
-                typeID = x.typeName,
+                typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
+                    ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
                 isDeleted = x.isDeleted,
                 Owner = x.Owner,
                 moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
