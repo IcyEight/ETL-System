@@ -11,8 +11,8 @@ using System;
 namespace Main.Migrations
 {
     [DbContext(typeof(BamsDbContext))]
-    [Migration("20180313003516_AssetTypeChg")]
-    partial class AssetTypeChg
+    [Migration("20180313031213_AssetTypeChanges")]
+    partial class AssetTypeChanges
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -140,12 +140,12 @@ namespace Main.Migrations
 
             modelBuilder.Entity("Main.Models.AssetType", b =>
                 {
-                    b.Property<int>("typeGUID")
+                    b.Property<int>("typeID")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("typeName");
 
-                    b.HasKey("typeGUID");
+                    b.HasKey("typeID");
 
                     b.ToTable("AssetTypes");
                 });

@@ -11,7 +11,7 @@ namespace Main.Models
 	{
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public int typeGUID { get; set; }
+        public int typeID { get; set; }
 		public String typeName { get; set; }
         public AssetType()
         {

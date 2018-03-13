@@ -139,12 +139,12 @@ namespace Main.Migrations
 
             modelBuilder.Entity("Main.Models.AssetType", b =>
                 {
-                    b.Property<int>("typeGUID")
+                    b.Property<int>("typeID")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("typeName");
 
-                    b.HasKey("typeGUID");
+                    b.HasKey("typeID");
 
                     b.ToTable("AssetTypes");
                 });

@@ -50,7 +50,7 @@ namespace Main.Controllers
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
                 isPreferredAsset = x.isPreferredAsset,
-                typeID = x.typeID,
+                typeID = x.typeName,
                 isDeleted = x.isDeleted,
                 Owner = x.Owner,
                 moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
@@ -71,7 +71,7 @@ namespace Main.Controllers
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
                 isPreferredAsset = x.isPreferredAsset,
-                typeID = x.typeID,
+                typeID = x.typeName,
                 isDeleted = x.isDeleted,
                 Owner = x.Owner,
                 moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
@@ -93,7 +93,7 @@ namespace Main.Controllers
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
                 isPreferredAsset = x.isPreferredAsset,
-                typeID = x.typeID,
+                typeID = x.typeName,
                 isDeleted = x.isDeleted,
                 Owner = x.Owner,
                 moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
@@ -105,7 +105,7 @@ namespace Main.Controllers
 
         public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
-            IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType));
+            var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
 
             Asset deletedAsset = new Asset();
             deletedAsset.AssetId = assetId;
@@ -113,14 +113,15 @@ namespace Main.Controllers
             deletedAsset.ShortDescription = shortDescription;
             deletedAsset.LongDescription = longDescription;
             deletedAsset.isPreferredAsset = isPreferredAsset;
-            if (findAssetType.Any())
-            {
-                deletedAsset.typeName = findAssetType.First().typeName;
-            } else
+            if (findAssetType == null)
             {
                 deletedAsset.typeName = null;
             }
-            
+            else
+            {
+                deletedAsset.typeName = findAssetType.typeName;
+            }
+
             deletedAsset.isDeleted = true;
 
             _dbcontext.Update(deletedAsset);
@@ -140,7 +141,7 @@ namespace Main.Controllers
                 return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
             }
 
-            IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType));
+            var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
 
             Asset modifiedAsset = new Asset();
             modifiedAsset.AssetId = assetId;
@@ -150,13 +151,13 @@ namespace Main.Controllers
             modifiedAsset.isPreferredAsset = isPreferredAsset;
             modifiedAsset.Owner = owner;
 
-            if (findAssetType.Any())
+            if (findAssetType == null)
             {
-                modifiedAsset.typeName = findAssetType.First().typeName;
+                modifiedAsset.typeName = null;
             }
             else
             {
-                modifiedAsset.typeName = null;
+                modifiedAsset.typeName = findAssetType.typeName;
             }
             modifiedAsset.isDeleted = false;
 
@@ -186,7 +187,7 @@ namespace Main.Controllers
                 return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
             }
 
-            IQueryable<AssetType> findAssetType = _dbcontext.AssetTypes.Where(x => x.typeName.Equals(assetType));
+            var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
 
             Asset newAsset = new Asset();
             newAsset.AssetId = assetId;
@@ -196,13 +197,13 @@ namespace Main.Controllers
             newAsset.isPreferredAsset = isPreferredAsset;
             newAsset.Owner = owner;
 
-            if (findAssetType.Any())
+            if (findAssetType == null)
             {
-                newAsset.typeName = findAssetType.First().typeName;
+                newAsset.typeName = null;
             }
             else
             {
-                newAsset.typeName = null;
+                newAsset.typeName = findAssetType.typeName;
             }
             newAsset.isDeleted = false;
 
