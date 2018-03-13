@@ -8,6 +8,6 @@ namespace Main.ViewModels
 {
     public class AssetListViewModel
     {
-		public IEnumerable<Asset> Assets { get; set; }
+        public IEnumerable<AssetDisplayModel> Assets { get; set; }
     }
 }
