@@ -61,7 +61,6 @@ namespace Main.Migrations
                     Owner = table.Column<string>(nullable: true),
                     ShortDescription = table.Column<string>(nullable: true),
                     isDeleted = table.Column<bool>(nullable: false),
-                    isPreferredAsset = table.Column<bool>(nullable: false),
                     typeName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -128,6 +127,21 @@ namespace Main.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Module", x => x.moduleID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PreferredAsset",
+                columns: table => new
+                {
+                    paID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    assetID = table.Column<int>(nullable: false),
+                    isDeleted = table.Column<bool>(nullable: false),
+                    userID = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PreferredAsset", x => x.paID);
                 });
 
             migrationBuilder.CreateTable(
@@ -364,6 +378,9 @@ namespace Main.Migrations
 
             migrationBuilder.DropTable(
                 name: "Module");
+
+            migrationBuilder.DropTable(
+                name: "PreferredAsset");
 
             migrationBuilder.DropTable(
                 name: "Reporting");

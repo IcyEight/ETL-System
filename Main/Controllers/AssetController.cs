@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Controllers
 {
@@ -34,14 +35,19 @@ namespace Main.Controllers
             _logger.LogCritical("CRITICAL");
 			ViewBag.Title = "All Assets";
             AssetListViewModel vm = new AssetListViewModel();
-            fetchAssetData();
+            //fetchAssetData();
             vm.Assets = GetAssetsList();
             return View(vm);
         }
 
         public JsonResult GetAssets()
         {
-            fetchAssetData();
+            //fetchAssetData();
+
+            // get current user
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            string currentUserID = userDetails.Id;
 
             List<AssetDisplayModel> assetList = _dbcontext.Assets.Where(x => x.isDeleted == false).Select(x => new AssetDisplayModel
             {
@@ -49,7 +55,12 @@ namespace Main.Controllers
                 AssetName = x.AssetName,
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
-                isPreferredAsset = x.isPreferredAsset,
+                // if no preferred asset entry in table, default to false for isPreferredAsset
+                // if preferred asset entry is deleted, not a preferred asset (isPreferredAsset = false)
+                // if preferred asset entry is NOT deleted, preferred asset (isPreferredAsset = true)
+                isPreferredAsset = _dbcontext.PreferredAssets.Where(m => m.assetID == x.AssetId && m.userID == 
+                    currentUserID).FirstOrDefault() == null ? false : (_dbcontext.PreferredAssets.Where(m => m.assetID == 
+                    x.AssetId && m.userID == currentUserID).FirstOrDefault().isDeleted == true ? false : true),
                 typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
                     ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
                 isDeleted = x.isDeleted,
@@ -63,7 +74,12 @@ namespace Main.Controllers
 
         public List<AssetDisplayModel> GetAssetsList()
         {
-            fetchAssetData();
+            //fetchAssetData();
+
+            // get current user
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            string currentUserID = userDetails.Id;
 
             List<AssetDisplayModel> assetList = _dbcontext.Assets.Where(x => x.isDeleted == false).Select(x => new AssetDisplayModel
             {
@@ -71,7 +87,12 @@ namespace Main.Controllers
                 AssetName = x.AssetName,
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
-                isPreferredAsset = x.isPreferredAsset,
+                // if no preferred asset entry in table, default to false for isPreferredAsset
+                // if preferred asset entry is deleted, not a preferred asset (isPreferredAsset = false)
+                // if preferred asset entry is NOT deleted, preferred asset (isPreferredAsset = true)
+                isPreferredAsset = _dbcontext.PreferredAssets.Where(m => m.assetID == x.AssetId && m.userID ==
+                    currentUserID).FirstOrDefault() == null ? false : (_dbcontext.PreferredAssets.Where(m => m.assetID ==
+                    x.AssetId && m.userID == currentUserID).FirstOrDefault().isDeleted == true ? false : true),
                 typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
                     ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
                 isDeleted = x.isDeleted,
@@ -86,7 +107,12 @@ namespace Main.Controllers
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
-            fetchAssetData();
+            //fetchAssetData();
+
+            // get current user
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            string currentUserID = userDetails.Id;
 
             List<AssetDisplayModel> assetList = _dbcontext.Assets.Where(x => x.isDeleted == false).Select(x => new AssetDisplayModel
             {
@@ -94,7 +120,12 @@ namespace Main.Controllers
                 AssetName = x.AssetName,
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
-                isPreferredAsset = x.isPreferredAsset,
+                // if no preferred asset entry in table, default to false for isPreferredAsset
+                // if preferred asset entry is deleted, not a preferred asset (isPreferredAsset = false)
+                // if preferred asset entry is NOT deleted, preferred asset (isPreferredAsset = true)
+                isPreferredAsset = _dbcontext.PreferredAssets.Where(m => m.assetID == x.AssetId && m.userID ==
+                    currentUserID).FirstOrDefault() == null ? false : (_dbcontext.PreferredAssets.Where(m => m.assetID ==
+                    x.AssetId && m.userID == currentUserID).FirstOrDefault().isDeleted == true ? false : true),
                 typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
                     ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
                 isDeleted = x.isDeleted,
@@ -115,7 +146,6 @@ namespace Main.Controllers
             deletedAsset.AssetName = name;
             deletedAsset.ShortDescription = shortDescription;
             deletedAsset.LongDescription = longDescription;
-            deletedAsset.isPreferredAsset = isPreferredAsset;
             if (findAssetType == null)
             {
                 deletedAsset.typeName = null;
@@ -126,6 +156,9 @@ namespace Main.Controllers
             }
 
             deletedAsset.isDeleted = true;
+
+            // delete asset from user's preferred assets
+            SaveUsersPreferredAsset(assetId, true);
 
             _dbcontext.Update(deletedAsset);
             _dbcontext.SaveChanges();
@@ -151,7 +184,6 @@ namespace Main.Controllers
             modifiedAsset.AssetName = name;
             modifiedAsset.ShortDescription = shortDescription;
             modifiedAsset.LongDescription = longDescription;
-            modifiedAsset.isPreferredAsset = isPreferredAsset;
             modifiedAsset.Owner = owner;
 
             if (findAssetType == null)
@@ -163,6 +195,16 @@ namespace Main.Controllers
                 modifiedAsset.typeName = findAssetType.typeName;
             }
             modifiedAsset.isDeleted = false;
+
+            // set preferred asset for current user
+            if (isPreferredAsset == true)
+            {
+                SaveUsersPreferredAsset(assetId, false);
+            }
+            else
+            {
+                SaveUsersPreferredAsset(assetId, true);
+            }
 
             _dbcontext.Update(modifiedAsset);
             _dbcontext.SaveChanges();
@@ -197,7 +239,6 @@ namespace Main.Controllers
             newAsset.AssetName = name;
             newAsset.ShortDescription = shortDescription;
             newAsset.LongDescription = longDescription;
-            newAsset.isPreferredAsset = isPreferredAsset;
             newAsset.Owner = owner;
 
             if (findAssetType == null)
@@ -210,6 +251,15 @@ namespace Main.Controllers
             }
             newAsset.isDeleted = false;
 
+            if (isPreferredAsset == true)
+            {
+                SaveUsersPreferredAsset(assetId, false);
+            }
+            else
+            {
+                SaveUsersPreferredAsset(assetId, true);
+            }
+
             _dbcontext.Assets.Add(newAsset);
             _dbcontext.SaveChanges();
 
@@ -218,7 +268,7 @@ namespace Main.Controllers
             {
                 var newlyAddedAsset = _dbcontext.Assets.Where(x => x.AssetName == name 
                     && x.LongDescription == longDescription && x.ShortDescription == shortDescription 
-                    && x.isPreferredAsset == isPreferredAsset && x.Owner == owner).FirstOrDefault();
+                    && x.Owner == owner).FirstOrDefault();
 
                 var newAssetId = newlyAddedAsset.AssetId;
 
@@ -265,7 +315,7 @@ namespace Main.Controllers
         public void UpdateAssetsModule(AssetModule amLink)
         {
             // look for pair in table, if exists update otherwise add new row
-            var assetModulePair = _dbcontext.AssetModules.Where(x => x.assetID == amLink.assetID && x.moduleID == amLink.moduleID).FirstOrDefault();
+            var assetModulePair = _dbcontext.AssetModules.AsNoTracking().Where(x => x.assetID == amLink.assetID && x.moduleID == amLink.moduleID).FirstOrDefault();
             if (assetModulePair != null)
             {
                 // update existing record
@@ -280,15 +330,35 @@ namespace Main.Controllers
             }
         }
 
-        public void SaveUsersPreferredAsset(int assetId, Boolean isPreferredAsset)
+        public void SaveUsersPreferredAsset(int assetId, Boolean isDeleted)
         {
             // get current user to save preferred asset under
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
-            string currentUser = userDetails.UserName;
+            string currentUserID = userDetails.Id;
+
+            // build out model to add/update to database
+            PreferredAsset pa = new PreferredAsset();
+            pa.assetID = assetId;
+            pa.userID = currentUserID;
+            pa.isDeleted = isDeleted;
 
             // determine whether to create new row in table (new asset as preferred asset) or modify an existing row
             // in the table (change in preferred asset preference)
+            var checkForPAEntry = _dbcontext.PreferredAssets.AsNoTracking().Where(x => x.assetID == assetId && x.userID == currentUserID).FirstOrDefault();
+            if (checkForPAEntry == null)
+            {
+                _dbcontext.PreferredAssets.Add(pa);
+                _dbcontext.SaveChanges();
+            }
+            else
+            {
+                // set paID before updating
+                pa.paID = checkForPAEntry.paID;
+
+                _dbcontext.Update(pa);
+                _dbcontext.SaveChanges();
+            }
         }
     }
 }

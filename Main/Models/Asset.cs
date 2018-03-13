@@ -15,7 +15,6 @@ namespace Main.Models
         public String AssetName { get; set; }
 		public String ShortDescription { get; set; }
 		public String LongDescription { get; set; }
-		public bool isPreferredAsset { get; set; }
         public String typeName { get; set; }
         public bool isDeleted { get; set; }
         public String Owner { get; set; }

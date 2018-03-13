@@ -11,7 +11,7 @@ using System;
 namespace Main.Migrations
 {
     [DbContext(typeof(BamsDbContext))]
-    [Migration("20180313042246_BamsDB")]
+    [Migration("20180313062109_BamsDB")]
     partial class BamsDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,8 +90,6 @@ namespace Main.Migrations
                     b.Property<string>("ShortDescription");
 
                     b.Property<bool>("isDeleted");
-
-                    b.Property<bool>("isPreferredAsset");
 
                     b.Property<string>("typeName");
 
@@ -192,6 +190,22 @@ namespace Main.Migrations
                     b.HasKey("moduleID");
 
                     b.ToTable("Module");
+                });
+
+            modelBuilder.Entity("Main.Models.PreferredAsset", b =>
+                {
+                    b.Property<int>("paID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("assetID");
+
+                    b.Property<bool>("isDeleted");
+
+                    b.Property<string>("userID");
+
+                    b.HasKey("paID");
+
+                    b.ToTable("PreferredAsset");
                 });
 
             modelBuilder.Entity("Main.Models.Reporting", b =>

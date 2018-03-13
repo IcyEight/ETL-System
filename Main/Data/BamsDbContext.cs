@@ -16,6 +16,7 @@ namespace Main.Data
         public DbSet<TaskQueue> TaskQueues { get; set; }
         public DbSet<DataSchema> Schemas { get; set; }
         public DbSet<Reporting> Reportings { get; set; }
+        public DbSet<PreferredAsset> PreferredAssets { get; set; }
 
         public BamsDbContext(DbContextOptions<BamsDbContext> options) : base(options)
         { }
@@ -34,6 +35,7 @@ namespace Main.Data
             modelBuilder.Entity<TaskQueue>().ToTable("TaskQueue");
             modelBuilder.Entity<DataSchema>().ToTable("DataSchema");
             modelBuilder.Entity<Reporting>().ToTable("Reporting");
+            modelBuilder.Entity<PreferredAsset>().ToTable("PreferredAsset");
         }
     }
 }
