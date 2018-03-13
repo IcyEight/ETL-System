@@ -19,54 +19,153 @@
                     <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
                     <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
                     <li class="active"><a href="@Url.Action("Index", "UserProfile")">User Profile <span class="sr-only">(current)</span></a></li>
+                    <span class="navbar-text" style="color: #e3f2fd;font-family:verdana;">
+                      @Model.FirstName @Model.LastName
+                    </span>
                 </ul>
             </div>
         </div>
     </nav>
-   
-    <div class="container mx-auto" style="width: 500px;">
-     <h2>@ViewBag.Title</h2>
-      <div class="form-group">
-        <label asp-for="FirstName" ></label>
-        <input id="firstname" asp-for="FirstName" class="form-control" readonly="readonly"/>
-        <span asp-validation-for="FirstName"></span>
-      </div>
-
-       <div class="form-group">
-        <label asp-for="LastName"></label>
-        <input id="lastname" asp-for="LastName" class="form-control" readonly="readonly"/>
-        <span asp-validation-for="LastName"></span>
-      </div>
-
-       <div class="form-group">
-        <label asp-for="Email"></label>
-        <input id="email" asp-for="Email" class="form-control" readonly="readonly"/>
-        <span asp-validation-for="Email"></span>
-      </div>
+    <h2 align="center">@ViewBag.Title</h2> <br/>
+    <div class="container">
+      <form class="form-horizontal" asp-controller="UserProfile" asp-action="Index">
+        <div><p align="center"><small>Please click field specific tick mark to save your change.</small></p></div>>
+        <div class="form-group">
+          <label class="control-label col-sm-3" asp-for="FirstName"></label>
+          <div class="col-sm-6">
+            <input id="firstname" class="form-control" asp-for="FirstName" readonly="readonly">
+          </div>
+          <button id="editFirstname" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span></button>
+          <button id="saveFirstname" type="button" class="btn btn-default btn-sm" disabled="true"><span class="glyphicon glyphicon-ok"></span></button>
+          <span asp-validation-for="FirstName"></span>
+        </div>
+                
+        <div class="form-group">
+          <label class="control-label col-sm-3" asp-for="LastName"></label>
+          <div class="col-sm-6">
+            <input id="lastname" class="form-control" asp-for="LastName" readonly="readonly">
+          </div>
+          <button id="editLastname" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span></button>
+          <button id="saveLastname" type="button" class="btn btn-default btn-sm" disabled="true"><span class="glyphicon glyphicon-ok"></span></button>
+          <span asp-validation-for="LastName"></span>
+        </div>
+                
+        <div class="form-group">
+          <label class="control-label col-sm-3" asp-for="Email"></label>
+          <div class="col-sm-6">
+            <input id="email" type="email" class="form-control" asp-for="Email" readonly="readonly">
+          </div>
+          <button id="editEmail" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span></button>
+          <button id="saveEmail" type="button" class="btn btn-default btn-sm" disabled="true"><span class="glyphicon glyphicon-ok"></span></button>
+          <span asp-validation-for="Email"></span>
+        </div>
+      </form>
     </div>
-
 </html>
 
+<!--see who was the event listener. based on that make corresponding input box editable.-->
 <script type="text/javascript">
-    $(document).ready(function () {
-        var firstname = document.querySelector("#firstname");
-        var lastname = document.querySelector("#lastname");
-        var email = document.querySelector("#email");
+    $(document).ready(function() {
+        $("#editFirstname").click(function(event) {
+            $("#firstname").prop('readOnly', false);
+            $("#saveFirstname").prop('disabled',false);
+            $(this).prop('disabled',true);
+        });
+        $("#editLastname").click(function(event) {
+            $("#lastname").prop('readOnly', false);
+            $("#saveLastname").prop('disabled',false);
+            $(this).prop('disabled',true);
+        });
+        $("#editEmail").click(function(event) {
+           $("#email").prop('readOnly', false);
+           $("#saveEmail").prop('disabled',false);
+           $(this).prop('disabled',true);
+        });
 
-        firstname.addEventListener("click", edit, false);
-        lastname.addEventListener("click", edit, false);
-        email.addEventListener("click", edit, false);
-
-        firstname.addEventListener("click", edit, false);
-        lastname.addEventListener("click", edit, false);
-        email.addEventListener("click", edit, false);
-    });
-    function edit(e){
-        var clickedItem = e.target;
-        clickedItem.readOnly = false;
-        console.log(clickedItem);
-    }
+        $("#saveFirstname").click(function(event) {
+           var newval = $("#firstname").val();
+           var editbutton = $("#editFirstname");
+           var savebutton = $("#saveFirstname");
+           if(newval){
+            $.ajax({
+                async: false,
+                url: '@Url.Action("UpdateProfile")',
+                dataType: 'application/json',
+                data: {
+                    firstname:newval 
+                },
+                complete: function (data) {
+                    var response = JSON.parse(data.responseText);
+                    console.log(response);
+                    if (response.success) {
+                        $("#firstname").prop('readOnly', true);
+                        $("#editFirstname").prop('disabled',false);
+                        $("#saveFirstname").prop('disabled',true);
+                        console.log(response.responseText);
+                        window.location.reload();
+                    } else {
+                        console.log(response.responseText);
+                    }                          
+                }
+            });
+           }
+        });
+        
+        $("#saveLastname").click(function(event) {
+           var newval = $("#lastname").val();
+           var editbutton = $("#editLastname");
+           var savebutton = $("#saveLastname");
+           if(newval){
+            $.ajax({
+                async: false,
+                url: '@Url.Action("UpdateProfile")',
+                dataType: 'application/json',
+                data: {
+                    lastname:newval 
+                },
+                complete: function (data) {
+                    var response = JSON.parse(data.responseText);
+                    console.log(response);
+                    if (response.success) {
+                        $("#lastname").prop('readOnly', true);
+                        $("#editLastname").prop('disabled',false);
+                        $("#saveLastname").prop('disabled',true);
+                        console.log(response.responseText);
+                        window.location.reload();
+                    } else {
+                        console.log(response.responseText);
+                    }                          
+                }
+            });
+           }
+        });
     
+        $("#saveEmail").click(function(event) {
+           var newval = $("#email").val();
+           var editbutton = $("#editEmail");
+           var savebutton = $("#saveEmail");
+           if(newval){
+            $.ajax({
+                async: false,
+                url: '@Url.Action("UpdateProfile")',
+                dataType: 'application/json',
+                data: {
+                    email:newval 
+                },
+                complete: function (data) {
+                    var response = JSON.parse(data.responseText);
+                    console.log(response);
+                    if (response.success) {
+                        $("#email").prop('readOnly', true);
+                        $("#editEmail").prop('disabled',false);
+                        $("#saveEmail").prop('disabled',true);
+                        console.log(response.responseText);
+                    } else {
+                        console.log(response.responseText);
+                    }                          
+                }
+            });
+           }
+        });
+    });
 </script>
-
-   

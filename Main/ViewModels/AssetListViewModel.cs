@@ -9,5 +9,7 @@ namespace Main.ViewModels
     public class AssetListViewModel
     {
         public IEnumerable<AssetDisplayModel> Assets { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

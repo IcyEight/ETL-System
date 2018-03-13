@@ -37,6 +37,12 @@ namespace Main.Controllers
             AssetListViewModel vm = new AssetListViewModel();
             //fetchAssetData();
             vm.Assets = GetAssetsList();
+
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            vm.FirstName = userDetails.FirstName;
+            vm.LastName = userDetails.LastName;
+
             return View(vm);
         }
 

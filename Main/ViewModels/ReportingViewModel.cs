@@ -9,5 +9,7 @@ namespace Main.ViewModels
     public class ReportingViewModel
     {
         public IEnumerable<Reporting> Reporting { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

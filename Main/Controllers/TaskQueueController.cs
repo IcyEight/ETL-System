@@ -26,6 +26,11 @@ namespace Main.Controllers
             ViewBag.Title = "Task Queue";
             TaskQueueViewModel vm = new TaskQueueViewModel();
             vm.TaskQueue = GetTasksList();
+
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            vm.FirstName = userDetails.FirstName;
+            vm.LastName = userDetails.LastName;
             return View(vm);
         }
 

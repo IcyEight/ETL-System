@@ -36,6 +36,9 @@
                     <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
                     <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
                     <li><a href="@Url.Action("Index", "UserProfile")">User Profile</a></li>
+                    <span class="navbar-text" style="color: #e3f2fd;font-family:verdana;">
+                      @Model.FirstName @Model.LastName
+                    </span>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->

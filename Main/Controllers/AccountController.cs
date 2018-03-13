@@ -35,7 +35,7 @@ namespace Main.Controllers
             ViewBag.Title = "Registration";
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { Email = vm.Email, UserName = vm.Email };
+                var user = new ApplicationUser { Email = vm.Email, UserName = vm.Email, FirstName = vm.Firstname, LastName = vm.Lastname };
                 var result = await _userManager.CreateAsync(user, vm.Password);
                 if (result.Succeeded)
                 {

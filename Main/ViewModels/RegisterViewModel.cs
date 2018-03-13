@@ -5,6 +5,18 @@ namespace Main.ViewModels
     public class RegisterViewModel
     {
         public RegisterViewModel() { }
+        [Required(ErrorMessage = "First name can't be empty"), MaxLength(256), Display(Name = "First Name")]
+        public string Firstname
+        {
+            get;
+            set;
+        }
+        [Required(ErrorMessage = "Last name can't be empty"), MaxLength(256), Display(Name = "Last Name")]
+        public string Lastname
+        {
+            get;
+            set;
+        }
         [Required, EmailAddress, MaxLength(256), Display(Name = "Email Address")]
         public string Email
         {

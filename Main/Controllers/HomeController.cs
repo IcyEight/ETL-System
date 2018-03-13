@@ -30,6 +30,13 @@ namespace Main.Controllers
             {
                 PreferredAssets = _dbcontext.Assets.Where(x => assetIds.Contains(x.AssetId) && x.isDeleted == false).ToList()
             };
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            if (homeViewModel != null)
+            {
+                homeViewModel.FirstName = userDetails.FirstName;
+                homeViewModel.LastName = userDetails.LastName;
+            }
             return View(homeViewModel);
         }
 

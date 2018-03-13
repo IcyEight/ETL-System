@@ -9,5 +9,7 @@ namespace Main.ViewModels
     public class HomeViewModel
     {
 		public IEnumerable<Asset> PreferredAssets { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

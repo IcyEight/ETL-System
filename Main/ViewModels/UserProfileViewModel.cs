@@ -11,11 +11,14 @@ namespace Main.ViewModels
             LastName = lastName;
             Email = email;
         }
-        [Required]
+        [Required(ErrorMessage = "First name can't be empty")]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Last name can't be empty")]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
-        [EmailAddress, Required]
+        [Required(ErrorMessage = "Email can't be empty")]
+        [EmailAddress]
         public string Email { get; set; } 
     }
 }

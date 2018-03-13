@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Main.Data;
 using Main.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,11 @@ namespace Main.Controllers
             ViewBag.Title = "Reporting";
             ReportingViewModel vm = new ReportingViewModel();
             vm.Reporting = _dbcontext.Reportings;
+
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            vm.FirstName = userDetails.FirstName;
+            vm.LastName = userDetails.LastName;
             return View(vm);
         }
 
