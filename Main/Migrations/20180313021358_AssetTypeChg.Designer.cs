@@ -11,7 +11,7 @@ using System;
 namespace Main.Migrations
 {
     [DbContext(typeof(BamsDbContext))]
-    [Migration("20180313003516_AssetTypeChg")]
+    [Migration("20180313021358_AssetTypeChg")]
     partial class AssetTypeChg
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -92,6 +92,8 @@ namespace Main.Migrations
                     b.Property<bool>("isDeleted");
 
                     b.Property<bool>("isPreferredAsset");
+
+                    b.Property<string>("typeID");
 
                     b.Property<string>("typeName");
 

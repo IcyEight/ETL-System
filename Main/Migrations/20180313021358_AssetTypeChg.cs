@@ -12,6 +12,7 @@ namespace Main.Migrations
             migrationBuilder.DropPrimaryKey(
                 name: "PK_AssetTypes",
                 table: "AssetTypes");
+
             migrationBuilder.AddColumn<int>(
                 name: "typeGUID",
                 table: "AssetTypes",
@@ -24,21 +25,19 @@ namespace Main.Migrations
                 table: "AssetTypes",
                 nullable: true);
 
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_AssetTypes",
-                table: "AssetTypes",
-                column: "typeGUID");
-
             migrationBuilder.DropColumn(
                 name: "typeID",
                 table: "AssetTypes");
 
-            migrationBuilder.RenameColumn(
-                name: "typeID",
+            migrationBuilder.AddColumn<string>(
+                name: "typeName",
                 table: "Asset",
-                newName: "typeName");
+                nullable: true);
 
-
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AssetTypes",
+                table: "AssetTypes",
+                column: "typeGUID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -46,16 +45,6 @@ namespace Main.Migrations
             migrationBuilder.DropPrimaryKey(
                 name: "PK_AssetTypes",
                 table: "AssetTypes");
-            migrationBuilder.RenameColumn(
-                name: "typeName",
-                table: "Asset",
-                newName: "typeID");
-
-            migrationBuilder.AddColumn<string>(
-                name: "typeID",
-                table: "AssetTypes",
-                nullable: false,
-                defaultValue: "");
 
             migrationBuilder.DropColumn(
                 name: "typeGUID",
@@ -64,6 +53,16 @@ namespace Main.Migrations
             migrationBuilder.DropColumn(
                 name: "typeName",
                 table: "AssetTypes");
+
+            migrationBuilder.DropColumn(
+                name: "typeName",
+                table: "Asset");
+
+            migrationBuilder.AddColumn<string>(
+                name: "typeID",
+                table: "AssetTypes",
+                nullable: false,
+                defaultValue: "");
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_AssetTypes",

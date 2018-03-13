@@ -92,6 +92,8 @@ namespace Main.Migrations
 
                     b.Property<bool>("isPreferredAsset");
 
+                    b.Property<string>("typeID");
+
                     b.Property<string>("typeName");
 
                     b.HasKey("AssetId");
