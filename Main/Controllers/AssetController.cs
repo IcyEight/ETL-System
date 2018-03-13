@@ -35,7 +35,7 @@ namespace Main.Controllers
             _logger.LogCritical("CRITICAL");
 			ViewBag.Title = "All Assets";
             AssetListViewModel vm = new AssetListViewModel();
-            //fetchAssetData();
+            fetchAssetData();
             vm.Assets = GetAssetsList();
 
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -48,7 +48,7 @@ namespace Main.Controllers
 
         public JsonResult GetAssets()
         {
-            //fetchAssetData();
+            fetchAssetData();
 
             // get current user
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -80,7 +80,7 @@ namespace Main.Controllers
 
         public List<AssetDisplayModel> GetAssetsList()
         {
-            //fetchAssetData();
+            fetchAssetData();
 
             // get current user
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -113,7 +113,7 @@ namespace Main.Controllers
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
-            //fetchAssetData();
+            fetchAssetData();
 
             // get current user
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
