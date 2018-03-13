@@ -11,8 +11,8 @@ using System;
 namespace Main.Migrations
 {
     [DbContext(typeof(BamsDbContext))]
-    [Migration("20180308215303_UserId")]
-    partial class UserId
+    [Migration("20180313042246_BamsDB")]
+    partial class BamsDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -93,7 +93,7 @@ namespace Main.Migrations
 
                     b.Property<bool>("isPreferredAsset");
 
-                    b.Property<string>("typeID");
+                    b.Property<string>("typeName");
 
                     b.HasKey("AssetId");
 
@@ -140,7 +140,10 @@ namespace Main.Migrations
 
             modelBuilder.Entity("Main.Models.AssetType", b =>
                 {
-                    b.Property<string>("typeID");
+                    b.Property<int>("typeID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("typeName");
 
                     b.HasKey("typeID");
 
