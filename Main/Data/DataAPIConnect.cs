@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Data
 {
@@ -101,12 +102,21 @@ namespace Main.Data
                 foreach(DataSchema s in inputSch)
                 {
                     if (context.AssetData.Any(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName))){
-                        context.AssetData.Update(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
+                        var data = context.AssetData.Single(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName));
+                        var newData = new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset);
+
+                        data.asset = newData.asset;
+                        data.fieldType = newData.fieldType;
+                        data.strValue = newData.strValue;
+                        data.intValue = newData.intValue;
+                        data.floatValue = newData.floatValue;
+                        data.dateValue = newData.dateValue;
+                        data.boolValue = newData.boolValue;
+                        data.isPrimaryKey = newData.isPrimaryKey;
                     } else
                     {
                         context.AssetData.Add(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
                     }
-
                 }
                 i++;
             }
