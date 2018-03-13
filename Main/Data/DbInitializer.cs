@@ -125,6 +125,8 @@ namespace Main.Data
             context.Reportings.Add(report3);
             logger.LogDebug("Seeded Reportings");
 
+            context.SaveChanges();
+
             Module csvModule = context.Modules.Where(M => M.moduleName.Equals("CSVImporter")).First();
             AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID);
 
