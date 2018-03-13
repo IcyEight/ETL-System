@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Main.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Main.Data
 {
     public static class DbInitializer
     {
-        public static void Seed(BamsDbContext context)
+        public static void Seed(BamsDbContext context, ILogger<Program> logger)
         {
             context.Database.Migrate();
+            logger.LogInformation("Applied pending migrations");
 
             DataAPIConnect.loadConfigurationXml(context);
             if (context.Assets.Any())
             {
-                return;   // DB has been seeded
+                logger.LogInformation("Database is already seeded");
+                return;
             }
 
             Asset asset1 = new Asset
@@ -59,6 +59,7 @@ namespace Main.Data
             context.Assets.Add(asset2);
             context.Assets.Add(asset3);
             context.Assets.Add(asset4);
+            logger.LogDebug("Seeded Assets");
 
             TaskQueue task1 = new TaskQueue
             {
@@ -93,6 +94,7 @@ namespace Main.Data
             context.TaskQueues.Add(task1);
             context.TaskQueues.Add(task2);
             context.TaskQueues.Add(task3);
+            logger.LogDebug("Seeded TaskQueues");
 
             Reporting report1 = new Reporting
             {
@@ -121,15 +123,16 @@ namespace Main.Data
             context.Reportings.Add(report1);
             context.Reportings.Add(report2);
             context.Reportings.Add(report3);
-
-            context.SaveChanges();
+            logger.LogDebug("Seeded Reportings");
 
             Module csvModule = context.Modules.Where(M => M.moduleName.Equals("CSVImporter")).First();
             AssetModule csvTestModule = new AssetModule(asset4.AssetId, csvModule.moduleID);
 
             context.AssetModules.Add(csvTestModule);
+            logger.LogDebug("Seeded AssetModules");
 
             context.SaveChanges();
+            logger.LogInformation("Seeded database successfully");
         }
     }
 }
