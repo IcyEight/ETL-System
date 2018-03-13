@@ -47,7 +47,7 @@ namespace Main.Data
         {
             foreach (AssetType asset in typeList)
             {
-                if (context.AssetTypes.Where(M => M.typeID.Equals(asset.typeID)).Count() == 0)
+                if (context.AssetTypes.Where(M => M.typeName.Equals(asset.typeName)).Count() == 0)
                 {
                     context.AssetTypes.Add(asset);
                 } else

@@ -9,16 +9,17 @@ namespace Main.Models
 {
 	public class AssetType
 	{
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-		public String typeID { get; set; }
+        public int typeGUID { get; set; }
+		public String typeName { get; set; }
         public AssetType()
         {
         }
 
         public AssetType(String n)
         {
-            typeID = n;
+            typeName = n;
         }
 	}
 }
