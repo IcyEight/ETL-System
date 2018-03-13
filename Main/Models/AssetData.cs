@@ -21,6 +21,11 @@ namespace Main.Models
         public Boolean boolValue { get; set; }
         public Boolean isPrimaryKey { get; set; }
 
+        public AssetData()
+        {
+
+        }
+
         public AssetData(int aID, int dID, String name, String type, String value, Boolean primary, Asset a)
         {
             assetID = aID;
