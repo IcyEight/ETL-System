@@ -31,32 +31,34 @@ namespace Main
 
             try
             {
-                Log.Information("Getting the motors running...");
+                Log.Information("Core Web Server starting up");
 
                 var host = BuildWebHost(args);
 
                 using (var scope = host.Services.CreateScope())
                 {
-                    var services = scope.ServiceProvider;
                     try
                     {
+                        var services = scope.ServiceProvider;
                         var context = services.GetRequiredService<BamsDbContext>();
-                        DbInitializer.Seed(context);
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        DbInitializer.Seed(context, logger);
                     }
                     catch (Exception ex)
                     {
-                        var logger = services.GetRequiredService<ILogger<Program>>();
-                        logger.LogError(ex, "An error occurred while seeding the database.");
+                        Log.Error(ex, "An error occurred while seeding the database.");
                     }
                 }
 
                 host.Run();
 
+                Log.Information("Core Web Server shutting down");
+
                 return 0;
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Host terminated unexpectedly");
+                Log.Fatal(ex, "Core Web Server terminated unexpectedly");
                 return 1;
             }
             finally
