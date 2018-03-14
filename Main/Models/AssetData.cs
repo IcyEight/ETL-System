@@ -10,6 +10,7 @@ namespace Main.Models
     public class AssetData
     {
         public int assetID { get; set; }
+        public String schemaName { get; set; }
         public int dataEntryID { get; set; }
         public String fieldName { get; set; }
         public virtual Asset asset { get; set; }
@@ -23,12 +24,13 @@ namespace Main.Models
 
         public AssetData()
         {
-
+            
         }
 
-        public AssetData(int aID, int dID, String name, String type, String value, Boolean primary, Asset a)
+        public AssetData(int aID, String sID, int dID, String name, String type, String value, Boolean primary, Asset a)
         {
             assetID = aID;
+            schemaName = sID;
             dataEntryID = dID;
             asset = a;
             fieldName = name;
