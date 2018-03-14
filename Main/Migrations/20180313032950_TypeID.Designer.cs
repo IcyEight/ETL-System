@@ -11,9 +11,10 @@ using System;
 namespace Main.Migrations
 {
     [DbContext(typeof(BamsDbContext))]
-    partial class BamsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180313032950_TypeID")]
+    partial class TypeID
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,6 +91,10 @@ namespace Main.Migrations
 
                     b.Property<bool>("isDeleted");
 
+                    b.Property<bool>("isPreferredAsset");
+
+                    b.Property<string>("typeID");
+
                     b.Property<string>("typeName");
 
                     b.HasKey("AssetId");
@@ -116,8 +121,6 @@ namespace Main.Migrations
                     b.Property<long>("intValue");
 
                     b.Property<bool>("isPrimaryKey");
-
-                    b.Property<int>("schemaID");
 
                     b.Property<string>("strValue");
 
@@ -191,22 +194,6 @@ namespace Main.Migrations
                     b.HasKey("moduleID");
 
                     b.ToTable("Module");
-                });
-
-            modelBuilder.Entity("Main.Models.PreferredAsset", b =>
-                {
-                    b.Property<int>("paID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("assetID");
-
-                    b.Property<bool>("isDeleted");
-
-                    b.Property<string>("userID");
-
-                    b.HasKey("paID");
-
-                    b.ToTable("PreferredAsset");
                 });
 
             modelBuilder.Entity("Main.Models.Reporting", b =>

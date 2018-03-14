@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace Main.Data
 {
@@ -19,6 +20,20 @@ namespace Main.Data
      */
     public class DataAPIConnect
     {
+        public static void startDataMonitoringThread(BamsDbContext dataAPIContext)
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                while (true)
+                {
+                    Thread.Sleep(60000);
+
+                    fetchAssetData(dataAPIContext);
+                }
+            }).Start();
+        }
+
         public static void loadConfigurationXml(BamsDbContext context)
         {
             List<AssetType> assetTypes = new List<AssetType>();
@@ -76,7 +91,7 @@ namespace Main.Data
 
         public static void PerformDataProcessing(BamsDbContext context)
         {
-            List<AssetModule> modules = context.AssetModules.ToList();
+            List<AssetModule> modules = context.AssetModules.ToListAsync().Result;
             foreach (AssetModule module in modules) {
                 Models.Module temp = context.Modules.Where(M => M.moduleID == module.moduleID).First();
                 if (temp.typeID.Equals("CSV File"))
@@ -96,6 +111,8 @@ namespace Main.Data
         {
             Asset tempAsset = context.Assets.Where(A => A.AssetId == module.assetID).First();
             context.Schemas.AddRange(inputSch);
+            context.SaveChanges(); //need to know the schema ID later not generated till in database.
+
             int i = 0;
             foreach(Dictionary<String, String> row in input.rowEntries)
             {
@@ -103,7 +120,7 @@ namespace Main.Data
                 {
                     if (context.AssetData.Any(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName))){
                         var data = context.AssetData.Single(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName));
-                        var newData = new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset);
+                        var newData = new AssetData(module.assetID, s.schemaName, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset);
 
                         data.asset = newData.asset;
                         data.fieldType = newData.fieldType;
@@ -115,7 +132,7 @@ namespace Main.Data
                         data.isPrimaryKey = newData.isPrimaryKey;
                     } else
                     {
-                        context.AssetData.Add(new AssetData(module.assetID, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
+                        context.AssetData.AddAsync(new AssetData(module.assetID, s.schemaName, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
                     }
                 }
                 i++;
@@ -181,7 +198,16 @@ namespace Main.Data
 
             GenerateDatabaseEntries(module, context, dataImport, entries);
         }
-        
+
+        public static void fetchAssetData(BamsDbContext context)
+        {
+            List<AssetModule> modules = context.AssetModules.ToList();
+            if (modules.Count() > 0)
+            {
+                DataAPIConnect.PerformDataProcessing(context);
+            }
+        }
+
     }
 
 }

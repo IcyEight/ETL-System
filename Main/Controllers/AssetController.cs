@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace Main.Controllers
 {
@@ -35,7 +36,6 @@ namespace Main.Controllers
             _logger.LogCritical("CRITICAL");
 			ViewBag.Title = "All Assets";
             AssetListViewModel vm = new AssetListViewModel();
-            fetchAssetData();
             vm.Assets = GetAssetsList();
 
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -48,8 +48,6 @@ namespace Main.Controllers
 
         public JsonResult GetAssets()
         {
-            fetchAssetData();
-
             // get current user
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
@@ -80,8 +78,6 @@ namespace Main.Controllers
 
         public List<AssetDisplayModel> GetAssetsList()
         {
-            fetchAssetData();
-
             // get current user
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
@@ -113,8 +109,6 @@ namespace Main.Controllers
         // for getting assets without refreshing the repo to initial assets
         public JsonResult GetCurrentAssets()
         {
-            fetchAssetData();
-
             // get current user
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
@@ -287,15 +281,6 @@ namespace Main.Controllers
             JsonResult updatedAssetList = GetCurrentAssets();
 
             return Json(updatedAssetList);
-        }
-
-        public void fetchAssetData()
-        {
-           List<AssetModule> modules = _dbcontext.AssetModules.ToList();
-           if ( modules.Count() > 0)
-            {
-                DataAPIConnect.PerformDataProcessing(_dbcontext);
-            }
         }
 
         public JsonResult GetAssetTypes()
