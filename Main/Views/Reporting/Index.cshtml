@@ -29,48 +29,35 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Index","Home")">Home</a></li>
-                    <li ><a href="@Url.Action("List","Asset")">Asset <span class="sr-only"></span></a></li>
+                    <li><a href="@Url.Action("List","Asset")">Asset <span class="sr-only"></span></a></li>
                     <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
                     <li class="active"><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only">(current)</span></a></li>
                     <li><a href="@Url.Action("Index", "UserProfile")">User Profile</a></li>
                     <span class="navbar-text" style="color: #e3f2fd;font-family:verdana;">
-                      @Model.FirstName @Model.LastName
+                        @Model.FirstName @Model.LastName
                     </span>
                 </ul>
             </div>
         </div>
     </nav>
-
     <h2 align="center">@ViewBag.Title</h2>
-
     <br />
-    <div class="row">
-        <div class="col-md-1"><strong>Select Report</strong></div>
-        @*<div class="dropdown">
-            <button class="btn btn-secondary btb-sm dropdown-toggle col-md-7" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
-            </button>
-
-        </div>*@
-                    <div>
-                <ul>
-                    <li class="dropdown">
-                        <a href= "#" class="dropdown-toggle" data-toggle="dropdown"> Select a report <span class=" caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Report 1</a></li>
-                            <li><a href="#">Report 2</a></li>
-                            <li><a href="#">Report 3</a></li>
-                        </ul>
-                    </li>
-                        
-                </ul>
-
-            </div>
-        <div class="col-md-4">Add new report</div>
+    <div class="container">
+        <div class="row">
+            <ul>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Select a report <span class=" caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:swapGrids()">Fantasy Football Manager</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <br />
+        @*<div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>*@
+        <div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
+        <div id="fantasyGrid" class="hidden" style="margin-left:5px !important; margin-right:5px !important"></div>
     </div>
-
-    <br/>
-    <div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
 
 </body>
 </html>
@@ -79,14 +66,32 @@
     var reportingList;
     $(document).ready(function () {
         $.ajax({
+            url: "/Reporting/GetFantasyData",
+            dataType: 'application/json',
+            complete: function (data) {
+                reportingList = JSON.parse(data["responseText"]);
+                //buildReportingGrid(reportingList);
+                buildFantasyGrid(reportingList);
+            }
+        });
+
+        $.ajax({
             url: "/Reporting/GetReportsView",
             dataType: 'application/json',
             complete: function (data) {
                 reportingList = JSON.parse(data["responseText"]);
+                reportingList = null;
                 buildReportingGrid(reportingList);
+                //buildFantasyGrid(reportingList);
             }
         });
     });
+
+    function swapGrids() {
+        $("#reportingGrid").addClass("hidden");
+        $("#fantasyGrid").removeClass("hidden");
+
+    }
 
     function buildReportingGrid(allReports) {
         $("#reportingGrid").jsGrid({
@@ -136,6 +141,33 @@
                 { name: "DateCreated", title: "Created on", width: 50 },
                 { name: "DateModified", title: "Modified on", width: 50 },
 
+            ]
+        });
+    }
+
+
+
+    function buildFantasyGrid(allReports) {
+        $("#fantasyGrid").jsGrid({
+            width: "100%",
+            height: "auto",
+            autoload: false,
+            paging: true,
+            pageSize: 5,
+            pageButtonCount: 5,
+            pageIndex: 1,
+            data: allReports,
+            fields: [
+                { name: "name", title: "Name", width: 50 },
+                { name: "tm", title: "Team", width: 100 },
+                { name: "age", title: "Age", width: 75 },
+                { name: "pos", title: "Position", width: 50 },
+                { name: "qBrec", title: "Quarterback Record", width: 75 },
+                { name: "cmpPer", title: "Completed Percentage", width: 50 },
+                { name: "passYds", title: "Pass Yards", width: 50 },
+                { name: "td", title: "Touchdowns", width: 75 },
+                { name: "int", title: "Interceptions", width: 50 },
+                { name: "qbr", title: "Quarterback Rating", width: 50 }
             ]
         });
     }

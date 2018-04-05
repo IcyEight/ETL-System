@@ -5,7 +5,9 @@ using System.Security.Claims;
 using Main.Data;
 using Main.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Main.Controllers
 {
@@ -13,10 +15,12 @@ namespace Main.Controllers
     public class ReportingController : Controller
     {
         private readonly BamsDbContext _dbcontext;
+        private readonly IHostingEnvironment _HostingEnvironment;
 
-        public ReportingController(BamsDbContext dbcontext)
+        public ReportingController(BamsDbContext dbcontext, IHostingEnvironment HostingEnvironment)
         {
             _dbcontext = dbcontext;
+            _HostingEnvironment = HostingEnvironment;
         }
 
         public ViewResult Index()
@@ -24,6 +28,8 @@ namespace Main.Controllers
             ViewBag.Title = "Reporting";
             ReportingViewModel vm = new ReportingViewModel();
             vm.Reporting = _dbcontext.Reportings;
+
+            GetFantasyData();
 
             var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
@@ -56,6 +62,15 @@ namespace Main.Controllers
             }).ToList();
 
             return Json(reportList);
+        }
+
+        public JsonResult GetFantasyData()
+        {
+            string contentRootPath = _HostingEnvironment.ContentRootPath;
+            var footballStats = System.IO.File.ReadAllText(contentRootPath + "/Data/test.json").Replace("\r\n", "");
+            var myObj = JsonConvert.DeserializeObject<List<FantasyPlayer>>(footballStats);
+
+            return Json(myObj);
         }
 
     }
