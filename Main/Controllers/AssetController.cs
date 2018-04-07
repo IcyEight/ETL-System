@@ -170,11 +170,24 @@ namespace Main.Controllers
 
         public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner, string moduleName)
         {
+            // trim whitespace on non null text input
+            name = name == null ? null : name.Trim();
+            shortDescription = shortDescription == null ? null : shortDescription.Trim();
+            longDescription = longDescription == null ? null : longDescription.Trim();
+            owner = owner == null ? null : owner.Trim();
+
             // check provided owner is a registered user in the database
             var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
             if (userDetails == null)
             {
                 return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
+            }
+
+            // check that asset does not already exist in system
+            bool isDuplicateAsset = CheckDuplicateAsset(name);
+            if (isDuplicateAsset == true)
+            {
+                return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
             }
 
             var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
@@ -225,11 +238,24 @@ namespace Main.Controllers
 
         public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner, string moduleName)
         {
+            // trim whitespace on non null text input
+            name = name == null ? null : name.Trim();
+            shortDescription = shortDescription == null ? null : shortDescription.Trim();
+            longDescription = longDescription == null ? null : longDescription.Trim();
+            owner = owner == null ? null : owner.Trim();
+
             // check provided owner is a registered user in the database
             var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
             if (userDetails == null)
             {
                 return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
+            }
+
+            // check that asset does not already exist in system
+            bool isDuplicateAsset = CheckDuplicateAsset(name);
+            if (isDuplicateAsset == true)
+            {
+                return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
             }
 
             var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
@@ -349,6 +375,20 @@ namespace Main.Controllers
 
                 _dbcontext.Update(pa);
                 _dbcontext.SaveChanges();
+            }
+        }
+
+        public bool CheckDuplicateAsset(string name)
+        {
+            // search asset table for similar assets
+            var existingAssets = _dbcontext.Assets.Where(x => x.AssetName == name).ToList();
+            if (existingAssets.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

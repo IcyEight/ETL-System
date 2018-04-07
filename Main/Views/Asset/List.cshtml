@@ -176,10 +176,14 @@
                     complete: function (data) {
                         var response = JSON.parse(data.responseText);
 
-                        if (response.validOwner == false) {
-                            // invalid owner message to user
+                        if (response.validOwner == false || response.duplicateAsset == true) {
+                            // invalid owner message or duplicate asset message to user
                             window.alert(response.message);
                         }
+                        //else if (response.duplicateAsset == true) {
+                        //    // duplicate asset message to user
+                        //    window.alert(response.message);
+                        //}
                         else {
                             // refresh assets list
                             $("#assetDialog").dialog("close");
@@ -218,8 +222,8 @@
                     complete: function (data) {
                         var response = JSON.parse(data.responseText);
 
-                        if (response.validOwner == false) {
-                            // invalid owner message to user
+                        if (response.validOwner == false || response.duplicateAsset == true) {
+                            // invalid owner message or duplicate asset message to user
                             window.alert(response.message);
                         }
                         else {
