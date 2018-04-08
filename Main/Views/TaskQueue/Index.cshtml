@@ -85,10 +85,16 @@
                 { name: "dateComplete", title: "Date Completed", width: 50 },
                 {
                     itemTemplate: function (_, item) {
-                        return $("<button>").text("Mark Complete")
-                            .on("click", function () {
-                                markTaskComplete(item);
-                            });
+                        if (item.isComplete == "complete") {
+                            // mark complete button is disabled
+                            return $("<button disabled>").text("Mark Complete").addClass("btn-disable");
+                        }
+                        else {
+                            return $("<button>").text("Mark Complete")
+                                .on("click", function () {
+                                    markTaskComplete(item);
+                                });
+                        }
                     }
                 }
             ]
@@ -125,3 +131,15 @@
         });
     }
 </script>
+
+
+@* CSS for disabled button must be in this file due to dynamically building out button elements in jsgrid item template *@
+<style type="text/css">
+    .btn-disable {
+        border: 2px outset ButtonFace;
+        color: GrayText;
+        cursor: inherit;
+        background-color: #ddd;
+        background: #ddd;
+    }
+</style>
