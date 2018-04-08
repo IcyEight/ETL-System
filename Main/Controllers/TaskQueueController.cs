@@ -132,5 +132,51 @@ namespace Main.Controllers
                 return false;
             }
         }
+
+
+        public JsonResult ReassignTask(int assetId, string alertMsg, string tName, string tAssignee)
+        {
+            try
+            {
+                // check provided assignee is a registered user in the database
+                var userDetails = _dbcontext.Users.AsNoTracking().Where(x => x.UserName == tAssignee || x.Email == tAssignee).FirstOrDefault();
+                if (userDetails == null)
+                {
+                    return Json(new { errorReassigning = true, validOwner = false, message = "The owner you reassigned the task to is not a registered user in BAMS.  Please provide a registered user as the assignee." });
+                }
+
+                bool isComplete = CheckIfTaskComplete(assetId);
+
+                if (isComplete == true)
+                {
+                    return Json(new { errorReassigning = true, wasComplete = true, message = "Unable to reassign a task that has been completed.  Please select another task." });
+                }
+                else
+                {
+                    // get current user (user reassigning the task)
+                    var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var currentUser = _dbcontext.Users.AsNoTracking().Where(x => x.Id == user).FirstOrDefault();
+                    string resolvingUser = currentUser.UserName;
+
+                    // create modified task object to save new assignee
+                    TaskQueue modifiedTask = new TaskQueue();
+                    modifiedTask.AssetId = assetId;
+                    modifiedTask.isComplete = false;
+                    modifiedTask.alertMessage = alertMsg;
+                    modifiedTask.Name = tName;
+                    modifiedTask.assignee = tAssignee;
+
+                    _dbcontext.Update(modifiedTask);
+                    _dbcontext.SaveChanges();
+
+                    return Json(new { errorCompleting = false, wasComplete = false, message = "Successfully modified the assignee of " + tName + "." });
+                }
+            }
+            catch (Exception ex)
+            {
+                // EVENTUALLY LOG EXCEPTION
+                return Json(new { errorCompleting = true, message = "An error occured while reassigning the task to another user.  Please try again or contact a system admin." });
+            }
+        }
     }
 }

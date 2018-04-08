@@ -96,16 +96,13 @@
                 },
                 complete: function (data) {
                     var response = JSON.parse(data.responseText);
-                    console.log(response);
+
                     if (response.success) {
                         $("#firstname").prop('readOnly', true);
                         $("#editFirstname").prop('disabled',false);
                         $("#saveFirstname").prop('disabled',true);
-                        console.log(response.responseText);
                         window.location.reload();
-                    } else {
-                        console.log(response.responseText);
-                    }                          
+                    }                      
                 }
             });
            }
@@ -125,16 +122,12 @@
                 },
                 complete: function (data) {
                     var response = JSON.parse(data.responseText);
-                    console.log(response);
                     if (response.success) {
                         $("#lastname").prop('readOnly', true);
                         $("#editLastname").prop('disabled',false);
                         $("#saveLastname").prop('disabled',true);
-                        console.log(response.responseText);
                         window.location.reload();
-                    } else {
-                        console.log(response.responseText);
-                    }                          
+                    }                        
                 }
             });
            }
@@ -154,15 +147,12 @@
                 },
                 complete: function (data) {
                     var response = JSON.parse(data.responseText);
-                    console.log(response);
+
                     if (response.success) {
                         $("#email").prop('readOnly', true);
                         $("#editEmail").prop('disabled',false);
                         $("#saveEmail").prop('disabled',true);
-                        console.log(response.responseText);
-                    } else {
-                        console.log(response.responseText);
-                    }                          
+                    }                       
                 }
             });
            }
