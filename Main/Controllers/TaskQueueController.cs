@@ -81,33 +81,41 @@ namespace Main.Controllers
         // mark task from the task queue as complete
         public JsonResult MarkTaskAsComplete(int assetId, string alertMsg, string tName, string tAssignee)
         {
-            bool isComplete = CheckIfTaskComplete(assetId);
-
-            if (isComplete == true)
+            try
             {
-                return Json(new { wasComplete = true, message = "The task you selected has already been marked complete.  Please select another task." });
-            }
-            else
+                bool isComplete = CheckIfTaskComplete(assetId);
+
+                if (isComplete == true)
+                {
+                    return Json(new { errorCompleting = false, wasComplete = true, message = "The task you selected has already been marked complete.  Please select another task." });
+                }
+                else
+                {
+                    // get current user (user resolving the task)
+                    var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+                    string resolvingUser = userDetails.UserName;
+
+                    // create modified task object
+                    TaskQueue modifiedTask = new TaskQueue();
+                    modifiedTask.AssetId = assetId;
+                    modifiedTask.isComplete = true;
+                    modifiedTask.resolvedBy = resolvingUser;
+                    modifiedTask.dateComplete = DateTime.Now;
+                    modifiedTask.alertMessage = alertMsg;
+                    modifiedTask.Name = tName;
+                    modifiedTask.assignee = tAssignee;
+
+                    _dbcontext.Update(modifiedTask);
+                    _dbcontext.SaveChanges();
+
+                    return Json(new { errorCompleting = false, wasComplete = false, message = "Successfully marked task as complete." });
+                }
+                }
+            catch (Exception ex)
             {
-                // get current user (user resolving the task)
-                var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
-                string resolvingUser = userDetails.UserName;
-
-                // create modified task object
-                TaskQueue modifiedTask = new TaskQueue();
-                modifiedTask.AssetId = assetId;
-                modifiedTask.isComplete = true;
-                modifiedTask.resolvedBy = resolvingUser;
-                modifiedTask.dateComplete = DateTime.Now;
-                modifiedTask.alertMessage = alertMsg;
-                modifiedTask.Name = tName;
-                modifiedTask.assignee = tAssignee;
-
-                _dbcontext.Update(modifiedTask);
-                _dbcontext.SaveChanges();
-
-                return Json(new { wasComplete = false, message = "Successfully marked task as complete." });
+                // EVENTUALLY LOG EXCEPTION
+                return Json(new { errorCompleting = true, message = "An error occured while marking the task complete.  Please try again or contact a system admin." });
             }
         }
 

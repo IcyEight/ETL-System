@@ -119,13 +119,23 @@
             complete: function (data) {
                 var response = JSON.parse(data.responseText);
 
-                if (response.wasComplete == true) {
-                    // task already complete message to user
+                if (response.errorCompleting == true) {
+                    // error popup
                     window.alert(response.message);
                 }
                 else {
-                    // refresh page
-                    window.location.reload();
+                    if (response.wasComplete == true) {
+                        // task already complete message to user
+                        window.alert(response.message);
+                    }
+                    else {
+                        if (confirm(response.message)) {
+                            window.location.reload();
+                        }
+                        else {
+                            window.location.reload();
+                        }
+                    }
                 }
             }
         });
