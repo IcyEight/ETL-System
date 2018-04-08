@@ -139,174 +139,203 @@ namespace Main.Controllers
 
         public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
         {
-            var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
-
-            Asset deletedAsset = new Asset();
-            deletedAsset.AssetId = assetId;
-            deletedAsset.AssetName = name;
-            deletedAsset.ShortDescription = shortDescription;
-            deletedAsset.LongDescription = longDescription;
-            if (findAssetType == null)
+            try
             {
-                deletedAsset.typeName = null;
+                var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
+
+                Asset deletedAsset = new Asset();
+                deletedAsset.AssetId = assetId;
+                deletedAsset.AssetName = name;
+                deletedAsset.ShortDescription = shortDescription;
+                deletedAsset.LongDescription = longDescription;
+                if (findAssetType == null)
+                {
+                    deletedAsset.typeName = null;
+                }
+                else
+                {
+                    deletedAsset.typeName = findAssetType.typeName;
+                }
+
+                deletedAsset.isDeleted = true;
+
+                // delete asset from user's preferred assets
+                SaveUsersPreferredAsset(assetId, true);
+
+                _dbcontext.Update(deletedAsset);
+                _dbcontext.SaveChanges();
+
+                return Json(new { isDeleted = true, message = "Successfully deleted " + name + "." });
             }
-            else
+            catch (Exception ex)
             {
-                deletedAsset.typeName = findAssetType.typeName;
+                // EVENTUALLY LOG EXCEPTION
+                return Json(new { isDeleted = false, message = "An error occured while attempting to delete " + name + ".  Please try again or contact a system admin." });
             }
-
-            deletedAsset.isDeleted = true;
-
-            // delete asset from user's preferred assets
-            SaveUsersPreferredAsset(assetId, true);
-
-            _dbcontext.Update(deletedAsset);
-            _dbcontext.SaveChanges();
-
-            JsonResult updatedAssetList = GetCurrentAssets();
-
-            return Json(updatedAssetList);
         }
 
         public JsonResult ModifyAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner, string moduleName)
         {
-            // trim whitespace on non null text input
-            name = name == null ? null : name.Trim();
-            shortDescription = shortDescription == null ? null : shortDescription.Trim();
-            longDescription = longDescription == null ? null : longDescription.Trim();
-            owner = owner == null ? null : owner.Trim();
-
-            // check provided owner is a registered user in the database
-            var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
-            if (userDetails == null)
+            try
             {
-                return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
-            }
+                // trim whitespace on non null text input
+                name = name == null ? null : name.Trim();
+                shortDescription = shortDescription == null ? null : shortDescription.Trim();
+                longDescription = longDescription == null ? null : longDescription.Trim();
+                owner = owner == null ? null : owner.Trim();
 
-            // check that asset does not already exist in system
-            bool isDuplicateAsset = CheckDuplicateAsset(name);
-            if (isDuplicateAsset == true)
+                // check provided owner is a registered user in the database
+                var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
+                if (userDetails == null)
+                {
+                    return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
+                }
+
+                // check that asset does not already exist in system (only if name of asset changed)
+                var nameChange = _dbcontext.Assets.AsNoTracking().Where(x => x.AssetId == assetId).FirstOrDefault();
+                if (nameChange != null)
+                {
+                    if (nameChange.AssetName != name)
+                    {
+                        bool isDuplicateAsset = CheckDuplicateAsset(name);
+                        if (isDuplicateAsset == true)
+                        {
+                            return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
+                        }
+                    }
+                }
+
+                var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
+
+                Asset modifiedAsset = new Asset();
+                modifiedAsset.AssetId = assetId;
+                modifiedAsset.AssetName = name;
+                modifiedAsset.ShortDescription = shortDescription;
+                modifiedAsset.LongDescription = longDescription;
+                modifiedAsset.Owner = owner;
+
+                if (findAssetType == null)
+                {
+                    modifiedAsset.typeName = null;
+                }
+                else
+                {
+                    modifiedAsset.typeName = findAssetType.typeName;
+                }
+                modifiedAsset.isDeleted = false;
+
+                // set preferred asset for current user
+                if (isPreferredAsset == true)
+                {
+                    SaveUsersPreferredAsset(assetId, false);
+                }
+                else
+                {
+                    SaveUsersPreferredAsset(assetId, true);
+                }
+
+                _dbcontext.Update(modifiedAsset);
+                _dbcontext.SaveChanges();
+
+                // get recently modified asset and update module linked to that asset if the asset was assigned a module
+                if (moduleName != null)
+                {
+                    AssetModule assetModuleLink = new AssetModule();
+                    assetModuleLink.assetID = assetId;
+                    assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
+                    UpdateAssetsModule(assetModuleLink);
+                }
+
+                JsonResult updatedAssetList = GetCurrentAssets();
+
+                return Json(new { isUpdated = true, message = "Successfully updated the selected asset.", updatedAssets = updatedAssetList });
+            }
+            catch (Exception ex)
             {
-                return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
+                // EVENTUALLY LOG EXCEPTION
+                return Json(new { isUpdated = false, message = "An error occured while attempting to update the selected asset.  Please try again or contact a system admin." });
             }
-
-            var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
-
-            Asset modifiedAsset = new Asset();
-            modifiedAsset.AssetId = assetId;
-            modifiedAsset.AssetName = name;
-            modifiedAsset.ShortDescription = shortDescription;
-            modifiedAsset.LongDescription = longDescription;
-            modifiedAsset.Owner = owner;
-
-            if (findAssetType == null)
-            {
-                modifiedAsset.typeName = null;
-            }
-            else
-            {
-                modifiedAsset.typeName = findAssetType.typeName;
-            }
-            modifiedAsset.isDeleted = false;
-
-            // set preferred asset for current user
-            if (isPreferredAsset == true)
-            {
-                SaveUsersPreferredAsset(assetId, false);
-            }
-            else
-            {
-                SaveUsersPreferredAsset(assetId, true);
-            }
-
-            _dbcontext.Update(modifiedAsset);
-            _dbcontext.SaveChanges();
-
-            // get recently modified asset and update module linked to that asset if the asset was assigned a module
-            if (moduleName != null)
-            {
-                AssetModule assetModuleLink = new AssetModule();
-                assetModuleLink.assetID = assetId;
-                assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
-                UpdateAssetsModule(assetModuleLink);
-            }
-
-            JsonResult updatedAssetList = GetCurrentAssets();
-
-            return Json(updatedAssetList);
         }
 
         public JsonResult AddAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string owner, string moduleName)
         {
-            // trim whitespace on non null text input
-            name = name == null ? null : name.Trim();
-            shortDescription = shortDescription == null ? null : shortDescription.Trim();
-            longDescription = longDescription == null ? null : longDescription.Trim();
-            owner = owner == null ? null : owner.Trim();
-
-            // check provided owner is a registered user in the database
-            var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
-            if (userDetails == null)
+            try
             {
-                return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
-            }
+                // trim whitespace on non null text input
+                name = name == null ? null : name.Trim();
+                shortDescription = shortDescription == null ? null : shortDescription.Trim();
+                longDescription = longDescription == null ? null : longDescription.Trim();
+                owner = owner == null ? null : owner.Trim();
 
-            // check that asset does not already exist in system
-            bool isDuplicateAsset = CheckDuplicateAsset(name);
-            if (isDuplicateAsset == true)
+                // check provided owner is a registered user in the database
+                var userDetails = _dbcontext.Users.Where(x => x.UserName == owner || x.Email == owner).FirstOrDefault();
+                if (userDetails == null)
+                {
+                    return Json(new { validOwner = false, message = "The owner you provided for the asset is not a registered user in BAMS.  Please provide a registered user as the owner." });
+                }
+
+                // check that asset does not already exist in system
+                bool isDuplicateAsset = CheckDuplicateAsset(name);
+                if (isDuplicateAsset == true)
+                {
+                    return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
+                }
+
+                var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
+
+                Asset newAsset = new Asset();
+                newAsset.AssetId = assetId;
+                newAsset.AssetName = name;
+                newAsset.ShortDescription = shortDescription;
+                newAsset.LongDescription = longDescription;
+                newAsset.Owner = owner;
+
+                if (findAssetType == null)
+                {
+                    newAsset.typeName = null;
+                }
+                else
+                {
+                    newAsset.typeName = findAssetType.typeName;
+                }
+                newAsset.isDeleted = false;
+
+                if (isPreferredAsset == true)
+                {
+                    SaveUsersPreferredAsset(assetId, false);
+                }
+                else
+                {
+                    SaveUsersPreferredAsset(assetId, true);
+                }
+
+                _dbcontext.Assets.Add(newAsset);
+                _dbcontext.SaveChanges();
+
+                // find recently added asset and update module linked to that asset if the asset was assigned a module
+                if (moduleName != null)
+                {
+                    var newlyAddedAsset = _dbcontext.Assets.Where(x => x.AssetName == name
+                        && x.LongDescription == longDescription && x.ShortDescription == shortDescription
+                        && x.Owner == owner).FirstOrDefault();
+
+                    var newAssetId = newlyAddedAsset.AssetId;
+
+                    AssetModule assetModuleLink = new AssetModule();
+                    assetModuleLink.assetID = newAssetId;
+                    assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
+                    AddAssetsModule(assetModuleLink);
+                }
+
+                JsonResult updatedAssetList = GetCurrentAssets();
+
+                return Json(new { isAdded = true, message = "Successfully added new asset " + name + ".", updatedAssets = updatedAssetList });
+            }
+            catch (Exception ex)
             {
-                return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
+                // EVENTUALLY LOG EXCEPTION
+                return Json(new { isAdded = false, message = "An error occured while attempting to add the new asset " + name + ".  Please try again or contact a system admin." });
             }
-
-            var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
-
-            Asset newAsset = new Asset();
-            newAsset.AssetId = assetId;
-            newAsset.AssetName = name;
-            newAsset.ShortDescription = shortDescription;
-            newAsset.LongDescription = longDescription;
-            newAsset.Owner = owner;
-
-            if (findAssetType == null)
-            {
-                newAsset.typeName = null;
-            }
-            else
-            {
-                newAsset.typeName = findAssetType.typeName;
-            }
-            newAsset.isDeleted = false;
-
-            if (isPreferredAsset == true)
-            {
-                SaveUsersPreferredAsset(assetId, false);
-            }
-            else
-            {
-                SaveUsersPreferredAsset(assetId, true);
-            }
-
-            _dbcontext.Assets.Add(newAsset);
-            _dbcontext.SaveChanges();
-
-            // find recently added asset and update module linked to that asset if the asset was assigned a module
-            if (moduleName != null)
-            {
-                var newlyAddedAsset = _dbcontext.Assets.Where(x => x.AssetName == name 
-                    && x.LongDescription == longDescription && x.ShortDescription == shortDescription 
-                    && x.Owner == owner).FirstOrDefault();
-
-                var newAssetId = newlyAddedAsset.AssetId;
-
-                AssetModule assetModuleLink = new AssetModule();
-                assetModuleLink.assetID = newAssetId;
-                assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
-                AddAssetsModule(assetModuleLink);
-            }
-
-            JsonResult updatedAssetList = GetCurrentAssets();
-
-            return Json(updatedAssetList);
         }
 
         public JsonResult GetAssetTypes()
@@ -316,6 +345,8 @@ namespace Main.Controllers
             return Json(assetTypes);
         }
 
+
+        #region Asset Modules
         public JsonResult GetAssetModules()
         {
             var assetModules = _dbcontext.Modules.ToList();
@@ -346,7 +377,10 @@ namespace Main.Controllers
                 _dbcontext.SaveChanges();
             }
         }
+        #endregion
 
+
+        #region Preferred Assets
         public void SaveUsersPreferredAsset(int assetId, Boolean isDeleted)
         {
             // get current user to save preferred asset under
@@ -377,11 +411,13 @@ namespace Main.Controllers
                 _dbcontext.SaveChanges();
             }
         }
+        #endregion
+
 
         public bool CheckDuplicateAsset(string name)
         {
             // search asset table for similar assets
-            var existingAssets = _dbcontext.Assets.Where(x => x.AssetName == name).ToList();
+            var existingAssets = _dbcontext.Assets.AsNoTracking().Where(x => x.AssetName == name && x.isDeleted != true).ToList();
             if (existingAssets.Count > 0)
             {
                 return true;

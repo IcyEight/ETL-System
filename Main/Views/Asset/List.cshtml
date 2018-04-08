@@ -139,14 +139,21 @@
                     dataType: 'application/json',
                     data: {
                         assetId: deletedItem.assetId,
-                        assetName: deletedItem.assetName,
+                        name: deletedItem.assetName,
                         shortDescription: deletedItem.shortDescription,
                         longDescription: deletedItem.longDescription,
                         isPreferredAsset: deletedItem.isPreferredAsset,
                         assetType: deletedItem.assetType
                     },
                     complete: function (data) {
-                        $("#allAssetGrid").jsGrid("refresh");
+                        var response = JSON.parse(data.responseText);
+
+                        if (confirm(response.message)) {
+                            $("#allAssetGrid").jsGrid("refresh");
+                        }
+                        else {
+                            $("#allAssetGrid").jsGrid("refresh");
+                        }
                     }
                 });
             },
@@ -180,17 +187,27 @@
                             // invalid owner message or duplicate asset message to user
                             window.alert(response.message);
                         }
-                        //else if (response.duplicateAsset == true) {
-                        //    // duplicate asset message to user
-                        //    window.alert(response.message);
-                        //}
                         else {
-                            // refresh assets list
-                            $("#assetDialog").dialog("close");
-
-                            var updatedAssetList = JSON.parse(data["responseText"]);
-                            var uAL = updatedAssetList["value"];
-                            buildAssetGrid(uAL);
+                            if (response.isUpdated == false) {
+                                // error message
+                                window.alert(response.message);
+                            }
+                            else {
+                                if (confirm(response.message)) {
+                                    // refresh assets list
+                                    $("#assetDialog").dialog("close");
+                                    var updatedAssetList = response.updatedAssets;
+                                    var uAL = updatedAssetList["value"];
+                                    buildAssetGrid(uAL);
+                                }
+                                else {
+                                    // refresh assets list
+                                    $("#assetDialog").dialog("close");
+                                    var updatedAssetList = response.updatedAssets;
+                                    var uAL = updatedAssetList["value"];
+                                    buildAssetGrid(uAL);
+                                }
+                            }
                         }
                     }
                 });
@@ -227,12 +244,26 @@
                             window.alert(response.message);
                         }
                         else {
-                            // refresh assets list
-                            $("#assetDialog").dialog("close");
-
-                            var updatedAssetList = JSON.parse(data["responseText"]);
-                            var uAL = updatedAssetList["value"];
-                            buildAssetGrid(uAL);
+                            if (response.isAdded == false) {
+                                // error message
+                                window.alert(response.message);
+                            }
+                            else {
+                                if (confirm(response.message)) {
+                                    // refresh assets list
+                                    $("#assetDialog").dialog("close");
+                                    var updatedAssetList = response.updatedAssets;
+                                    var uAL = updatedAssetList["value"];
+                                    buildAssetGrid(uAL);
+                                }
+                                else {
+                                    // refresh assets list
+                                    $("#assetDialog").dialog("close");
+                                    var updatedAssetList = response.updatedAssets;
+                                    var uAL = updatedAssetList["value"];
+                                    buildAssetGrid(uAL);
+                                }
+                            }
                         }
                     }
                 });
