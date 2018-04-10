@@ -43,6 +43,8 @@ namespace Main
                         var context = services.GetRequiredService<BamsDbContext>();
                         var logger = services.GetRequiredService<ILogger<Program>>();
                         DbInitializer.Seed(context, logger);
+
+                        DataAPIConnect.startDataMonitoringThread(services.GetRequiredService<BamsDbContext>());
                     }
                     catch (Exception ex)
                     {
