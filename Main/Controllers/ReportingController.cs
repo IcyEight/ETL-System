@@ -32,31 +32,32 @@ namespace Main.Controllers
             return View(vm);
         }
 
-        public List<ReportingDisplayModel> GetReports()
-        {
-            List<ReportingDisplayModel> reportList = _dbcontext.Reportings.Where(x => x.DateCreate == null || x.DateCreate > DateTime.Now.AddDays(-1)).Select(x => new ReportingDisplayModel
-            {
-                ReportID = x.ReportID,
-                Name = x.Name,
-                DateCreate = x.DateCreate.Value.ToShortDateString(),
-                DateModified = x.DateModified.Value.ToShortDateString()
-            }).ToList();
+        //public List<ReportingDisplayModel> GetReports()
+        //{
+        //    List<ReportingDisplayModel> reportList = _dbcontext.Reportings.Where(x => x.DateCreate == null || x.DateCreate > DateTime.Now.AddDays(-1)).Select(x => new ReportingDisplayModel
+        //    {
+        //        ReportID = x.ReportID,
+        //        Name = x.Name,
+        //        DateCreate = x.DateCreate.Value.ToShortDateString(),
+        //        DateModified = x.DateModified.Value.ToShortDateString()
+        //    }).ToList();
 
-            return reportList;
-        }
+        //    return reportList;
+        //}
 
         public JsonResult GetReportsView()
         {
-            List<ReportingDisplayModel> reportList = _dbcontext.Reportings.Where(x => x.DateCreate == null || x.DateCreate > DateTime.Now.AddDays(-1)).Select(x => new ReportingDisplayModel
+            List<ReportingDisplayModel> reportList = _dbcontext.AssetData.Where(x => x.fieldName == "Name").Select(x => new ReportingDisplayModel
+
             {
-                ReportID = x.ReportID,
-                Name = x.Name,
-                DateCreate = x.DateCreate == null ? null : x.DateCreate.Value.ToShortDateString(),
-                DateModified = x.DateModified == null ? null : x.DateModified.Value.ToShortDateString(),
+                fieldName = x.fieldName,
+                strValue = x.strValue,
             }).ToList();
 
             return Json(reportList);
         }
+
+
 
     }
 }

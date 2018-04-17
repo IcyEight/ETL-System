@@ -11,9 +11,7 @@ namespace Main.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
-        public int ReportID { get; set; }
-        public String Name { get; set; }
-        public DateTime? DateCreate { get; set; }
-        public DateTime? DateModified { get; set; }
+        public String fieldName { get; set; }
+        public String strValue { get; set; }
     }
 }

@@ -11,8 +11,8 @@ using System;
 namespace Main.Migrations
 {
     [DbContext(typeof(BamsDbContext))]
-    [Migration("20180313062109_BamsDB")]
-    partial class BamsDB
+    [Migration("20180313163353_mg")]
+    partial class mg
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

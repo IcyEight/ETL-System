@@ -12,6 +12,8 @@
     <Compile Remove="Migrations\20180308214522_UserId.Designer.cs" />
     <Compile Remove="Migrations\20180313003516_AssetTypeChg.cs" />
     <Compile Remove="Migrations\20180313003516_AssetTypeChg.Designer.cs" />
+    <Compile Remove="Migrations\20180313163334_mg.cs" />
+    <Compile Remove="Migrations\20180313163334_mg.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

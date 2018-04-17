@@ -17,10 +17,11 @@
                 <li><a href="@Url.Action("List","Asset")">Asset</a></li>
                 <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
                 <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
-                <li><a href="@Url.Action("Index", "UserProfile")">User Profile</a></li>
-                <span class="navbar-text" style="color: #e3f2fd;font-family:verdana;">
-                   @Model.FirstName @Model.LastName
-                </span>
+                <li><a href="@Url.Action("Index", "UserProfile")">
+                    <span style="color: #e3f2fd;font-family:verdana;">
+                        @Model.FirstName @Model.LastName
+                    </span>
+                </a></li>
             </ul>
         </div>
     </div>

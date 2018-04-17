@@ -33,10 +33,11 @@
                     <li><a href="@Url.Action("List","Asset")">Asset</a></li>
                     <li class="active"><a href="@Url.Action("Index","TaskQueue")">Task Queue<span class="sr-only">(current)</span></a></li>
                     <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
-                    <li><a href="@Url.Action("Index", "UserProfile")">User Profile</a></li>
-                    <span class="navbar-text" style="color: #e3f2fd;font-family:verdana;">
-                        @Model.FirstName @Model.LastName
-                    </span>
+                    <li><a href="@Url.Action("Index", "UserProfile")">
+                        <span style="color: #e3f2fd;font-family:verdana;">
+                            @Model.FirstName @Model.LastName
+                        </span>
+                    </a></li>
                 </ul>
             </div>
         </div>
@@ -85,11 +86,11 @@
     var tasksList;
     $(document).ready(function () {
         $.ajax({
-            url: "/TaskQueue/GetTasksWebView",
-            dataType: 'application/json',
+            url: "/taskqueue/gettaskswebview",
+            datatype: 'application/json',
             complete: function (data) {
-                tasksList = JSON.parse(data["responseText"]);
-                buildTaskQueueGrid(tasksList);
+                taskslist = json.parse(data["responsetext"]);
+                buildtaskqueuegrid(taskslist);
             }
         });
     });
