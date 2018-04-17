@@ -14,6 +14,7 @@
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
     <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+    <script src="~/Scripts/signalr-client-1.0.0-alpha2-final.js"></script>
 </head>
 
 <body>
@@ -37,12 +38,16 @@
                     <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
                     <li><a href="@Url.Action("Index", "UserProfile")">User Profile</a></li>
                     <span class="navbar-text" style="color: #e3f2fd;font-family:verdana;">
-                      @Model.FirstName @Model.LastName
+                        @Model.FirstName @Model.LastName
                     </span>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
+
+    <div id="alertBox" style="padding-top:0px !important; text-align:center !important; border-style: solid; border-color:#dc3545!important; background-color:#dc3545!important" class="hidden">
+        Your view is outdated.  Please <a href="javascript:refreshPage()">refresh</a> the page to get the latest data.
+    </div>
 
     <h2 align="center">@ViewBag.Title</h2>
 
@@ -94,6 +99,8 @@
             </div>
         </form>
     </div>
+
+    <input type="button" id="sendSignalRAlert" value="Send" class="hidden" />
 </body>
 </html>
 
@@ -146,6 +153,10 @@
                         assetType: deletedItem.assetType
                     },
                     complete: function (data) {
+                        triggeredAlert = true;
+                        var button = document.getElementById("sendSignalRAlert");
+                        button.click();
+
                         var response = JSON.parse(data.responseText);
 
                         if (confirm(response.message)) {
@@ -193,6 +204,10 @@
                                 window.alert(response.message);
                             }
                             else {
+                                triggeredAlert = true;
+                                var button = document.getElementById("sendSignalRAlert");
+                                button.click();
+
                                 if (confirm(response.message)) {
                                     // refresh assets list
                                     $("#assetDialog").dialog("close");
@@ -249,6 +264,10 @@
                                 window.alert(response.message);
                             }
                             else {
+                                triggeredAlert = true;
+                                var button = document.getElementById("sendSignalRAlert");
+                                button.click();
+
                                 if (confirm(response.message)) {
                                     // refresh assets list
                                     $("#assetDialog").dialog("close");
@@ -276,7 +295,7 @@
                 { name: "isPreferredAsset", title: "Is Preferred Asset", width: 50 },
                 { name: "typeID", width: 0, visible: false },
                 { name: "owner", title: "Owner", width: 50 },
-                { name: "moduleID", title: "Module", width: 0, visible: false},
+                { name: "moduleID", title: "Module", width: 0, visible: false },
                 {
                     type: "control",
                     modeSwitchButton: false,
@@ -373,4 +392,33 @@
             }
         });
     }
+
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
+
+<!-- SIGNALR SCRIPT -->
+<script type="text/javascript">
+    // for tracking whether to display the alert
+    var triggeredAlert = false;
+    var transport = signalR.TransportType.WebSockets;
+    var connection = new signalR.HubConnection("http://localhost:12834/alert", { transport: transport });
+
+    var button = document.getElementById("sendSignalRAlert");
+    connection.on('broadcastMessage', (name, message) => {
+        // only display if current client did not make the change to the data
+        if (triggeredAlert != true) {
+            $("#alertBox").removeClass("hidden");
+        }
+        else {
+            // reset alert value
+            triggeredAlert = false;
+        }
+    });
+    button.addEventListener("click", event => {
+        connection.invoke('send', "alertMessage", "Your view is outdated.  Please refresh the page to get the latest data.");
+    });
+    connection.start();
 </script>

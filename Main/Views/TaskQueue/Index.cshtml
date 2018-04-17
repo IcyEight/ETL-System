@@ -12,10 +12,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-
-    @*<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
-    <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>*@
+    <script src="~/Scripts/signalr-client-1.0.0-alpha2-final.js"></script>
 </head>
 
 <body>
@@ -44,6 +41,10 @@
             </div>
         </div>
     </nav>
+
+    <div id="alertBox" style="padding-top:0px !important; text-align:center !important; border-style: solid; border-color:#dc3545!important; background-color:#dc3545!important" class="hidden">
+        Your view is outdated.  Please <a href="javascript:refreshPage()">refresh</a> the page to get the latest data.
+    </div>
 
     <h2 align="center">@ViewBag.Title</h2>
 
@@ -75,6 +76,8 @@
         </div>
     </div>
 
+    <input type="button" id="sendSignalRAlert" value="Send" class="hidden" />
+
 </body>
 </html>
 
@@ -105,7 +108,7 @@
                 { name: "assetId", visible: false, width: 0 },
                 { name: "name", title: "Name", width: 50 },
                 { name: "alertMessage", title: "Action Required", width: 100 },
-                { name: "assignee", title: "Assignee", width: 75},
+                { name: "assignee", title: "Assignee", width: 75 },
                 { name: "isComplete", title: "Status", width: 50 },
                 { name: "resolvedBy", title: "Completed By", width: 75 },
                 { name: "dateComplete", title: "Date Completed", width: 50 },
@@ -152,6 +155,10 @@
                     window.alert(response.message);
                 }
                 else {
+                    triggeredAlert = true;
+                    var button = document.getElementById("sendSignalRAlert");
+                    button.click();
+
                     if (response.wasComplete == true) {
                         // task already complete message to user
                         window.alert(response.message);
@@ -208,6 +215,10 @@
                         window.alert(response.message);
                     }
                     else {
+                        triggeredAlert = true;
+                        var button = document.getElementById("sendSignalRAlert");
+                        button.click();
+
                         $("#reassignModal").modal("hide")
 
                         if (confirm(response.message)) {
@@ -221,6 +232,35 @@
             });
         }
     }
+
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
+
+<!-- SIGNALR SCRIPT -->
+<script type="text/javascript">
+    // for tracking whether to display the alert
+    var triggeredAlert = false;
+    var transport = signalR.TransportType.WebSockets;
+    var connection = new signalR.HubConnection("http://localhost:12834/alert", { transport: transport });
+
+    var button = document.getElementById("sendSignalRAlert");
+    connection.on('broadcastMessage', (name, message) => {
+        // only display if current client did not make the change to the data
+        if (triggeredAlert != true) {
+            $("#alertBox").removeClass("hidden");
+        }
+        else {
+            // reset alert value
+            triggeredAlert = false;
+        }
+    });
+    button.addEventListener("click", event => {
+        connection.invoke('send', "alertMessage", "Your view is outdated.  Please refresh the page to get the latest data.");
+    });
+    connection.start();
 </script>
 
 

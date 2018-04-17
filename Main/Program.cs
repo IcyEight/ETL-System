@@ -44,7 +44,7 @@ namespace Main
                         var logger = services.GetRequiredService<ILogger<Program>>();
                         DbInitializer.Seed(context, logger);
 
-                        DataAPIConnect.startDataMonitoringThread(services.GetRequiredService<BamsDbContext>());
+                        //DataAPIConnect.startDataMonitoringThread(services.GetRequiredService<BamsDbContext>());
                     }
                     catch (Exception ex)
                     {

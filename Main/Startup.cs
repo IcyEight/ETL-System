@@ -48,6 +48,7 @@ namespace Main
 
             services.AddReact();
             services.AddMvc();
+            services.AddSignalR();
             return services.BuildServiceProvider();
         }
 
@@ -79,6 +80,12 @@ namespace Main
             });
             app.UseStaticFiles();
 			app.UseMvcWithDefaultRoute();
+
+            app.UseFileServer();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<AlertHub>("alert");
+            });
         }
 
         public int DetectOS(){

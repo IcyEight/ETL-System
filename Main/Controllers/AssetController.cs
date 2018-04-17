@@ -23,7 +23,7 @@ namespace Main.Controllers
 		{
 			_dbcontext = dbcontext;
             _logger = logger;
-		}
+        }
 
         // GET: /<controller>/
         public ViewResult List()
