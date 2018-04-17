@@ -82,11 +82,11 @@
     var tasksList;
     $(document).ready(function () {
         $.ajax({
-            url: "/TaskQueue/GetTasksWebView",
-            dataType: 'application/json',
+            url: "/taskqueue/gettaskswebview",
+            datatype: 'application/json',
             complete: function (data) {
-                tasksList = JSON.parse(data["responseText"]);
-                buildTaskQueueGrid(tasksList);
+                taskslist = json.parse(data["responsetext"]);
+                buildtaskqueuegrid(taskslist);
             }
         });
     });

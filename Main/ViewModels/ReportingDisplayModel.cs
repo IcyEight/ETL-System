@@ -7,9 +7,7 @@ namespace Main.ViewModels
 {
     public class ReportingDisplayModel
     {
-        public int ReportID { get; set; }
-        public String Name { get; set; }
-        public String DateCreate { get; set; }
-        public String DateModified { get; set; }
+        public String fieldName { get; set; }
+        public String strValue { get; set; }
     }
 }

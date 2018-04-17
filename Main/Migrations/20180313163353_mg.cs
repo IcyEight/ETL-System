@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Main.Migrations
 {
-    public partial class BamsDB : Migration
+    public partial class mg : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
