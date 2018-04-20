@@ -2,6 +2,7 @@
 using System.IO;
 using Main.Data;
 using Main.Models;
+using Main.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,9 +40,8 @@ namespace Main
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                //should probably be true in actual use scenarios
-                //options.SignIn.RequireConfirmedEmail = true;
-                //options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<BamsDbContext>()
             .AddDefaultTokenProviders();
@@ -49,6 +49,7 @@ namespace Main
             services.AddReact();
             services.AddMvc();
             services.AddSignalR();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
             return services.BuildServiceProvider();
         }
 
