@@ -106,11 +106,11 @@ namespace Main
             {
                 return 0;
             }
-            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return 1;
             }
-            else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 return 2;
             }
