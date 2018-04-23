@@ -7,24 +7,26 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.InteropServices;
 using React.AspNet;
 
 namespace Main
 {
     public class Startup
     {
-        public static IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -46,14 +48,24 @@ namespace Main
             .AddEntityFrameworkStores<BamsDbContext>()
             .AddDefaultTokenProviders();
 
+            if(Environment.IsDevelopment())
+            {
+                services.AddMvc(opts =>
+                {
+                    opts.Filters.Add(new AllowAnonymousFilter());
+                });
+            }
+            else
+            {
+                services.AddMvc();
+            }
+
             services.AddReact();
-            services.AddMvc();
             services.AddSignalR();
             services.Configure<AuthMessageSenderOptions>(Configuration);
             return services.BuildServiceProvider();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
 			app.UseDeveloperExceptionPage();
@@ -90,7 +102,19 @@ namespace Main
         }
 
         public int DetectOS(){
-            string windir = Environment.GetEnvironmentVariable("windir");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return 0;
+            }
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return 1;
+            }
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return 2;
+            }
+            /*string windir = Environment.GetEnvironmentVariable("windir");
             if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
             {
                 return 0; // windows
@@ -108,7 +132,7 @@ namespace Main
             {
                 // Note: iOS gets here too
                 return 2; //MaxOSX
-            }
+            }*/
             return -1;
         }
     }
