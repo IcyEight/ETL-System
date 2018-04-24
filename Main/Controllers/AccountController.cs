@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Main.Models;
 using Main.Services;
@@ -100,19 +101,15 @@ namespace Main.Controllers
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (userId == null || token == null)
-                return View("Error");
+                return RedirectToAction("Error", "Account");
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return View("Error");
+                //throw new ApplicationException($"Unable to load user with ID '{userId}'.");
+                return RedirectToAction("Error", "Account");
             var result = await _userManager.ConfirmEmailAsync(user, token);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            if (result.Succeeded) return View("ConfirmEmail");
+            else return RedirectToAction("Error", "Account");
         }
-
-        public ActionResult ResetPassword()
-        {
-            return View();
-        }
-
 
         public ActionResult ForgotPassword()
         {
@@ -150,6 +147,11 @@ namespace Main.Controllers
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        public ActionResult ResetPassword()
         {
             return View();
         }
@@ -197,7 +199,10 @@ namespace Main.Controllers
             return View();
         }
 
-       
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
 
         private void AddErrors(IdentityResult result)
         {

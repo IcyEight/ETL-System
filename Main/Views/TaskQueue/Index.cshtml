@@ -7,12 +7,16 @@
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/css/bootstrap-dialog.min.css" />
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
 
-    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>*@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script src="~/Scripts/signalr-client-1.0.0-alpha2-final.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/js/bootstrap-dialog.min.js"></script>
+    <script src="~/Scripts/site.js"></script>
 </head>
 
 <body>
@@ -153,7 +157,7 @@
 
                 if (response.errorCompleting == true) {
                     // error popup
-                    window.alert(response.message);
+                    showPopup(BootstrapDialog.TYPE_DANGER, "Task Queue", response.message);
                 }
                 else {
                     triggeredAlert = true;
@@ -162,15 +166,20 @@
 
                     if (response.wasComplete == true) {
                         // task already complete message to user
-                        window.alert(response.message);
+                        showPopup(BootstrapDialog.TYPE_DANGER, "Task Queue", response.message);
                     }
                     else {
-                        if (confirm(response.message)) {
-                            window.location.reload();
-                        }
-                        else {
-                            window.location.reload();
-                        }
+                        BootstrapDialog.confirm({
+                            title: 'Task Queue',
+                            message: response.message,
+                            type: BootstrapDialog.TYPE_PRIMARY,
+                            btnOKLabel: 'OK',
+                            btnOKClass: 'btn-primary',
+                            callback: function (result) {
+                                // refresh task queue
+                                window.location.reload();
+                            }
+                        });
                     }
                 }
             }
@@ -196,7 +205,7 @@
         var assignee = $('#modalAssignee').val();
 
         if (assignee == "" || assignee == null || assignee === undefined || assignee.trim() == "" || assignee.trim() == null) {
-            window.alert("Invalid input.  Please enter a user as the assignee before saving this form.");
+            showPopup(BootstrapDialog.TYPE_DANGER, "Task Queue", "Invalid input.  Please enter a user as the assignee before saving this form.");
         }
         else {
             $.ajax({
@@ -213,7 +222,7 @@
 
                     if (response.errorReassigning == true) {
                         // error popup (either invalid assignee or task is already complete)
-                        window.alert(response.message);
+                        showPopup(BootstrapDialog.TYPE_DANGER, "Task Queue", response.message);
                     }
                     else {
                         triggeredAlert = true;
@@ -222,12 +231,17 @@
 
                         $("#reassignModal").modal("hide")
 
-                        if (confirm(response.message)) {
-                            window.location.reload();
-                        }
-                        else {
-                            window.location.reload();
-                        }
+                        BootstrapDialog.confirm({
+                            title: 'Task Queue',
+                            message: response.message,
+                            type: BootstrapDialog.TYPE_PRIMARY,
+                            btnOKLabel: 'OK',
+                            btnOKClass: 'btn-primary',
+                            callback: function (result) {
+                                // refresh task queue
+                                window.location.reload();
+                            }
+                        });
                     }
                 }
             });
