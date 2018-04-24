@@ -130,16 +130,9 @@
     });
 
     function buildAssetGrid(allAssets) {
-        localStorage.setItem("assetData", allAssets);
-
         $("#allAssetGrid").jsGrid({
             width: "100%",
             height: "auto",
-            //filtering: true,
-            //sorting: true,
-            //paging: true,
-            //autoload: true,
-            //controller: db,
             paging: true,
             pageSize: 5,
             pageButtonCount: 5,
@@ -421,37 +414,6 @@
             }
         });
     }
-
-
-    // for grid filtering
-    var db = {
-
-        loadData: function (filter) {
-            return $.grep(this.clients, function (client) {
-                return (!filter.assetName || client.assetName.indexOf(filter.assetName) > -1)
-                    && (!filter.owner || client.owner.indexOf(filter.owner) > -1)
-                    && (!filter.shortDescription || client.shortDescription.indexOf(filter.shortDescription) > -1)
-                    && (!filter.longDescription || client.longDescription.indexOf(filter.longDescription) > -1);
-            });
-        },
-
-        insertItem: function (insertingClient) {
-            this.clients.push(insertingClient);
-        },
-
-        updateItem: function (updatingClient) { },
-
-        deleteItem: function (deletingClient) {
-            var clientIndex = $.inArray(deletingClient, this.clients);
-            this.clients.splice(clientIndex, 1);
-        }
-
-    };
-
-    window.db = db;
-
-
-    db.clients = assetList;
 
     function refreshPage() {
         location.reload();
