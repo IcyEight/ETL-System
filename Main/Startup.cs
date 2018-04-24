@@ -70,6 +70,11 @@ namespace Main
 
             DbInitializer.Seed(serviceprovider);
 
+            /*
+            var db = serviceprovider.GetRequiredService<DbContext>();
+            DataAPIConnect.startDataMonitoringThread(db);
+            */
+
             if (Environment.IsDevelopment())
             {
                 var UserManager = serviceprovider.GetRequiredService<UserManager<ApplicationUser>>();
