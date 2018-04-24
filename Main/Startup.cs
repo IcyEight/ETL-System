@@ -71,8 +71,6 @@ namespace Main
             services.Configure<AuthMessageSenderOptions>(Configuration);
             var serviceprovider = services.BuildServiceProvider();
 
-            DbInitializer.Seed(serviceprovider);
-
             if (Environment.IsDevelopment())
             {
                 var UserManager = serviceprovider.GetRequiredService<UserManager<ApplicationUser>>();
