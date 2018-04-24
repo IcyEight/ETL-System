@@ -90,11 +90,11 @@
     var tasksList;
     $(document).ready(function () {
         $.ajax({
-            url: "/taskqueue/gettaskswebview",
+            url: "/TaskQueue/GetTasksWebView",
             datatype: 'application/json',
             complete: function (data) {
-                taskslist = json.parse(data["responsetext"]);
-                buildtaskqueuegrid(taskslist);
+                taskslist = JSON.parse(data["responsetext"]);
+                buildTaskQueueGrid(taskslist);
             }
         });
     });
