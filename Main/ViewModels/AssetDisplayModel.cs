@@ -12,7 +12,7 @@ namespace Main.ViewModels
         public String ShortDescription { get; set; }
         public String LongDescription { get; set; }
         public bool isPreferredAsset { get; set; }
-        public String typeID { get; set; }
+        public string typeID { get; set; }
         public bool isDeleted { get; set; }
         public String Owner { get; set; }
         public String moduleID { get; set; }

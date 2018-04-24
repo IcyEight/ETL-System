@@ -12,15 +12,17 @@ namespace Main.Data
         public static void Seed(IServiceProvider services)
         {
             var context = services.GetRequiredService<BamsDbContext>();
+            var dataAPI = services.GetRequiredService<IDataAPIService>();
             var logger = services.GetRequiredService<ILogger<Program>>();
 
             context.Database.Migrate();
             logger.LogInformation("Applied pending migrations");
 
-            DataAPIConnect.loadConfigurationXml(context);
+            dataAPI.LoadConfigurationXml();
             if (context.Assets.Any())
             {
                 logger.LogInformation("Database is already seeded");
+                dataAPI.StartDataMonitoringThread();
                 return;
             }
 
@@ -108,6 +110,8 @@ namespace Main.Data
 
             context.SaveChanges();
             logger.LogInformation("Seeded database successfully");
+
+            dataAPI.StartDataMonitoringThread();
         }
     }
 }

@@ -33,6 +33,7 @@ namespace Main
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IDataAPIService, DataAPIService>();
             string connectionKey = "DefaultConnection";
             if (DetectOS() == 2) connectionKey = "MacOSX_DefaultConnection";               
             services.AddDbContext<BamsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(connectionKey)));
@@ -67,8 +68,6 @@ namespace Main
             services.AddSignalR();
             services.Configure<AuthMessageSenderOptions>(Configuration);
             var serviceprovider = services.BuildServiceProvider();
-
-            DbInitializer.Seed(serviceprovider);
 
             if (Environment.IsDevelopment())
             {

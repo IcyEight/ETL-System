@@ -18,23 +18,29 @@ namespace Main.Data
      * Element and this is done for the pre-seeded Assets in DbInitializer.seed()
      * and you can see how that is done so we can add it to the Asset Screen logic. 
      */
-    public class DataAPIConnect
+    public class DataAPIService : IDataAPIService
     {
-        public static void startDataMonitoringThread(BamsDbContext dataAPIContext)
+        private readonly BamsDbContext _dbcontext;
+
+        public DataAPIService(BamsDbContext dbcontext)
+        {
+            _dbcontext = dbcontext;
+        }
+
+        public void StartDataMonitoringThread()
         {
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
                 while (true)
                 {
+                    FetchAssetData();
                     Thread.Sleep(60000);
-
-                    fetchAssetData(dataAPIContext);
                 }
             }).Start();
         }
 
-        public static void loadConfigurationXml(BamsDbContext context)
+        public void LoadConfigurationXml()
         {
             List<AssetType> assetTypes = new List<AssetType>();
             List<Models.Module> modules = new List<Models.Module>();
@@ -49,56 +55,56 @@ namespace Main.Data
             {
                 assetTypes.Add(new AssetType(tEle.Attributes["name"].Value));
             }
-            registerAssetTypes(context, assetTypes);
+            RegisterAssetTypes(assetTypes);
 
             foreach (XmlNode mEle in modEle)
             {
                 Models.Module temp = new Models.Module(mEle.Attributes["name"].Value, mEle.SelectSingleNode("./Type").InnerText, mEle.SelectSingleNode("./Detail[@id=1]").InnerText, mEle.SelectSingleNode("./Detail[@id=2]").InnerText);
                 modules.Add(temp);
             }
-            registerModules(context, modules);
+            RegisterModules(modules);
         }
 
-        public static void registerAssetTypes(BamsDbContext context, List<AssetType> typeList)
+        public void RegisterAssetTypes(List<AssetType> typeList)
         {
             foreach (AssetType asset in typeList)
             {
-                if (context.AssetTypes.Where(M => M.typeName.Equals(asset.typeName)).Count() == 0)
+                if (_dbcontext.AssetTypes.Where(M => M.typeName.Equals(asset.typeName)).Count() == 0)
                 {
-                    context.AssetTypes.Add(asset);
+                    _dbcontext.AssetTypes.Add(asset);
                 } else
                 {
-                    context.AssetTypes.Update(asset);
+                    _dbcontext.AssetTypes.Update(asset);
                 }
             }
-            context.SaveChanges();
+            _dbcontext.SaveChanges();
         }
 
-        public static void registerModules(BamsDbContext context, List<Models.Module> moduleLoad)
+        public void RegisterModules(List<Models.Module> moduleLoad)
         {
             foreach (Models.Module mod in moduleLoad)
             {
-                if(context.Modules.Where(M => M.moduleName.Equals(mod.moduleName)).Count() == 0)
+                if(_dbcontext.Modules.Where(M => M.moduleName.Equals(mod.moduleName)).Count() == 0)
                 {
-                    context.Modules.Add(mod);
+                    _dbcontext.Modules.Add(mod);
                 } else
                 {
-                    context.Modules.Update(mod);
+                    _dbcontext.Modules.Update(mod);
                 }
             }
-            context.SaveChanges();
+            _dbcontext.SaveChanges();
         }
 
-        public static void PerformDataProcessing(BamsDbContext context)
+        public void PerformDataProcessing()
         {
-            List<AssetModule> modules = context.AssetModules.ToListAsync().Result;
+            List<AssetModule> modules = _dbcontext.AssetModules.ToListAsync().Result;
             foreach (AssetModule module in modules) {
-                Models.Module temp = context.Modules.Where(M => M.moduleID == module.moduleID).First();
+                Models.Module temp = _dbcontext.Modules.Where(M => M.moduleID == module.moduleID).First();
                 if (temp.typeID.Equals("CSV File"))
                 {
                     StreamReader csv = File.OpenText(Directory.GetCurrentDirectory() + temp.detail1);
                     StreamReader schema = File.OpenText(Directory.GetCurrentDirectory() + temp.detail2);
-                    LoadCSV(module, context, csv, schema); 
+                    LoadCSV(module, csv, schema); 
                 }
                 else
                 {
@@ -107,22 +113,23 @@ namespace Main.Data
             }
         }
 
-        public static void GenerateDatabaseEntries(AssetModule module, BamsDbContext context, DataElements input, List<DataSchema> inputSch)
+        public void GenerateDatabaseEntries(AssetModule module, DataElements input, List<DataSchema> inputSch)
         {
-            Asset tempAsset = context.Assets.Where(A => A.AssetId == module.assetID).First();
-            context.Schemas.AddRange(inputSch);
-            context.SaveChanges(); //need to know the schema ID later not generated till in database.
+            Asset tempAsset = _dbcontext.Assets.Where(A => A.AssetId == module.assetID).First();
+            _dbcontext.Schemas.AddRange(inputSch);
+            _dbcontext.SaveChanges(); //need to know the schema ID later not generated till in database.
 
             int i = 0;
             foreach(Dictionary<String, String> row in input.rowEntries)
             {
                 foreach(DataSchema s in inputSch)
                 {
-                    if (context.AssetData.Any(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName))){
-                        var data = context.AssetData.Single(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName));
+                    if (_dbcontext.AssetData.Any(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName))){
+                        var data = _dbcontext.AssetData.Single(A => A.assetID == module.assetID && A.dataEntryID == i && A.fieldName.Equals(s.fieldName));
                         var newData = new AssetData(module.assetID, s.schemaName, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset);
 
                         data.asset = newData.asset;
+                        data.schemaName = newData.schemaName;
                         data.fieldType = newData.fieldType;
                         data.strValue = newData.strValue;
                         data.intValue = newData.intValue;
@@ -132,18 +139,18 @@ namespace Main.Data
                         data.isPrimaryKey = newData.isPrimaryKey;
                     } else
                     {
-                        context.AssetData.AddAsync(new AssetData(module.assetID, s.schemaName, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
+                        _dbcontext.AssetData.AddAsync(new AssetData(module.assetID, s.schemaName, i, s.fieldName, s.fieldType, row.GetValueOrDefault(s.fieldName), s.isPrimary, tempAsset));
                     }
                 }
                 i++;
             }
 
-            context.SaveChanges();
+            _dbcontext.SaveChanges();
         }
 
-        public static void LoadCSV(AssetModule module, BamsDbContext context, StreamReader csv, StreamReader importSchema)
+        public void LoadCSV(AssetModule module, StreamReader csv, StreamReader importSchema)
         {
-            Models.Module tempModule = context.Modules.Where(M => M.moduleID == module.moduleID).First();
+            Models.Module tempModule = _dbcontext.Modules.Where(M => M.moduleID == module.moduleID).First();
             DataElements dataImport = new DataElements();
             String[] colNames = null;
             List<DataSchema> entries = new List<DataSchema>();
@@ -169,7 +176,6 @@ namespace Main.Data
                 }
                 dataImport.AddRow(row);
             }
-            
 
            String schemaName = null;
            int count = 0;
@@ -196,15 +202,15 @@ namespace Main.Data
 
            }
 
-            GenerateDatabaseEntries(module, context, dataImport, entries);
+            GenerateDatabaseEntries(module, dataImport, entries);
         }
 
-        public static void fetchAssetData(BamsDbContext context)
+        public void FetchAssetData()
         {
-            List<AssetModule> modules = context.AssetModules.ToList();
+            List<AssetModule> modules = _dbcontext.AssetModules.ToList();
             if (modules.Count() > 0)
             {
-                DataAPIConnect.PerformDataProcessing(context);
+                PerformDataProcessing();
             }
         }
 

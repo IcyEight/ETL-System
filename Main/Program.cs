@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Main.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Main
@@ -30,7 +34,22 @@ namespace Main
                 Log.Information("Core Web Server starting up");
 
                 var host = BuildWebHost(args);
-                
+
+                using (var scope = host.Services.CreateScope())
+                {
+                    try
+                    {
+                        var services = scope.ServiceProvider;
+                        var context = services.GetRequiredService<BamsDbContext>();
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        DbInitializer.Seed(services);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "An error occurred while seeding the database.");
+                    }
+                }
+
                 host.Run();
 
                 Log.Information("Core Web Server shutting down");
