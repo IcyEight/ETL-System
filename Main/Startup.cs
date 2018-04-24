@@ -65,6 +65,8 @@ namespace Main
 
             services.AddReact();
             services.AddSignalR();
+            services.AddDistributedMemoryCache();
+            services.AddSession();
             services.Configure<AuthMessageSenderOptions>(Configuration);
             var serviceprovider = services.BuildServiceProvider();
 
@@ -130,8 +132,8 @@ namespace Main
                 //  .AddScriptWithoutTransform("~/Scripts/bundle.server.js");
             });
             app.UseStaticFiles();
-			app.UseMvcWithDefaultRoute();
-
+            app.UseSession();
+            app.UseMvcWithDefaultRoute();
             app.UseFileServer();
             app.UseSignalR(routes =>
             {
