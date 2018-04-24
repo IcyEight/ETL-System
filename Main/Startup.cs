@@ -67,23 +67,26 @@ namespace Main
             services.Configure<AuthMessageSenderOptions>(Configuration);
             var serviceprovider = services.BuildServiceProvider();
 
-            var UserManager = serviceprovider.GetRequiredService<UserManager<ApplicationUser>>();
-            var _user = UserManager.FindByEmailAsync("test@email.com").Result;
-
-            // check if the user exists
-            if (_user == null)
+            if (Environment.IsDevelopment())
             {
-                var user = new ApplicationUser
-                {
-                    UserName = "test@email.com",
-                    Email = "test@email.com",
-                    FirstName = "test",
-                    LastName = "user",
-                    EmailConfirmed = true
-                };
-                string password = "password";
+                var UserManager = serviceprovider.GetRequiredService<UserManager<ApplicationUser>>();
+                var _user = UserManager.FindByEmailAsync("test@email.com").Result;
 
-                var result = UserManager.CreateAsync(user, password).Result;
+                // check if the user exists
+                if (_user == null)
+                {
+                    var user = new ApplicationUser
+                    {
+                        UserName = "test@email.com",
+                        Email = "test@email.com",
+                        FirstName = "test",
+                        LastName = "user",
+                        EmailConfirmed = true
+                    };
+                    string password = "password";
+
+                    var result = UserManager.CreateAsync(user, password).Result;
+                }
             }
 
             return serviceprovider;
