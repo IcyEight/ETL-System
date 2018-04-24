@@ -1,14 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Main.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Data
 {
     public static class DbInitializer
     {
-        public static void Seed(BamsDbContext context, ILogger<Program> logger)
+        public static void Seed(IServiceProvider services)
         {
+            var context = services.GetRequiredService<BamsDbContext>();
+            var logger = services.GetRequiredService<ILogger<Program>>();
+
             context.Database.Migrate();
             logger.LogInformation("Applied pending migrations");
 

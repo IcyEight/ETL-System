@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using React.AspNet;
 using System.Security.Claims;
 using Main.Extensions;
+using System.Threading.Tasks;
 
 namespace Main
 {
@@ -67,10 +68,12 @@ namespace Main
             services.Configure<AuthMessageSenderOptions>(Configuration);
             var serviceprovider = services.BuildServiceProvider();
 
+            DbInitializer.Seed(serviceprovider);
+
             if (Environment.IsDevelopment())
             {
                 var UserManager = serviceprovider.GetRequiredService<UserManager<ApplicationUser>>();
-                var _user = UserManager.FindByEmailAsync("test@email.com").Result;
+                var _user = Task.Run(async () => await UserManager.FindByEmailAsync("test@email.com")).GetAwaiter().GetResult();
 
                 // check if the user exists
                 if (_user == null)
@@ -85,7 +88,7 @@ namespace Main
                     };
                     string password = "password";
 
-                    var result = UserManager.CreateAsync(user, password).Result;
+                    var result = Task.Run(async () => await UserManager.CreateAsync(user, password)).GetAwaiter().GetResult();
                 }
             }
 
