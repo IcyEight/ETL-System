@@ -10,18 +10,19 @@ using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
+using System.Linq.Dynamic;
 
 namespace Main.Controllers
 {
     [Authorize]
     public class AssetController : Controller
     {
-		private readonly BamsDbContext _dbcontext;
+        private readonly BamsDbContext _dbcontext;
         private readonly ILogger _logger;
 
         public AssetController(BamsDbContext dbcontext, ILogger<AssetController> logger)
-		{
-			_dbcontext = dbcontext;
+        {
+            _dbcontext = dbcontext;
             _logger = logger;
         }
 
@@ -34,7 +35,7 @@ namespace Main.Controllers
             _logger.LogWarning("WARNING");
             _logger.LogError("ERROR");
             _logger.LogCritical("CRITICAL");
-			ViewBag.Title = "All Assets";
+            ViewBag.Title = "All Assets";
             AssetListViewModel vm = new AssetListViewModel();
             vm.Assets = GetAssetsList();
 
@@ -62,8 +63,8 @@ namespace Main.Controllers
                 // if no preferred asset entry in table, default to false for isPreferredAsset
                 // if preferred asset entry is deleted, not a preferred asset (isPreferredAsset = false)
                 // if preferred asset entry is NOT deleted, preferred asset (isPreferredAsset = true)
-                isPreferredAsset = _dbcontext.PreferredAssets.Where(m => m.assetID == x.AssetId && m.userID == 
-                    currentUserID).FirstOrDefault() == null ? false : (_dbcontext.PreferredAssets.Where(m => m.assetID == 
+                isPreferredAsset = _dbcontext.PreferredAssets.Where(m => m.assetID == x.AssetId && m.userID ==
+                    currentUserID).FirstOrDefault() == null ? false : (_dbcontext.PreferredAssets.Where(m => m.assetID ==
                     x.AssetId && m.userID == currentUserID).FirstOrDefault().isDeleted == true ? false : true),
                 typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
                     ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
@@ -425,6 +426,48 @@ namespace Main.Controllers
             else
             {
                 return false;
+            }
+        }
+        public JsonResult FilterAssets(string aNameFilter, string sDescriptionFilter, string lDescriptionFilter, string assetTypeFilter, string ownerFilter)
+        {
+            if (aNameFilter == null && sDescriptionFilter == null && lDescriptionFilter == null && assetTypeFilter == null && ownerFilter == null)
+            {
+                JsonResult assets = GetAssets();
+                return assets;
+            }
+            else
+            {
+                var existingAssets = _dbcontext.Assets.AsNoTracking();
+
+                if (aNameFilter != null)
+                {
+                    existingAssets = existingAssets.Where(x => x.AssetName.Contains(aNameFilter));
+                }
+
+                if (sDescriptionFilter != null)
+                {
+                    existingAssets = existingAssets.Where(x => x.ShortDescription.Contains(sDescriptionFilter));
+                }
+
+
+                if (lDescriptionFilter != null)
+                {
+                    existingAssets = existingAssets.Where(x => x.LongDescription.Contains(lDescriptionFilter));
+                }
+
+                if (assetTypeFilter != null)
+                {
+                    existingAssets = existingAssets.Where(x => x.typeName.Contains(assetTypeFilter));
+                }
+
+                if (ownerFilter != null)
+                {
+                    existingAssets = existingAssets.Where(x => x.Owner.Contains(ownerFilter));
+                }
+
+                var filteredAssets = existingAssets.ToList();
+
+                return Json(filteredAssets);
             }
         }
     }

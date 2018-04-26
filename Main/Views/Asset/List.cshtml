@@ -53,13 +53,89 @@
         </div><!-- /.container-fluid -->
     </nav>
 
-    <div id="alertBox" style="padding-top:0px !important; text-align:center !important; border-style: solid; border-color:#dc3545!important; background-color:#dc3545!important" class="hidden">
+    <div id="alertBox" style="padding-top:0px !important; text-align:center !important; border-style: solid; border-color:#ffc107!important; background-color:#ffc107!important" class="hidden">
         Your view is outdated.  Please <a href="javascript:refreshPage()">refresh</a> the page to get the latest data.
     </div>
 
     <h2 align="center">@ViewBag.Title</h2>
 
     <br />
+
+    <div id="filterButtons" style="padding-bottom:5px !important;">
+        <div class="row">
+            <div class="col-md-3 pull-right" style="width:17% !important">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Set Filters</button>
+                <button id="clearFilters" class="btn btn-default" onclick="clearAssetsFilters();">Clear Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Filter Assets</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-3">
+                            <label>Asset Name</label>
+                            &nbsp;&nbsp;
+                            <a href="#" data-toggle="tooltip" rel="tooltip" title="Filters assets by name and returns assets who's name contains the value provided"><span class="glyphicon glyphicon-info-sign"></span></a>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" id="assetNameFilter" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-3">
+                            <label>Short Description</label>
+                            &nbsp;&nbsp;
+                            <a href="#" data-toggle="tooltip" rel="tooltip" title="Filters assets by short description and returns assets who's short description contains the value provided"><span class="glyphicon glyphicon-info-sign"></span></a>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" id="sDescriptionFilter" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-3">
+                            <label>Long Description</label>
+                            &nbsp;&nbsp;
+                            <a href="#" rel="tooltip" data-toggle="tooltip" title="Filters assets by long description and returns assets who's long description contains the value provided"><span class="glyphicon glyphicon-info-sign"></span></a>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" id="lDescriptionFilter" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-3">
+                            <label>Owner</label>
+                            &nbsp;&nbsp;
+                            <a href="#" data-toggle="tooltip" rel="tooltip" title="Filters assets by owner and returns assets who's owner contains the value provided"><span class="glyphicon glyphicon-info-sign"></span></a>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="email" id="ownerFilter" class="form-control validate">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-3"><label>Asset Type</label></div>
+                        <div class="col-md-9">
+                            <select id="assetTypeFilter" class=" col-md-10 form-control elipsis-text">
+                                <option value="">Select..</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="applyFiltersToAssets();">Apply Filters</button>
+                    <button type="button" class="btn btn-secondary" id="filteringModalClose" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="allAssetGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
 
@@ -389,9 +465,13 @@
                 for (var i = 0; i < response.length; i++) {
                     var assetType = response[i]["typeName"];
 
-                    // add each asset type to dropdown selection
                     var value = i + 1;
+
+                    // add each asset type to dropdown selection for editting asset
                     $('<option>').val(value).text(assetType).appendTo('#assetType');
+
+                    // add each asset type to dropdown selection for filtering assets
+                    $('<option>').val(value).text(assetType).appendTo('#assetTypeFilter');
                 }
             }
         });
@@ -407,8 +487,9 @@
                 for (var i = 0; i < response.length; i++) {
                     var assetModule = response[i]["moduleName"];
 
-                    // add each asset type to dropdown selection
                     var value = i + 1;
+
+                    // add each asset module to dropdown selection for editting asset
                     $('<option>').val(value).text(assetModule).appendTo('#assetModule');
                 }
             }
@@ -418,6 +499,56 @@
     function refreshPage() {
         location.reload();
     }
+
+    function clearAssetsFilters() {
+        $.ajax({
+            url: "/Asset/GetAssets",
+            dataType: 'application/json',
+            complete: function (data) {
+                assetList = JSON.parse(data["responseText"]);
+                buildAssetGrid(assetList);
+            }
+        });
+
+        // add all asset types and modules to form dynamically from database table on page load
+        addAssetTypesToForm();
+        addAssetModulesToForm();
+    }
+
+    function applyFiltersToAssets() {
+        var assetName = $("#assetNameFilter").val().trim();
+        var assetShortDescription = $("#sDescriptionFilter").val().trim();
+        var assetLongDescription = $("#lDescriptionFilter").val().trim();
+        var ownerName = $("#ownerFilter").val().trim();
+        var assetType = $("#assetTypeFilter").val().trim();
+
+        $.ajax({
+            url: "/Asset/FilterAssets",
+            dataType: 'application/json',
+            data: {
+                aNameFilter: assetName,
+                sDescriptionFilter: assetShortDescription,
+                lDescriptionFilter: assetLongDescription,
+                assetTypeFilter: assetType,
+                ownerFilter: ownerName
+            },
+            complete: function (data) {
+                var closeFilterPopupBtn = document.getElementById("filteringModalClose");
+                closeFilterPopupBtn.click();
+
+                var filteredAssetsList = JSON.parse(data["responseText"]);
+                buildAssetGrid(filteredAssetsList);
+            }
+        });
+    }
+</script>
+
+
+<!-- Activate Bootstrap Tooltips -->
+<script type="text/javascript">
+    $(function () {
+        $("[rel='tooltip']").tooltip();
+    });
 </script>
 
 
