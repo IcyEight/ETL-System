@@ -19,9 +19,26 @@ namespace Main.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, BamsDbContext dbcontext, SignInManager<ApplicationUser> login)
+        public async Task Invoke(HttpContext context, BamsDbContext dbcontext, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
-            var result = login.PasswordSignInAsync("test@email.com", "password", isPersistent: true, lockoutOnFailure: false).Result;
+            var testUser = Task.Run(async () => await userManager.FindByEmailAsync("test@email.com")).GetAwaiter().GetResult();
+
+            // check if the user exists
+            if (testUser == null)
+            {
+                testUser = new ApplicationUser
+                {
+                    UserName = "test@email.com",
+                    Email = "test@email.com",
+                    FirstName = "test",
+                    LastName = "user",
+                    EmailConfirmed = true
+                };
+                string password = "password";
+
+                var createResult = Task.Run(async () => await userManager.CreateAsync(testUser, password)).GetAwaiter().GetResult();
+            }
+            var result = signInManager.PasswordSignInAsync("test@email.com", "password", isPersistent: true, lockoutOnFailure: false).Result;
             var user = dbcontext.Users.Where(x => x.Email == "test@email.com").FirstOrDefault();
             context.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
                     new Claim(ClaimTypes.NameIdentifier, user.Id)

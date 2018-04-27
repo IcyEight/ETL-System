@@ -69,31 +69,7 @@ namespace Main
             services.AddDistributedMemoryCache();
             services.AddSession();
             services.Configure<AuthMessageSenderOptions>(Configuration);
-            var serviceprovider = services.BuildServiceProvider();
-
-            if (Environment.IsDevelopment())
-            {
-                var UserManager = serviceprovider.GetRequiredService<UserManager<ApplicationUser>>();
-                var _user = Task.Run(async () => await UserManager.FindByEmailAsync("test@email.com")).GetAwaiter().GetResult();
-
-                // check if the user exists
-                if (_user == null)
-                {
-                    var user = new ApplicationUser
-                    {
-                        UserName = "test@email.com",
-                        Email = "test@email.com",
-                        FirstName = "test",
-                        LastName = "user",
-                        EmailConfirmed = true
-                    };
-                    string password = "password";
-
-                    var result = Task.Run(async () => await UserManager.CreateAsync(user, password)).GetAwaiter().GetResult();
-                }
-            }
-
-            return serviceprovider;
+            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -135,7 +111,8 @@ namespace Main
             });
         }
 
-        public int DetectOS(){
+        public int DetectOS()
+        {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return 0;
@@ -148,25 +125,7 @@ namespace Main
             {
                 return 2;
             }
-            /*string windir = Environment.GetEnvironmentVariable("windir");
-            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
-            {
-                return 0; // windows
-            }
-            else if (File.Exists(@"/proc/sys/kernel/ostype"))
-            {
-                string osType = File.ReadAllText(@"/proc/sys/kernel/ostype");
-                if (osType.StartsWith("Linux", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Note: Android gets here too
-                    return 1; // Linux
-                }
-            }
-            else if (File.Exists(@"/System/Library/CoreServices/SystemVersion.plist"))
-            {
-                // Note: iOS gets here too
-                return 2; //MaxOSX
-            }*/
+
             return -1;
         }
     }
