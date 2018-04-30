@@ -187,7 +187,6 @@
                             <label>Long Description*</label>
                         </div>
                         <div class="col-md-8">
-                            @*<input type="text" id="longDescription" class="form-control">*@
                             <textarea name="longDescription" id="longDescription" class="form-control" rows="3"></textarea>
                         </div>
                     </div>
@@ -226,7 +225,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="saveAssetFromModal();">Save</button>
-                    <button type="button" class="btn btn-secondary" id="assetModalClose" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" id="assetModalClose" onclick="cancelAssetPopup();">Cancel</button>
                 </div>
             </div>
         </div>
@@ -597,6 +596,42 @@
                 $("#allAssetGrid").jsGrid("onItemUpdated", {});
             }
         }
+    }
+
+    function cancelAssetPopup() {
+        var errorMsg = "";
+        var assetOp = $("#operationType").val();
+        if (assetOp == "Add") {
+            errorMsg = "You are about to cancel adding an asset.  All input in this form will be lost.  Are you sure you wish to proceed?"
+        }
+        else {
+            errorMsg = "You are about to cancel modifying this asset.  All unsaved changes will be lost.  Are you sure you wish to proceed?"
+        }
+
+        BootstrapDialog.confirm({
+            title: 'Assets',
+            message: errorMsg,
+            type: BootstrapDialog.TYPE_WARNING,
+            btnOKLabel: 'Yes',
+            btnCancelLabel: "No",
+            btnOKClass: 'btn-warning',
+            callback: function (result) {
+                if (result == true) {
+                    $('#assetModal').modal('hide');
+
+                    $("#modalTitle").html("");
+                    $("#operationType").val("");
+                    $("#assetId").val("");
+                    $("#assetName").val("");
+                    $("#shortDescription").val("");
+                    $("#longDescription").val("");
+                    document.getElementById("isPreferredAsset").checked = false;
+                    $("#assetType").val("");
+                    $("#owner").val("");
+                    $("#assetModule").val("");
+                }
+            }
+        });
     }
 </script>
 
