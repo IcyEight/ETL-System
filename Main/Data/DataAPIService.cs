@@ -210,7 +210,7 @@ namespace Main.Data
             List<AssetModule> modules = _dbcontext.AssetModules.ToList();
             if (modules.Count() > 0)
             {
-                PerformDataProcessing();
+                //PerformDataProcessing();
             }
         }
 

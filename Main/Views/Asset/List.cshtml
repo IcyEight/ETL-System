@@ -64,13 +64,13 @@
     <div id="filterButtons" style="padding-bottom:5px !important;">
         <div class="row">
             <div class="col-md-3 pull-right" style="width:17% !important">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Set Filters</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" onclick="openFiltersModal();">Set Filters</button>
                 <button id="clearFilters" class="btn btn-default" onclick="clearAssetsFilters();">Clear Filters</button>
             </div>
         </div>
     </div>
 
-    <div class="modal bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal bd-example-modal-lg" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -139,49 +139,97 @@
 
     <div id="allAssetGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
 
-    <div id="assetDialog">
-        <form id="assetForm">
-            <div class="details-form-field">
-                <input type="hidden" value="" id="assetId" name="assetId">
+
+    <div class="modal fade" id="assetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="modalTitle" class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row hidden" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Operation</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="operationType" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row hidden" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Asset Id</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="assetId" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Asset Name*</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="assetName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Short Description*</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="shortDescription" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Long Description*</label>
+                        </div>
+                        <div class="col-md-8">
+                            @*<input type="text" id="longDescription" class="form-control">*@
+                            <textarea name="longDescription" id="longDescription" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Owner*</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="email" id="owner" class="form-control validate">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4"><label>Asset Type</label></div>
+                        <div class="col-md-8">
+                            <select id="assetType" class=" col-md-10 form-control elipsis-text">
+                                <option value="">Select..</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4"><label>Module</label></div>
+                        <div class="col-md-8">
+                            <select id="assetModule" class=" col-md-10 form-control elipsis-text">
+                                <option value="">Select..</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                        <div class="col-md-4">
+                            <label>Is Preferred Asset</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="isPreferredAsset" class="">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="saveAssetFromModal();">Save</button>
+                    <button type="button" class="btn btn-secondary" id="assetModalClose" data-dismiss="modal">Close</button>
+                </div>
             </div>
-            <div class="details-form-field">
-                <label for="name">Asset Name</label>
-                <input id="assetName" name="assetName" type="text" />
-            </div>
-            <div class="details-form-field">
-                <label for="shortDescription">Short Description</label>
-                <input id="shortDescription" name="shortDescription" type="text" />
-            </div>
-            <div class="details-form-field">
-                <label for="longDescription">Long Description</label>
-                <input id="longDescription" name="longDescription" type="text" />
-            </div>
-            <div class="details-form-field">
-                <label for="assetType">Asset Type</label>
-                <select id="assetType" name="assetType">
-                    <!-- these options are pulled in as the names of the AssetTypes from the database -->
-                    <option value="">Select..</option>
-                </select>
-            </div>
-            <div class="details-form-field">
-                <label for="assetModule">Asset Module</label>
-                <select id="assetModule" name="assetModule">
-                    <!-- these options are pulled in as the names of the Modules from the database -->
-                    <option value="">Select..</option>
-                </select>
-            </div>
-            <div class="details-form-field">
-                <label for="isPreferredAsset"> Is Preferred Asset</label>
-                <input type="checkbox" id="isPreferredAsset" name="isPreferredAsset">
-            </div>
-            <div class="details-form-field">
-                <label for="owner">Owner</label>
-                <input id="owner" name="owner" type="text" />
-            </div>
-            <div class="details-form-field">
-                <button type="submit" id="save">Save</button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <input type="button" id="sendSignalRAlert" value="Send" class="hidden" />
@@ -306,6 +354,8 @@
                                 var button = document.getElementById("sendSignalRAlert");
                                 button.click();
 
+                                $('#assetModal').modal('hide');
+
                                 BootstrapDialog.confirm({
                                     title: 'Assets',
                                     message: response.message,
@@ -314,7 +364,6 @@
                                     btnOKClass: 'btn-primary',
                                     callback: function (result) {
                                         // refresh assets grid
-                                        $("#assetDialog").dialog("close");
                                         var updatedAssetList = response.updatedAssets;
                                         var uAL = updatedAssetList["value"];
                                         buildAssetGrid(uAL);
@@ -366,6 +415,8 @@
                                 var button = document.getElementById("sendSignalRAlert");
                                 button.click();
 
+                                $('#assetModal').modal('hide');
+
                                 BootstrapDialog.confirm({
                                     title: 'Assets',
                                     message: response.message,
@@ -374,7 +425,6 @@
                                     btnOKClass: 'btn-primary',
                                     callback: function (result) {
                                         // refresh assets grid
-                                        $("#assetDialog").dialog("close");
                                         var updatedAssetList = response.updatedAssets;
                                         var uAL = updatedAssetList["value"];
                                         buildAssetGrid(uAL);
@@ -399,7 +449,7 @@
                     modeSwitchButton: false,
                     editButton: true,
                     headerTemplate: function () {
-                        return $("<button>").attr("type", "button").text("Add")
+                        return $("<button>").attr("type", "button").attr("class", "btn btn-default").text("Add")
                             .on("click", function () {
                                 showDetailsDialog("Add", {});
                             });
@@ -410,49 +460,29 @@
 
 
         var showDetailsDialog = function (dialogType, arg) {
-            $("#assetId").val(arg.assetId);
-            $("#assetName").val(arg.assetName);
-            $("#shortDescription").val(arg.shortDescription);
-            $("#longDescription").val(arg.longDescription);
-            document.getElementById("isPreferredAsset").checked = arg.isPreferredAsset;
-            $("#assetType").val(arg.typeID);
-            $("#owner").val(arg.owner);
-            $("#assetModule").val(arg.moduleID);
+            // dynamically build out dialog depending on add/ modify operation
+            $("#modalTitle").html("");
+            if (dialogType == "Add") {
+                $("#modalTitle").html("Add Asset");
+                $("#operationType").val("Add");
+            }
+            else {
+                $("#modalTitle").html("Modify Asset");
+                $("#operationType").val("Modify");
 
+                $("#assetId").val(arg.assetId);
+                $("#assetName").val(arg.assetName);
+                $("#shortDescription").val(arg.shortDescription);
+                $("#longDescription").val(arg.longDescription);
+                document.getElementById("isPreferredAsset").checked = arg.isPreferredAsset;
+                $("#assetType").val(arg.typeID);
+                $("#owner").val(arg.owner);
+                $("#assetModule").val(arg.moduleID);
+            }
 
-            formSubmitHandler = function () {
-                saveClient(arg, dialogType === "Add");
-            };
-
-            $("#assetDialog").dialog("option", "title", dialogType + " Asset")
-                .dialog("open");
+            $('#assetModal').modal('show');
 
         };
-
-        var saveClient = function (client, isNew) {
-            $("#allAssetGrid").jsGrid(isNew ? "onItemInserted" : "onItemUpdated", client);
-        };
-
-        $("#assetDialog").dialog({
-            autoOpen: false,
-            width: 400,
-            close: function () {
-                $("#assetForm").validate().resetForm();
-                $("#assetForm").find(".error").removeClass("error");
-            }
-        });
-
-        $("#assetForm").validate({
-            rules: {
-                assetName: "required",
-                shortDescription: "required",
-                longDescription: "required",
-                owner: "required"
-            },
-            submitHandler: function () {
-                formSubmitHandler();
-            }
-        });
     }
 
     function addAssetTypesToForm() {
@@ -515,6 +545,10 @@
         addAssetModulesToForm();
     }
 
+    function openFiltersModal() {
+        $('#filtersModal').modal('show');
+    }
+
     function applyFiltersToAssets() {
         var assetName = $("#assetNameFilter").val().trim();
         var assetShortDescription = $("#sDescriptionFilter").val().trim();
@@ -540,6 +574,29 @@
                 buildAssetGrid(filteredAssetsList);
             }
         });
+    }
+
+    function saveAssetFromModal() {
+        // check required fields are filled in
+        var assetName = $("#assetName").val();
+        var assetShortDescription = $("#shortDescription").val();
+        var assetLongDescription = $("#longDescription").val();
+        var ownerName = $("#owner").val();
+
+        if (assetName == null || assetName == "" || assetShortDescription == null || assetShortDescription == "" ||
+            assetLongDescription == null || assetLongDescription == "" || ownerName == null || ownerName == "") {
+            var errorMessage = "One or more required fields is missing.  Please fill in all required fields before saving the asset."
+            showPopup(BootstrapDialog.TYPE_DANGER, "Assets", errorMessage);
+        }
+        else {
+            var assetOp = $("#operationType").val();
+            if (assetOp == "Add") {
+                $("#allAssetGrid").jsGrid("onItemInserted", {});
+            }
+            else {
+                $("#allAssetGrid").jsGrid("onItemUpdated", {});
+            }
+        }
     }
 </script>
 
