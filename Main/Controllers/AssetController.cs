@@ -301,31 +301,32 @@ namespace Main.Controllers
                 }
                 newAsset.isDeleted = false;
 
-                if (isPreferredAsset == true)
-                {
-                    SaveUsersPreferredAsset(assetId, false);
-                }
-                else
-                {
-                    SaveUsersPreferredAsset(assetId, true);
-                }
-
                 _dbcontext.Assets.Add(newAsset);
                 _dbcontext.SaveChanges();
 
                 // find recently added asset and update module linked to that asset if the asset was assigned a module
+                var newlyAddedAsset = _dbcontext.Assets.Where(x => x.AssetName == name
+                                        && x.LongDescription == longDescription && x.ShortDescription == shortDescription
+                                        && x.Owner == owner).FirstOrDefault();
+
+                var newAssetId = newlyAddedAsset.AssetId;
+
                 if (moduleName != null)
                 {
-                    var newlyAddedAsset = _dbcontext.Assets.Where(x => x.AssetName == name
-                        && x.LongDescription == longDescription && x.ShortDescription == shortDescription
-                        && x.Owner == owner).FirstOrDefault();
-
-                    var newAssetId = newlyAddedAsset.AssetId;
-
                     AssetModule assetModuleLink = new AssetModule();
                     assetModuleLink.assetID = newAssetId;
                     assetModuleLink.moduleID = Convert.ToInt32(moduleName); // number passed back corresponds to ID in database
                     AddAssetsModule(assetModuleLink);
+                }
+
+                // also set is preferred asset using the newly added asset's asset id
+                if (isPreferredAsset == true)
+                {
+                    SaveUsersPreferredAsset(newAssetId, false);
+                }
+                else
+                {
+                    SaveUsersPreferredAsset(newAssetId, true);
                 }
 
                 JsonResult updatedAssetList = GetCurrentAssets();
