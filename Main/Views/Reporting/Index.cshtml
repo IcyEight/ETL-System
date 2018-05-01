@@ -28,9 +28,9 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="@Url.Action("Index","Home")">Home</a></li>
-                    <li ><a href="@Url.Action("List","Asset")">Asset <span class="sr-only"></span></a></li>
-                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
+                    <li><a href="@Url.Action("Index", "Home")">Home</a></li>
+                    <li ><a href="@Url.Action("List", "Asset")">Asset <span class="sr-only"></span></a></li>
+                    <li><a href="@Url.Action("Index", "TaskQueue")">Task Queue</a></li>
                     <li class="active"><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only">(current)</span></a></li>
                     <li><a href="@Url.Action("Index", "UserProfile")">
                         <span style="color: #e3f2fd;font-family:verdana;">
@@ -47,32 +47,24 @@
     <br />
     <div class="row">
         <div class="col-md-1"><strong>Select Report</strong></div>
-        @*<div class="dropdown">
-            <button class="btn btn-secondary btb-sm dropdown-toggle col-md-7" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
-            </button>
-
-        </div>*@
-            <div>
-                <ul>
-                    <li class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown button
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Report 1</a></li>
-                            <li><a href="#">Report 2</a></li>
-                            <li><a href="#">Report 3</a></li>
-                            <li id="namecsv"><a href="#">test.csv</a></li>
-                        </ul>
-                    </li>
-
-                    @*<li class = "col-md-4"> Add new report</li>*@
-                        
-                </ul>
-
-            </div>
-
+        <div>
+            <ul>
+                <li class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown button
+                    </button>
+                    <ul class="dropdown-menu">
+                        @{
+                            foreach (string table in Model.Reports.Keys)
+                            {
+                                <li><a href="@Url.Action("Index", "Reporting", new { reportName = table })">@table</a></li>
+                            }
+                        }
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
     <br/>
     <div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
 
@@ -82,8 +74,9 @@
 <script>
     var reportingList;
     $(document).ready(function () {
+        var reportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
-            url: "/Reporting/GetReportsView",
+            url: "/Reporting/GetReportsView/" + reportName,
             dataType: 'application/json',
             complete: function (data) {
                 reportingList = JSON.parse(data["responseText"]);
@@ -93,8 +86,9 @@
     });
 
     function buildContent() {
+        var reportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
-            url: "/Reporting/GetReportsView",
+            url: "/Reporting/GetReportsView/" + reportName,
             dataType: 'application/json',
             complete: function (data) {
                 reportingList = JSON.parse(data["responseText"]);
@@ -114,17 +108,40 @@
             pageIndex: 1,
             data: allReports,
             onItemInserted: function (item) {
-                var fieldName = $("#fieldName".val());
-                var strValue = $("#strValue").val();
-                              
+                var fieldName0 = $("#fieldName0").val();
+                var strValue0 = $("#strValue0").val();
+                var fieldName1 = $("#fieldName1").val();
+                var strValue1 = $("#strValue1").val();
+                var fieldName2 = $("#fieldName2").val();
+                var strValue2 = $("#strValue2").val();
+                var fieldName3 = $("#fieldName3").val();
+                var strValue3 = $("#strValue3").val();
+                var fieldName4 = $("#fieldName4").val();
+                var strValue4 = $("#strValue4").val();
+                var fieldName5 = $("#fieldName5").val();
+                var strValue5 = $("#strValue5").val();
+                var fieldName6 = $("#fieldName6").val();
+                var strValue6 = $("#strValue6").val();
+                var fieldName7 = $("#fieldName7").val();
+                var strValue7 = $("#strValue7").val();
+                var fieldName8 = $("#fieldName8").val();
+                var strValue8 = $("#strValue8").val();
+                var fieldName9 = $("#fieldName9").val();
+                var strValue9 = $("#strValue9").val();
             },
 
-            
+
             fields: [
-                { name: "fieldName", title: "Field Name", width: 100 },
-                { name: "strValue", title: "Value", width: 100 },
-
-
+                { name: "strValue0", title: "1", width: 20 },
+                { name: "strValue1", title: "2", width: 20 },
+                { name: "strValue2", title: "3", width: 20 },
+                { name: "strValue3", title: "4", width: 20 },
+                { name: "strValue4", title: "5", width: 20 },
+                { name: "strValue5", title: "6", width: 20 },
+                { name: "strValue6", title: "7", width: 20 },
+                { name: "strValue7", title: "8", width: 20 },
+                { name: "strValue8", title: "9", width: 20 },
+                { name: "strValue9", title: "10", width: 20 },
             ]
         });
     }
