@@ -479,8 +479,7 @@
                 $("#assetModule").val(arg.moduleID);
             }
 
-            $('#assetModal').modal('show');
-
+            $('#assetModal').modal({ backdrop: 'static', keyboard: false })  
         };
     }
 
@@ -545,7 +544,7 @@
     }
 
     function openFiltersModal() {
-        $('#filtersModal').modal('show');
+        $('#filtersModal').modal({ backdrop: 'static', keyboard: false })  
     }
 
     function applyFiltersToAssets() {
