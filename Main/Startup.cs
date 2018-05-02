@@ -68,7 +68,7 @@ namespace Main
             services.AddSignalR();
             services.AddDistributedMemoryCache();
             services.AddSession();
-            services.Configure<AuthMessageSenderOptions>(Configuration);
+            services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("SendGridCredentials"));
             return services.BuildServiceProvider();
         }
 
