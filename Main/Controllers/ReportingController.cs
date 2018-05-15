@@ -71,91 +71,38 @@ namespace Main.Controllers
         }
 
         [Route("/Reporting/GetReportsView/{reportName}")]
-        public JsonResult GetReportsView(string reportName)
+        public ReportingDisplayModel GetReportsView(string reportName)
         {
             ReportingDisplayModel reportModel = new ReportingDisplayModel
             {
                 ReportName = reportName,
                 ColumnNames = new List<string>(),
-                Table = new List<List<ReportingDisplayColumnModel>>()
+                Table = new List<ReportingDisplayRowModel>()
             };
             IQueryable<AssetData> tables = _dbcontext.AssetData.Where(x => x.schemaName.Equals(reportName));
-                
+
+            bool is_column_set = false;
             foreach (IGrouping<int, AssetData> row in tables.GroupBy(y => y.dataEntryID).ToList())
             {
-                var tempModels = row.Select(x => new ReportingDisplayColumnModel
+                ReportingDisplayRowModel report_row = new ReportingDisplayRowModel()
                 {
-                    fieldName = x.fieldName,
-                    strValue = x.ToString(),
-                }).ToList();
+                    items = row.Select(x => new ReportingDisplayItemModel
+                    {
+                        fieldName = x.fieldName,
+                        strValue = x.ToString(),
+                    }).ToList()
+                };
 
-                reportModel.Table.Add(tempModels);
-            }
-
-            List<ReportingDisplayColumnModel> display = new List<ReportingDisplayColumnModel>();
-            foreach (List<ReportingDisplayColumnModel> model in reportModel.Table)
-            {
-                ReportingDisplayColumnModel row = new ReportingDisplayColumnModel();
-                for (int i = 0; i < model.Count; i++)
+                if(!is_column_set)
                 {
-                    if(i == 0)
-                    {
-                        row.FieldName0 = model.ElementAt(i).fieldName;
-                        row.strValue0 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 1)
-                    {
-                        row.FieldName1 = model.ElementAt(i).fieldName;
-                        row.strValue1 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 2)
-                    {
-                        row.FieldName2 = model.ElementAt(i).fieldName;
-                        row.strValue2 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 3)
-                    {
-                        row.FieldName3 = model.ElementAt(i).fieldName;
-                        row.strValue3 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 4)
-                    {
-                        row.FieldName4 = model.ElementAt(i).fieldName;
-                        row.strValue4 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 5)
-                    {
-                        row.FieldName5 = model.ElementAt(i).fieldName;
-                        row.strValue5 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 6)
-                    {
-                        row.FieldName6 = model.ElementAt(i).fieldName;
-                        row.strValue6 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 7)
-                    {
-                        row.FieldName7 = model.ElementAt(i).fieldName;
-                        row.strValue7 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 8)
-                    {
-                        row.FieldName8 = model.ElementAt(i).fieldName;
-                        row.strValue8 = model.ElementAt(i).strValue;
-                    }
-                    if (i == 9)
-                    {
-                        row.FieldName9 = model.ElementAt(i).fieldName;
-                        row.strValue9 = model.ElementAt(i).strValue;
-                    }
+                    reportModel.ColumnNames = row.Select(x => x.fieldName).ToList();
+                    is_column_set = true;
                 }
-                display.Add(row);
+
+                reportModel.Table.Add(report_row);
             }
 
-            return Json(display);
+            return reportModel;
         }
-
-
-
     }
 }
