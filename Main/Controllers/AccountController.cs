@@ -211,5 +211,10 @@ namespace Main.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
+
+        public async Task<IActionResult> Logout() { 
+           await _signInManager.SignOutAsync(); 
+           return RedirectToAction("Login", "Account"); 
+        } 
     }
 }

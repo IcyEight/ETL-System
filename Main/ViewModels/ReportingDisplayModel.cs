@@ -9,6 +9,6 @@ namespace Main.ViewModels
     {
         public string ReportName;
         public List<string> ColumnNames;
-        public List<List<ReportingDisplayColumnModel>> Table;
+        public List<ReportingDisplayRowModel> Table;
     }
 }
