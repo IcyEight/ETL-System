@@ -97,7 +97,7 @@ namespace Main.Data
 
                 if(tempModule == null)
                 {
-                    return;
+                    continue;
                 }
 
                 if (tempModule.typeID.Equals("CSV File"))
