@@ -93,11 +93,17 @@ namespace Main.Data
         {
             List<AssetModule> modules = _dbcontext.AssetModules.ToListAsync().Result;
             foreach (AssetModule module in modules) {
-                Models.Module temp = _dbcontext.Modules.Where(M => M.moduleID == module.moduleID).First();
-                if (temp.typeID.Equals("CSV File"))
+                Models.Module tempModule = _dbcontext.Modules.Where(M => M.moduleID == module.moduleID).FirstOrDefault();
+
+                if(tempModule == null)
                 {
-                    StreamReader csv = File.OpenText(Directory.GetCurrentDirectory() + temp.detail1);
-                    StreamReader schema = File.OpenText(Directory.GetCurrentDirectory() + temp.detail2);
+                    return;
+                }
+
+                if (tempModule.typeID.Equals("CSV File"))
+                {
+                    StreamReader csv = File.OpenText(Directory.GetCurrentDirectory() + tempModule.detail1);
+                    StreamReader schema = File.OpenText(Directory.GetCurrentDirectory() + tempModule.detail2);
                     LoadCSV(module, csv, schema); 
                 }
                 else
@@ -109,7 +115,7 @@ namespace Main.Data
 
         public void GenerateDatabaseEntries(AssetModule module, DataElements input, List<DataSchema> inputSch)
         {
-            Asset tempAsset = _dbcontext.Assets.Where(A => A.AssetId == module.assetID).First();
+            Asset tempAsset = _dbcontext.Assets.Where(A => A.AssetId == module.assetID).FirstOrDefault();
             _dbcontext.Schemas.AddRange(inputSch);
             _dbcontext.SaveChanges(); //need to know the schema ID later not generated till in database.
 
