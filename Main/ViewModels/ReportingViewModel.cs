@@ -11,5 +11,7 @@ namespace Main.ViewModels
         public IEnumerable<Reporting> Reporting { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string ActiveReport { get; set; }
+        public Dictionary<string, List<string>> Reports { get; set; }
     }
 }

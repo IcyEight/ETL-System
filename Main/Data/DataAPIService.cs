@@ -72,10 +72,7 @@ namespace Main.Data
                 if (_dbcontext.AssetTypes.Where(M => M.typeName.Equals(asset.typeName)).Count() == 0)
                 {
                     _dbcontext.AssetTypes.Add(asset);
-                } else
-                {
-                    _dbcontext.AssetTypes.Update(asset);
-                }
+                } 
             }
             _dbcontext.SaveChanges();
         }
@@ -87,10 +84,7 @@ namespace Main.Data
                 if(_dbcontext.Modules.Where(M => M.moduleName.Equals(mod.moduleName)).Count() == 0)
                 {
                     _dbcontext.Modules.Add(mod);
-                } else
-                {
-                    _dbcontext.Modules.Update(mod);
-                }
+                } 
             }
             _dbcontext.SaveChanges();
         }
@@ -191,18 +185,24 @@ namespace Main.Data
                 }
                 else if (count == 1)
                 {
+                    if (_dbcontext.Schemas.Any(x => x.schemaName.Equals(schemaName) && x.fieldName.Equals(cols[0])))
+                    {
+                        continue;
+                    }
                     entries.Add(new DataSchema(schemaName, cols[0], cols[1], true, assetTypeID));
-
                 }
                 else
                 {
+                    if (_dbcontext.Schemas.Any(x => x.schemaName.Equals(schemaName) && x.fieldName.Equals(cols[0])))
+                    {
+                        continue;
+                    }
                     entries.Add(new DataSchema(schemaName, cols[0], cols[1], false, assetTypeID));
                 }
                 count++;
-
            }
 
-            GenerateDatabaseEntries(module, dataImport, entries);
+           GenerateDatabaseEntries(module, dataImport, entries);
         }
 
         public void FetchAssetData()
@@ -210,7 +210,7 @@ namespace Main.Data
             List<AssetModule> modules = _dbcontext.AssetModules.ToList();
             if (modules.Count() > 0)
             {
-                //PerformDataProcessing();
+                PerformDataProcessing();
             }
         }
 

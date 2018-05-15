@@ -7,7 +7,8 @@ namespace Main.ViewModels
 {
     public class ReportingDisplayModel
     {
-        public String fieldName { get; set; }
-        public String strValue { get; set; }
+        public string ReportName;
+        public List<string> ColumnNames;
+        public List<ReportingDisplayRowModel> Table;
     }
 }

@@ -90,5 +90,31 @@ namespace Main.Models
 
             isPrimaryKey = primary;
         }
+
+        public string ToString()
+        {
+            if (fieldType.Equals("String"))
+            {
+                return strValue;
+            }
+            else if (fieldType.Equals("Integer"))
+            {
+                return intValue.ToString();
+            }
+            else if (fieldType.Equals("Decimal"))
+            {
+                return floatValue.ToString();
+            }
+            else if (fieldType.Equals("Date"))
+            {
+                return dateValue.ToString();
+            }
+            else if (fieldType.Equals("Boolean"))
+            {
+                boolValue.ToString();
+            }
+
+            return "";
+        }
     }
 }
