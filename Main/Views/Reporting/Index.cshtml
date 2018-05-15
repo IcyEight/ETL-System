@@ -29,14 +29,16 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Index", "Home")">Home</a></li>
-                    <li ><a href="@Url.Action("List", "Asset")">Asset <span class="sr-only"></span></a></li>
+                    <li><a href="@Url.Action("List", "Asset")">Asset <span class="sr-only"></span></a></li>
                     <li><a href="@Url.Action("Index", "TaskQueue")">Task Queue</a></li>
                     <li class="active"><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only">(current)</span></a></li>
-                    <li><a href="@Url.Action("Index", "UserProfile")">
-                        <span style="color: #e3f2fd;font-family:verdana;">
-                            @Model.FirstName @Model.LastName
-                        </span>
-                    </a></li>
+                    <li>
+                        <a href="@Url.Action("Index", "UserProfile")">
+                            <span style="color: #e3f2fd;font-family:verdana;">
+                                @Model.FirstName @Model.LastName
+                            </span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -45,28 +47,37 @@
     <h2 align="center">@ViewBag.Title</h2>
 
     <br />
-    <div class="row">
-        <div class="col-md-1"><strong>Select Report</strong></div>
-        <div>
-            <ul>
-                <li class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown button
-                    </button>
-                    <ul class="dropdown-menu">
-                        @{
-                            foreach (string table in Model.Reports.Keys)
-                            {
-                                <li><a href="@Url.Action("Index", "Reporting", new { reportName = table })">@table</a></li>
-                            }
-                        }
-                    </ul>
-                </li>
-            </ul>
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-sm-3">
+                <h5><strong>Select the Report</strong></h5>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span data-bind="label">Select One</span>&nbsp;<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                @{
+                                    foreach (string table in Model.Reports.Keys)
+                                    {
+                                        <li><a href="@Url.Action("Index", "Reporting", new { reportName = table })">@table</a></li>
+}
+                                    }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
-    </div>
-    <br/>
-    <div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
+     </div>
+        <br />
+        <div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
 
 </body>
 </html>
