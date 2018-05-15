@@ -9,6 +9,44 @@
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     <script src="~/lib/bootstrap-select/dist/js/bootstrap-select.js"></script>
+    <style>
+        .dropbtn {
+            background-color: transparent;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-top:15px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right:0;
+            background-color: #f1f1f1;
+            min-width: 100px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {background-color: #ddd}
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: transparent;
+        }
+    </style>
     <title>@ViewBag.Title</title>
 </head>
 <body>
