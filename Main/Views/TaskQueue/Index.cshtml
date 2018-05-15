@@ -93,7 +93,8 @@
             url: "/TaskQueue/GetTasksWebView",
             datatype: 'application/json',
             complete: function (data) {
-                taskslist = JSON.parse(data["responsetext"]);
+                console.log(data);
+                taskslist = JSON.parse(data["responseText"]);
                 buildTaskQueueGrid(taskslist);
             }
         });
