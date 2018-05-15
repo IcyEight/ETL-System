@@ -438,7 +438,7 @@ namespace Main.Controllers
             }
             else
             {
-                var existingAssets = _dbcontext.Assets.AsNoTracking();
+                var existingAssets = _dbcontext.Assets.AsNoTracking().Where(x => x.isDeleted == false);
 
                 if (aNameFilter != null)
                 {
@@ -458,7 +458,15 @@ namespace Main.Controllers
 
                 if (assetTypeFilter != null)
                 {
-                    existingAssets = existingAssets.Where(x => x.typeName.Contains(assetTypeFilter));
+                    string assetType = null;
+                    var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetTypeFilter)).FirstOrDefault();
+
+                    if (findAssetType != null)
+                    {
+                        assetType = findAssetType.typeName;
+                    }
+
+                    existingAssets = existingAssets.Where(x => x.typeName.Contains(assetType));
                 }
 
                 if (ownerFilter != null)
