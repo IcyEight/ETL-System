@@ -532,6 +532,12 @@
     }
 
     function clearAssetsFilters() {
+        $("#assetNameFilter").val("");
+        $("#sDescriptionFilter").val("");
+        $("#lDescriptionFilter").val("");
+        $("#ownerFilter").val("");
+        $("#assetTypeFilter").val("");
+
         $.ajax({
             url: "/Asset/GetAssets",
             dataType: 'application/json',
