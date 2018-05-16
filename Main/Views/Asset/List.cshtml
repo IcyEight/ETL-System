@@ -62,6 +62,12 @@
     <h2 align="center">@ViewBag.Title</h2>
 
     <br />
+    
+    <div id="noAssetsMsg" style="text-align:center; color:red">
+        <h4>There are currently no assets in the system.  Assets can be added by clicking the 'Add' button in the grid below.</h4>
+    </div>
+    
+    <br />
 
     <div id="filterButtons" style="padding-bottom:5px !important;">
         <div class="row">
@@ -255,6 +261,10 @@
     });
 
     function buildAssetGrid(allAssets) {
+        if (allAssets.length > 0) {
+            $("#noAssetsMsg").addClass("hidden");
+        }
+
         $("#allAssetGrid").jsGrid({
             width: "100%",
             height: "auto",
