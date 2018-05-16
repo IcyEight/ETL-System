@@ -1,5 +1,10 @@
 ﻿@model UserProfileViewModel
 <html>
+    <head>
+        <script type="text/javascript" src="~/Scripts/jquery.min.js"></script>
+        <script type="text/javascript" src="~/Scripts/bootstrap.min.js"></script>
+    </head>
+    
     <nav class="navbar navbar-inverse  navbar-default">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -65,7 +70,55 @@
           <button id="saveEmail" type="button" class="btn btn-default btn-sm" disabled="true"><span class="glyphicon glyphicon-ok"></span></button>
           <span asp-validation-for="Email"></span>
         </div>
+
       </form>
+
+
+      <div align="center">
+           <button id="changePassword" type="button" class="btn btn-default btn-sm">Change Password</button>
+      </div>
+
+
+       <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="myChangePasswordModalLabel" aria-hidden="true">
+           <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                 <div class="modal-header">
+                    <h4 class="modal-title">Change Password</h4>
+                    <button type="button" class="close" onclick="closeModal();" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                 </div>
+                 <div class="modal-body">
+                    <div>
+                       <p id="errormessage"></p>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                       <label class="control-label col-sm-4" asp-for="CurrentPassword"></label>
+                       <div class="col-sm-6">
+                          <input id="currentPassword" type="password" class="form-control" asp-for="CurrentPassword">
+                       </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                       <label class="control-label col-sm-4" asp-for="NewPassword"></label>
+                       <div class="col-sm-6">
+                          <input id="newPassword" type="password" class="form-control" asp-for="NewPassword">
+                       </div>
+                    </div>
+                    <div class="row" style="padding-bottom:15px !important">
+                       <label class="control-label col-sm-4" asp-for="ConfirmNewPassword"></label>
+                       <div class="col-sm-6">
+                          <input id="confirmNewPassword" type="password" class="form-control" asp-for="ConfirmNewPassword">
+                       </div>
+                    </div>
+                 </div>
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="changePassword();">Change</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal();">Cancel</button>
+                 </div>
+              </div>
+           </div>
+        </div>
+        
     </div>
 </html>
 
@@ -95,7 +148,7 @@
            if(newval){
             $.ajax({
                 async: false,
-                url: '@Url.Action("UpdateProfile")',
+                url: '@Url.Action("UpdateNameOrEmail")',
                 dataType: 'application/json',
                 data: {
                     firstname:newval 
@@ -121,7 +174,7 @@
            if(newval){
             $.ajax({
                 async: false,
-                url: '@Url.Action("UpdateProfile")',
+                url: '@Url.Action("UpdateNameOrEmail")',
                 dataType: 'application/json',
                 data: {
                     lastname:newval 
@@ -146,7 +199,7 @@
            if(newval){
             $.ajax({
                 async: false,
-                url: '@Url.Action("UpdateProfile")',
+                url: '@Url.Action("UpdateNameOrEmail")',
                 dataType: 'application/json',
                 data: {
                     email:newval 
@@ -163,5 +216,72 @@
             });
            }
         });
+
+        $("#changePassword").click(function(event){
+           $('#changePasswordModal').modal({ backdrop: 'static', keyboard: false })
+        });
+
     });
+
+
+
+    function changePassword(){
+       var _currentPassword = $("#currentPassword").val();
+       var _newPassword = $("#newPassword").val();
+       var _confirmNewPassword = $("#confirmNewPassword").val();
+
+       var errors = [];
+       // check for empty string in all three fields
+       if(_currentPassword === "") errors.push("Current Password can not be empty");
+       if(_newPassword === "") errors.push("New Password can not be empty");
+       if(_confirmNewPassword === "") errors.push("Confirm New Password can not be empty");
+       if(_newPassword === _currentPassword) errors.push("New password can not be same as current password");
+       if(_newPassword !== _confirmNewPassword) errors.push("New password and Confirm new password do not match");
+       if(_newPassword.length < 8) errors.push("Password must be at least 8 character long."); 
+
+       if(errors.length > 0)
+       {
+          var messages = "";
+          for(var i = 0; i < errors.length; i++)
+          {
+             messages += errors[i];
+             messages += "</br>";
+          }
+          $("#errormessage").html(messages);
+          return;
+       }
+    
+       // if all seems okay, pass the ajax
+       $.ajax({
+            async: true,
+            url: '@Url.Action("ChangePassword")',
+            dataType: 'application/json',
+            data: {
+                currentPassword : _currentPassword,
+                newPassword : _newPassword
+            },
+            complete: function (data) {
+                var response = JSON.parse(data.responseText);
+                if (response.success) {
+                    $("#errormessage").html('<span style="color:green">'+response.message+'</span>');
+                }
+                else
+                {
+                    $("#errormessage").html('<span style="color:red">'+response.message+'</span>');
+                }
+            }
+      });
+    }
+
+
+    function closeModal()
+    {
+       // silently exits. does not alert user if field is non-empty. 
+       // well, having another popup on top of a modal makes it less user friendly.
+       $("#currentPassword").val("");
+       $("#newPassword").val("");
+       $("#confirmNewPassword").val("");
+
+       $("#changePasswordModal").modal('hide');
+    }
 </script>

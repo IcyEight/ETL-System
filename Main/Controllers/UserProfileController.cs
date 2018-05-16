@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Main.Data;
+using Main.Models;
 using Main.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +18,12 @@ namespace Main.Controllers
     public class UserProfileController : Controller
     {
         private readonly BamsDbContext _dbcontext;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserProfileController(BamsDbContext dbcontext)
+        public UserProfileController(BamsDbContext dbcontext, UserManager<ApplicationUser> userManager)
         {
             _dbcontext = dbcontext;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -36,7 +41,7 @@ namespace Main.Controllers
             return View(vm);
         }
 
-        public JsonResult UpdateProfile(string firstname, string lastname, string email)
+        public JsonResult UpdateNameOrEmail(string firstname, string lastname, string email)
         {
             bool success = false;
             try
@@ -83,6 +88,18 @@ namespace Main.Controllers
             {
                 return Json(new { success = false, responseText = "Update failed." });
             }
+        }
+
+        public async Task<JsonResult> ChangePassword(string currentPassword, string newPassword)
+        {
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+            var result = await _userManager.ChangePasswordAsync(userDetails, currentPassword, newPassword);
+            if (result.Succeeded)
+            {
+                return Json(new { success = true, message = "Password is successfully updated" });
+            }
+            return Json(new { success = false, message = "Password update failed" });
         }
     }
 }
