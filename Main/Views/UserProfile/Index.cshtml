@@ -40,7 +40,7 @@
     <h2 align="center">@ViewBag.Title</h2> <br/>
     <div class="container">
       <form class="form-horizontal" asp-controller="UserProfile" asp-action="Index">
-        <div><p align="center"><small>Please click field specific tick mark to save your change.</small></p></div>>
+        <div><p align="center"><small>Please click field specific tick mark to save your change.</small></p></div>
         <div class="form-group">
           <label class="control-label col-sm-3" asp-for="FirstName"></label>
           <div class="col-sm-6">
@@ -69,6 +69,7 @@
           <button id="editEmail" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span></button>
           <button id="saveEmail" type="button" class="btn btn-default btn-sm" disabled="true"><span class="glyphicon glyphicon-ok"></span></button>
           <span asp-validation-for="Email"></span>
+          <div align="center"><br><p text-align="center" id="emailWarning" style="color:blue"></p></div>
         </div>
 
       </form>
@@ -139,6 +140,7 @@
            $("#email").prop('readOnly', false);
            $("#saveEmail").prop('disabled',false);
            $(this).prop('disabled',true);
+           document.getElementById("emailWarning").innerHTML = "Email will be updated after the new email is confimed";
         });
 
         $("#saveFirstname").click(function(event) {
@@ -148,7 +150,7 @@
            if(newval){
             $.ajax({
                 async: false,
-                url: '@Url.Action("UpdateNameOrEmail")',
+                url: '@Url.Action("UpdateName")',
                 dataType: 'application/json',
                 data: {
                     firstname:newval 
@@ -174,7 +176,7 @@
            if(newval){
             $.ajax({
                 async: false,
-                url: '@Url.Action("UpdateNameOrEmail")',
+                url: '@Url.Action("UpdateName")',
                 dataType: 'application/json',
                 data: {
                     lastname:newval 
@@ -198,8 +200,8 @@
            var savebutton = $("#saveEmail");
            if(newval){
             $.ajax({
-                async: false,
-                url: '@Url.Action("UpdateNameOrEmail")',
+                async: true,
+                url: '@Url.Action("UpdateEmailAsync")',
                 dataType: 'application/json',
                 data: {
                     email:newval 
@@ -211,7 +213,14 @@
                         $("#email").prop('readOnly', true);
                         $("#editEmail").prop('disabled',false);
                         $("#saveEmail").prop('disabled',true);
-                    }                       
+
+                        $("#email").val(response.oldEmail);
+                        document.getElementById("emailWarning").innerHTML = response.message;
+                    }
+                    else {
+                        document.getElementById("emailWarning").innerHTML = response.message;
+                    }
+
                 }
             });
            }

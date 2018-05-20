@@ -84,6 +84,7 @@ namespace Main.Controllers
             ViewBag.Title = "Login";
             if (ModelState.IsValid)
             {
+                // vm.Email is passed as username to PasswordSignInAsync function since we make Email and UserName same value in database
                 var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, false); // false means don’t lock user out if log in is invalid
                 if (result.Succeeded)
                 {
