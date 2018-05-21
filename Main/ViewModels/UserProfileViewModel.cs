@@ -20,5 +20,25 @@ namespace Main.ViewModels
         [Required(ErrorMessage = "Email can't be empty")]
         [EmailAddress]
         public string Email { get; set; } 
+
+        [Required, MaxLength(50), DataType(DataType.Password), Display(Name = "Current Password")]
+        public string CurrentPassword
+        {
+            get;
+            set;
+        }
+        [Required, MaxLength(50), DataType(DataType.Password), Display(Name = "New Password")]
+        public string NewPassword
+        {
+            get;
+            set;
+        }
+        [Required, MaxLength(50), DataType(DataType.Password), Display(Name = "Confirm New Password")]
+        [Compare("NewPassword", ErrorMessage = "The confirmation password does not match the password")]
+        public string ConfirmNewPassword
+        {
+            get;
+            set;
+        }
     }
 }

@@ -438,7 +438,7 @@ namespace Main.Controllers
             }
             else
             {
-                var existingAssets = _dbcontext.Assets.AsNoTracking();
+                var existingAssets = _dbcontext.Assets.AsNoTracking().Where(x => x.isDeleted == false);
 
                 if (aNameFilter != null)
                 {
@@ -458,7 +458,15 @@ namespace Main.Controllers
 
                 if (assetTypeFilter != null)
                 {
-                    existingAssets = existingAssets.Where(x => x.typeName.Contains(assetTypeFilter));
+                    string assetType = null;
+                    var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetTypeFilter)).FirstOrDefault();
+
+                    if (findAssetType != null)
+                    {
+                        assetType = findAssetType.typeName;
+                    }
+
+                    existingAssets = existingAssets.Where(x => x.typeName.Contains(assetType));
                 }
 
                 if (ownerFilter != null)
@@ -468,7 +476,32 @@ namespace Main.Controllers
 
                 var filteredAssets = existingAssets.ToList();
 
-                return Json(filteredAssets);
+                // get current user
+                var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var userDetails = _dbcontext.Users.Where(x => x.Id == user).FirstOrDefault();
+                string currentUserID = userDetails.Id;
+
+                List<AssetDisplayModel> assetList = filteredAssets.Select(x => new AssetDisplayModel
+                {
+                    AssetId = x.AssetId,
+                    AssetName = x.AssetName,
+                    ShortDescription = x.ShortDescription,
+                    LongDescription = x.LongDescription,
+                    // if no preferred asset entry in table, default to false for isPreferredAsset
+                    // if preferred asset entry is deleted, not a preferred asset (isPreferredAsset = false)
+                    // if preferred asset entry is NOT deleted, preferred asset (isPreferredAsset = true)
+                    isPreferredAsset = _dbcontext.PreferredAssets.Where(m => m.assetID == x.AssetId && m.userID ==
+                        currentUserID).FirstOrDefault() == null ? false : (_dbcontext.PreferredAssets.Where(m => m.assetID ==
+                        x.AssetId && m.userID == currentUserID).FirstOrDefault().isDeleted == true ? false : true),
+                    typeID = _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault() == null
+                        ? null : _dbcontext.AssetTypes.Where(m => m.typeName == x.typeName).FirstOrDefault().typeID.ToString(),
+                    isDeleted = x.isDeleted,
+                    Owner = x.Owner,
+                    moduleID = _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault() == null
+                        ? null : _dbcontext.AssetModules.Where(m => m.assetID == x.AssetId).FirstOrDefault().moduleID.ToString()
+                }).ToList();
+
+                return Json(assetList);
             }
         }
     }
