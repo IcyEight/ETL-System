@@ -63,7 +63,7 @@
 
     <br />
 
-    <div id="noAssetsMsg" style="text-align:center; color:red">
+    <div id="noAssetsMsg" style="text-align:center; color:red" class="hidden">
         <h4>There are currently no assets in the system.  Assets can be added by clicking the 'Add' button in the grid below.</h4>
     </div>
 
@@ -267,8 +267,8 @@
     });
 
     function buildAssetGrid(allAssets) {
-        if (allAssets.length > 0) {
-            $("#noAssetsMsg").addClass("hidden");
+        if (allAssets.length == 0) {
+            $("#noAssetsMsg").removeClass("hidden");
         }
 
         $("#allAssetGrid").jsGrid({
