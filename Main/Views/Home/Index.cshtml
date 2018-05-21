@@ -1,73 +1,161 @@
 ﻿@model HomeViewModel
+<html>
+<head>
+    <style> 
+        /* The sidebar menu */
+         .sidenav {
+             height: 100% 
+            /* Full-height: remove this if you want "auto" height */
+             width: 160px;
+            /* Set the width of the sidebar */
+             position: fixed;
+            /* Fixed Sidebar (stay in place on scroll) */
+             z-index: 1;
+            /* Stay on top */
+             top: 68px;
+            /* Stay at the top */
+             left: 0;
+             background-color: #111;
+            /* Black */
+             overflow-x: hidden;
+            /* Disable horizontal scroll */
+        }
+        /* The navigation menu links */
+         .sidenav a {
+             padding: 6px 8px 6px 16px;
+             text-decoration: none;
+             font-size: 20px;
+             color: #818181;
+             display: block;
+        }
+        /* When you mouse over the navigation links, change their color */
+         .sidenav a:hover {
+             color: #f1f1f1;
+        }
+        /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+         @@media screen and (max-height: 450px) {
+             .sidenav {
+                padding-top: 15px;
+            }
+             .sidenav a {
+                font-size: 18px;
+            }
+        }
+    </style>
+    <script src="~/Scripts/bootstrap-treeview.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-inverse  navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
 
-<nav class="navbar navbar-inverse  navbar-default">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-            </button>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
+                    <li><a href="@Url.Action("List","Asset")">Asset</a></li>
+                    <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
+                    <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
+                    <li>
+                        <div class="dropdown">
+                            <a class="dropbtn" href="@Url.Action("Index", "UserProfile")">
+                                <span style="color: #e3f2fd;font-family:verdana;">
+                                    @Model.FirstName @Model.LastName
+                                </span>
+                            </a>
+                            <div class="dropdown-content"><a href="@Url.Action("Logout", "Account")">Logout</a></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                <li class="active"><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
-                <li><a href="@Url.Action("List","Asset")">Asset</a></li>
-                <li><a href="@Url.Action("Index","TaskQueue")">Task Queue</a></li>
-                <li><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only"></span></a></li>
-                <li>
-                    <div class="dropdown">
-                        <a class="dropbtn" href="@Url.Action("Index", "UserProfile")">
-                            <span style="color: #e3f2fd;font-family:verdana;">
-                                @Model.FirstName @Model.LastName
-                            </span>
-                        </a>
-                        <div class="dropdown-content"><a href="@Url.Action("Logout", "Account")">Logout</a></div>
-                    </div>
-                </li>
-            </ul>
-        </div>
+     <!-- Side navigation -->      <div class="sidenav">         <a href="#assetGrid">Grid View</a>         <a href="#assetTree">Tree View</a>      </div>
+            
+    <div class="container no-padding no-margin">
+            <img src="~/Images/bayada_logo.jpg"
+                    class="img-responsive center-block"
+                    style="max-width:500px;max-height:100px;margin-top:-7px" />
+
+            <div class="row" style="margin-left:1px !important; margin-right:1px !important">
+                @{
+                    foreach (var asset in Model.PreferredAssets)
+                    {
+                        <div class="col-sm-4 col-lg-4 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3 class="pull-right">@asset.AssetId.ToString()</h3>
+                                    <h3>
+                                        <a>@asset.AssetName</a>
+                                    </h3>
+                                    <p>@asset.ShortDescription</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    if (Model.PreferredAssets.Count() == 0)
+                    {
+                        <div style="text-align:center">
+                            <h4>You do not have any preferred assets.  Preferred assets can be added in the Assets tab.</h4>
+                        </div>
+                    }
+                }
+            </div>
+
+           <div id="tree"></div>
     </div>
-</nav>
-<div class="no-padding no-margin">
-    <div class="container">
-        <img src="~/Images/bayada_logo.jpg"
-                class="img-responsive center-block"
-                style="max-width:500px;max-height:100px;margin-top:-7px" />
-    </div>
-</div>
 <br />
-
-<div class="row" style="margin-left:1px !important; margin-right:1px !important">
-    @{
-        foreach (var asset in Model.PreferredAssets)
-        {
-            <div class="col-sm-4 col-lg-4 col-md-4">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <h3 class="pull-right">@asset.AssetId.ToString()</h3>
-                        <h3>
-                            <a>@asset.AssetName</a>
-                        </h3>
-                        <p>@asset.ShortDescription</p>
-                    </div>
-                </div>
-            </div>
-        }
-
-        if (Model.PreferredAssets.Count() == 0)
-        {
-            <div style="text-align:center">
-                <h4>You do not have any preferred assets.  Preferred assets can be added in the Assets tab.</h4>
-            </div>
-        }
-    }
-</div>
-
-
+</body>
+</html>
 <script type="text/javascript">
+function getTree() {
+
+var tree = [
+  {
+    text: "Parent 1",
+    nodes: [
+      {
+        text: "Child 1",
+        nodes: [
+          {
+            text: "Grandchild 1"
+          },
+          {
+            text: "Grandchild 2"
+          }
+        ]
+      },
+      {
+        text: "Child 2"
+      }
+    ]
+  },
+  {
+    text: "Parent 2"
+  },
+  {
+    text: "Parent 3"
+  },
+  {
+    text: "Parent 4"
+  },
+  {
+    text: "Parent 5"
+  }
+];
+
+  return tree;
+}
+
+$('#tree').treeview({data: getTree()});
 
 </script>
 
