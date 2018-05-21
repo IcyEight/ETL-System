@@ -7,6 +7,7 @@ using Main.Models;
 using Main.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Main.Controllers
 {
@@ -71,7 +72,7 @@ namespace Main.Controllers
         }
 
         [Route("/Reporting/GetReportsView/{reportName}")]
-        public ReportingDisplayModel GetReportsView(string reportName)
+        public JsonResult GetReportsView(string reportName)
         {
             ReportingDisplayModel reportModel = new ReportingDisplayModel
             {
@@ -102,7 +103,7 @@ namespace Main.Controllers
                 reportModel.Table.Add(report_row);
             }
 
-            return reportModel;
+            return Json(reportModel);
         }
     }
 }
