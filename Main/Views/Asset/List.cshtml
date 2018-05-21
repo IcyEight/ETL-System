@@ -62,11 +62,17 @@
     <h2 align="center">@ViewBag.Title</h2>
 
     <br />
-    
+
     <div id="noAssetsMsg" style="text-align:center; color:red">
         <h4>There are currently no assets in the system.  Assets can be added by clicking the 'Add' button in the grid below.</h4>
     </div>
-    
+
+    <br />
+
+    <div id="filteredAssetsAlert" style="padding-top:0px !important; text-align:center !important; border-style: solid; border-color:#ffc107!important; background-color:#ffc107!important" class="hidden">
+        Filters have been applied to this data set.  Please click the 'Clear Filters' button below to view all assets.
+    </div>
+
     <br />
 
     <div id="filterButtons" style="padding-bottom:5px !important;">
@@ -553,6 +559,8 @@
             complete: function (data) {
                 assetList = JSON.parse(data["responseText"]);
                 buildAssetGrid(assetList);
+
+                $("#filteredAssetsAlert").addClass("hidden");
             }
         });
 
@@ -588,6 +596,8 @@
 
                 var filteredAssetsList = JSON.parse(data["responseText"]);
                 buildAssetGrid(filteredAssetsList);
+
+                $("#filteredAssetsAlert").removeClass("hidden");
             }
         });
     }
