@@ -106,7 +106,7 @@ namespace Main.Controllers
             foreach (IGrouping<int, AssetData> row in tables.GroupBy(y => y.dataEntryID).ToList())
             {   
                 columnNames = row.Select(x => x.fieldName).ToList();
-                break;
+                //break;
             }
             return Json(columnNames);
         }
