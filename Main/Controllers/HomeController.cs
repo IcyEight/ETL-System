@@ -61,7 +61,7 @@ namespace Main.Controllers
         public JsonResult GetAssetTree()
         {
             List<AssetType> assetTypes = _dbcontext.AssetTypes.ToList(); // where clause is preferred instead of getting all rows.
-            List<JsonResult> tree = new List<JsonResult>();
+            List<object> tree = new List<object>();
             foreach (AssetType a in assetTypes)
             {
                 tree.Add(getAssetTypeInfo(a));
@@ -74,7 +74,7 @@ namespace Main.Controllers
             List<Module> modules = _dbcontext.Modules.Where(x => x.typeID == assetType.typeName).ToList();
             if (modules.Count > 0)
             {
-                List<JsonResult> _nodes = new List<JsonResult>();
+                List<object> _nodes = new List<object>();
                 foreach (Module m in modules)
                 {
                     _nodes.Add(getModuleInfo(m));
@@ -89,7 +89,7 @@ namespace Main.Controllers
             List<AssetModule> assetModule = _dbcontext.AssetModules.Where(x => x.moduleID == m.moduleID).ToList();
             if (assetModule.Count > 0)
             {
-                List<JsonResult> _nodes = new List<JsonResult>();
+                List<object> _nodes = new List<object>();
                 foreach (AssetModule am in assetModule)
                 {
                     _nodes.Add(getAssetInfo(am.assetID));
