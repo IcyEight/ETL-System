@@ -78,21 +78,39 @@ namespace Main.Controllers
             {
                 ReportName = reportName,
                 ColumnNames = new List<string>(),
-                Table = new List<ReportingDisplayRowModel>()
+                Table = new List<dynamic>()
             };
             IQueryable<AssetData> tables = _dbcontext.AssetData.Where(x => x.schemaName.Equals(reportName));
 
             bool is_column_set = false;
+            List<dynamic> results = new List<dynamic>();
             foreach (IGrouping<int, AssetData> row in tables.GroupBy(y => y.dataEntryID).ToList())
             {
-                ReportingDisplayRowModel report_row = new ReportingDisplayRowModel()
+                var jsonResultRow = "{";
+                foreach (var item in row)
                 {
-                    items = row.Select(x => new ReportingDisplayItemModel
-                    {
-                        fieldName = x.fieldName,
-                        strValue = x.ToString(),
-                    }).ToList()
-                };
+                    if (item.fieldType == "String") {
+                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.strValue + ", ";
+                    }
+                    else if (item.fieldType == "Integer") {
+                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.intValue.ToString() + ", ";
+                    }
+                    else if (item.fieldType == "Decimal") {
+                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.floatValue.ToString() + ", ";
+                    }
+                    else if (item.fieldType == "Date") {
+                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.dateValue.ToString() + ", ";
+                    }
+                    else if (item.fieldType == "Boolean") {
+                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.boolValue.ToString() + ", ";
+                    }
+
+                }
+
+                //jsonResultRow.Substring(jsonResultRow.Length - 2);
+                jsonResultRow = jsonResultRow + "}";
+
+                results.Add(jsonResultRow);
 
                 if(!is_column_set)
                 {
@@ -100,9 +118,8 @@ namespace Main.Controllers
                     is_column_set = true;
                 }
 
-                reportModel.Table.Add(report_row);
+                reportModel.Table = results;
             }
-
             return Json(reportModel);
         }
     }

@@ -349,11 +349,21 @@ namespace Main.Controllers
 
 
         #region Asset Modules
-        public JsonResult GetAssetModules()
+        public JsonResult GetAssetModules(string aType)
         {
-            var assetModules = _dbcontext.Modules.ToList();
+            var assetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(aType)).FirstOrDefault();
 
-            return Json(assetModules);
+            if (assetType != null)
+            {
+                var aTypeName = assetType.typeName;
+                var assetModules = _dbcontext.Modules.Where(x => x.typeID == aTypeName).ToList();
+
+                return Json(assetModules);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void AddAssetsModule(AssetModule amLink)
