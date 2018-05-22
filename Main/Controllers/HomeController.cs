@@ -69,7 +69,7 @@ namespace Main.Controllers
             return Json(tree);
         }
 
-        private JsonResult getAssetTypeInfo(AssetType assetType)
+        private IDictionary<string, object> getAssetTypeInfo(AssetType assetType)
         {
             List<Module> modules = _dbcontext.Modules.Where(x => x.typeID == assetType.typeName).ToList();
             if (modules.Count > 0)
@@ -79,12 +79,20 @@ namespace Main.Controllers
                 {
                     _nodes.Add(getModuleInfo(m));
                 }
-                return Json(new { text = assetType.typeName, nodes = _nodes });
+                IDictionary<string, object> assetTypeInfo = new Dictionary<string, object>();
+                assetTypeInfo["text"] = assetType.typeName;
+                assetTypeInfo["nodes"] = _nodes;
+                return assetTypeInfo;
             }
-            else return Json(new { text = assetType.typeName });
+            else
+            {
+                IDictionary<string, object> assetTypeInfo = new Dictionary<string, object>();
+                assetTypeInfo["text"] = assetType.typeName;
+                return assetTypeInfo;
+            }
         }
 
-        private JsonResult getModuleInfo(Module m)
+        private IDictionary<string, object> getModuleInfo(Module m)
         {
             List<AssetModule> assetModule = _dbcontext.AssetModules.Where(x => x.moduleID == m.moduleID).ToList();
             if (assetModule.Count > 0)
@@ -94,15 +102,26 @@ namespace Main.Controllers
                 {
                     _nodes.Add(getAssetInfo(am.assetID));
                 }
-                return Json(new { text = m.moduleName, nodes = _nodes });
+                IDictionary<string, object> moduleInfo = new Dictionary<string, object>();
+
+                moduleInfo["text"] = m.moduleName;
+                moduleInfo["nodes"] = _nodes; 
+                return moduleInfo;
             }
-            else return Json(new { text = m.moduleName });
+            else
+            {
+                IDictionary<string, object> moduleInfo = new Dictionary<string, object>();
+                moduleInfo["text"] = m.moduleName;
+                return moduleInfo;
+            }
         }
 
-        private JsonResult getAssetInfo(int assetid)
+        private IDictionary<string, object> getAssetInfo(int assetid)
         {
             Asset asset = _dbcontext.Assets.Where(x => x.AssetId == assetid).FirstOrDefault<Asset>();
-            return Json(new { text = asset.AssetName });
+            IDictionary<string, object> assetInfo = new Dictionary<string, object>();
+            assetInfo["text"] = asset.AssetName;
+            return assetInfo;
         }
     }
 }
