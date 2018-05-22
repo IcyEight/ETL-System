@@ -72,7 +72,6 @@ namespace Main.Controllers
             return View(vm);
         }
 
-        [Route("/Reporting/GetReportsView/{reportName}")]
         public JsonResult GetReportsView(string reportName)
         {
             ViewBag.Title = reportName;
@@ -100,7 +99,6 @@ namespace Main.Controllers
             return Json(json);
         }
 
-        [Route("/Reporting/GetReportViewColumns/{reportName}")]
         public JsonResult GetReportViewColumns(string reportName)
         {
             List<string> columnNames = new List<string>();
