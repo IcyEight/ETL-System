@@ -5,7 +5,7 @@
     <link type="text/css" rel="stylesheet" href="~/Content/jsgrid.min.css" />
     <link type="text/css" rel="stylesheet" href="~/Content/jsgrid-theme.min.css" />
     <link type="text/css" rel="stylesheet" href="~/Content/jquery-ui.css" />
-    <link type="text/css" rel="stylesheet" href="~/Content/Site.css"/>
+    <link type="text/css" rel="stylesheet" href="~/Content/Site.css" />
 
     <script type="text/javascript" src="~/Scripts/jquery.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery.min.js"></script>
@@ -52,18 +52,30 @@
     <br />
     <div class="text-center">
         <div class="btn-group">
-            <a class="btn btn-primary" href="#"><i class="icon-user icon-white" id="reportSelect"></i><strong>Select Report</strong></a>
-            <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+            <button class="btn btn-primary no-click"><i class="icon-user icon-white" id="reportSelect"></i><strong>@Html.Raw(@Model.ActiveReport)</strong></button>
+            <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
 
             <ul class="dropdown-menu">
                 @{
                     foreach (string table in Model.Reports.Keys)
                     {
-                        <li><a id ="reportName" href="@Url.Action("Index", "Reporting" , new { reportName=table })">@table</a></li>
+                        <li><a id="reportName" href="@Url.Action("Index", "Reporting" , new { reportName=table })">@table</a></li>
                     }
                 }
             </ul>
         </div>
+
+        @*<div>
+            <select class="selectpicker" onchange="window.location.href = this.value;">
+                @{
+                    foreach (string table in Model.Reports.Keys)
+                    {
+                        <option value="@Url.Action("Index", "Reporting" , new { reportName=table })">@table</option>
+                    }
+                }
+
+            </select>
+        </div>*@
     </div>
 
     <br />
@@ -128,9 +140,9 @@
 
                 $("#reportingGrid").jsGrid({
                     width: "auto",
-                    height: "auto",
+                    height: "600px",
                     autoload: false,
-                    paging: true,
+                    paging: false,
                     pageSize: 10,
                     pageButtonCount: 5,
                     pageIndex: 1,

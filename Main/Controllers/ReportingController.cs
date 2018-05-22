@@ -42,7 +42,7 @@ namespace Main.Controllers
             vm.FirstName = userDetails.FirstName;
             vm.LastName = userDetails.LastName;
             
-            vm.ActiveReport = "";
+            vm.ActiveReport = "Select Report";
 
             return View(vm);
         }
