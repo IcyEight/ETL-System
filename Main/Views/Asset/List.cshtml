@@ -215,7 +215,7 @@
                     <div class="row" style="padding-bottom:15px !important">
                         <div class="col-md-4"><label>Asset Type</label></div>
                         <div class="col-md-8">
-                            <select id="assetType" class=" col-md-10 form-control elipsis-text">
+                            <select id="assetType" class="col-md-10 form-control elipsis-text" onchange="addAssetModulesToForm()">
                                 <option value="">Select..</option>
                             </select>
                         </div>
@@ -223,7 +223,7 @@
                     <div class="row" style="padding-bottom:15px !important">
                         <div class="col-md-4"><label>Module</label></div>
                         <div class="col-md-8">
-                            <select id="assetModule" class=" col-md-10 form-control elipsis-text">
+                            <select disabled id="assetModule" class="col-md-10 form-control elipsis-text">
                                 <option value="">Select..</option>
                             </select>
                         </div>
@@ -261,9 +261,9 @@
             }
         });
 
-        // add all asset types and modules to form dynamically from database table on page load
+        // add all asset types to form dynamically from database table on page load
+        // modules will be added based on asset type selection
         addAssetTypesToForm();
-        addAssetModulesToForm();
     });
 
     function buildAssetGrid(allAssets) {
@@ -523,23 +523,52 @@
         });
     }
 
+    function enableDisableAssetModules(assetType) {
+        if (assetType == null || assetType == "") {
+            // disable asset module
+            $('#assetModule').attr("disabled", "disabled")
+        }
+        else {
+            // enable asset module
+            $('#assetModule').removeAttr("disabled")
+        }
+    }
+
     function addAssetModulesToForm() {
-        $.ajax({
-            url: "/Asset/GetAssetModules",
-            dataType: 'application/json',
-            complete: function (data) {
-                var response = JSON.parse(data.responseText);
+        var assetType = $("#assetType").val();
 
-                for (var i = 0; i < response.length; i++) {
-                    var assetModule = response[i]["moduleName"];
+        enableDisableAssetModules(assetType);
 
-                    var value = i + 1;
+        // remove existing values (necessary if user changes asset type selection)
+        $('#assetModule').find('option').remove().end();
 
-                    // add each asset module to dropdown selection for editting asset
-                    $('<option>').val(value).text(assetModule).appendTo('#assetModule');
+        // add select to option selection
+        $('<option>').val("").text("Select..").appendTo('#assetModule');
+
+        if (assetType != null && assetType != "") {
+            $.ajax({
+                url: "/Asset/GetAssetModules",
+                data: {
+                    aType: assetType
+                },
+                dataType: 'application/json',
+                complete: function (data) {
+                    var response = JSON.parse(data.responseText);
+
+                    // enable asset module
+                    $('#assetModule').removeAttr("disabled")
+
+                    for (var i = 0; i < response.length; i++) {
+                        var assetModule = response[i]["moduleName"];
+
+                        var value = i + 1;
+
+                        // add each asset module to dropdown selection for editting asset
+                        $('<option>').val(value).text(assetModule).appendTo('#assetModule');
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     function refreshPage() {
@@ -564,9 +593,9 @@
             }
         });
 
-        // add all asset types and modules to form dynamically from database table on page load
+        // add all asset types to form dynamically from database table on page load
+        // modules will be added based on asset type selection
         addAssetTypesToForm();
-        addAssetModulesToForm();
     }
 
     function openFiltersModal() {
