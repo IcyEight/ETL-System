@@ -8,6 +8,6 @@ namespace Main.ViewModels
     public class ReportingDisplayItemModel
     {
         public String fieldName { get; set; }
-        public String strValue { get; set; }
+        public dynamic strValue { get; set; }
     }
 }

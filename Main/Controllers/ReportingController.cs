@@ -88,7 +88,7 @@ namespace Main.Controllers
                 var Obj = row.Select(x => new ReportingDisplayItemModel
                 {
                     fieldName = x.fieldName,
-                    strValue = x.ToString(),
+                    strValue = x.ValueOf(),
                 }).ToList();
 
                 foreach(var item in Obj)
