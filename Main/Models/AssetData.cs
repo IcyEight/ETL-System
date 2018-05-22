@@ -111,10 +111,36 @@ namespace Main.Models
             }
             else if (fieldType.Equals("Boolean"))
             {
-                boolValue.ToString();
+                return boolValue.ToString();
             }
 
             return "";
+        }
+
+        public dynamic ValueOf()
+        {
+            if (fieldType.Equals("String"))
+            {
+                return strValue;
+            }
+            else if (fieldType.Equals("Integer"))
+            {
+                return intValue;
+            }
+            else if (fieldType.Equals("Decimal"))
+            {
+                return floatValue;
+            }
+            else if (fieldType.Equals("Date"))
+            {
+                return dateValue;
+            }
+            else if (fieldType.Equals("Boolean"))
+            {
+                return boolValue;
+            }
+
+            return null;
         }
     }
 }
