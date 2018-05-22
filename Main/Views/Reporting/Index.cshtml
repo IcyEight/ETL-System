@@ -118,8 +118,8 @@
                     width: "auto",
                     height: "auto",
                     autoload: false,
-                    paging: false,
-                    pageSize: 15,
+                    paging: true,
+                    pageSize: 10,
                     pageButtonCount: 5,
                     pageIndex: 1,
                     data: reportingList,
@@ -129,3 +129,10 @@
         });
     }
 </script>
+
+<style>
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+</style>
