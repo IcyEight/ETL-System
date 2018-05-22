@@ -91,6 +91,7 @@ namespace Main.Controllers
             }
         }
 
+        [AllowAnonymous]
         public async Task<ActionResult> ChangeEmail(string userid, string token, string newEmail)
         {
             if (userid == null || token == null)
