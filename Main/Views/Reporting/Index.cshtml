@@ -76,13 +76,16 @@
 </html>
 <script>
     $(document).ready(function () {
-        var reportName = '@Html.Raw(@Model.ActiveReport)';
+        var activeReportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
-            url: "/Reporting/GetReportsView/" + reportName,
+            url: "/Reporting/GetReportsView/",
+            data: {
+                reportName: activeReportName
+            },
             dataType: 'application/json',
             complete: function (data) {
-                var reportinglist = JSON.parse(data["responseText"]);
-                buildReportingGrid(reportinglist);
+                var reportingList = JSON.parse(data["responseText"]);
+                buildReportingGrid(reportingList);
             }
         });
     });
@@ -91,29 +94,32 @@
         return { "name": name, "title": name };
     }
     
-    function buildReportingGrid(reportinglist) {
-        var reportName = '@Html.Raw(@Model.ActiveReport)';
+    function buildReportingGrid(reportingList) {
+        var activeReportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
-            url:"/Reporting/GetReportViewColumns/" + reportName,
+            url: "/Reporting/GetReportViewColumns/",
+            data: {
+                reportName: activeReportName
+            },
             dataType: 'application/json',
-            conplete : function(data)
+            complete : function(data)
             {
                 var columnNames = JSON.parse(data["responseText"]);
                 var formatedFields = colName.map(x => makefield(x));
 
                 console.log(formatedFields);
-                console.log(reportinglist);
-                    $("#reportingGrid").jsGrid({
-                        width: "auto",
-                        height: "auto",
-                        autoload: false,
-                        paging: true,
-                        pageSize: 10,
-                        pageButtonCount: 5,
-                        pageIndex: 1,
-                        data: reportinglist,
-                        fields: formatedFields
-                    });
+                console.log(reportingList);
+                $("#reportingGrid").jsGrid({
+                    width: "auto",
+                    height: "auto",
+                    autoload: false,
+                    paging: true,
+                    pageSize: 10,
+                    pageButtonCount: 5,
+                    pageIndex: 1,
+                    data: reportinglist,
+                    fields: formatedFields
+                });
             }
         });
     }
