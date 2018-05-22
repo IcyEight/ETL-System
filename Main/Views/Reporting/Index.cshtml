@@ -5,6 +5,7 @@
     <link type="text/css" rel="stylesheet" href="~/Content/jsgrid.min.css" />
     <link type="text/css" rel="stylesheet" href="~/Content/jsgrid-theme.min.css" />
     <link type="text/css" rel="stylesheet" href="~/Content/jquery-ui.css" />
+    <link type="text/css" rel="stylesheet" href="~/Content/Site.css"/>
 
     <script type="text/javascript" src="~/Scripts/jquery.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery.min.js"></script>
@@ -28,7 +29,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Index", "Home")">Home</a></li>
-                    <li ><a href="@Url.Action("List", "Asset")">Asset <span class="sr-only"></span></a></li>
+                    <li><a href="@Url.Action("List", "Asset")">Asset <span class="sr-only"></span></a></li>
                     <li><a href="@Url.Action("Index", "TaskQueue")">Task Queue</a></li>
                     <li class="active"><a href="@Url.Action("Index", "Reporting")">Reporting <span class="sr-only">(current)</span></a></li>
                     <li>
@@ -49,31 +50,30 @@
     <h2 align="center">@ViewBag.Title</h2>
 
     <br />
-    <div class="row">
-        <div class="col-md-1"><strong>Select Report</strong></div>
-        <div>
-            <ul>
-                <li class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown button
-                    </button>
-                    <ul class="dropdown-menu">
-                        @{
-                            foreach (string table in Model.Reports.Keys)
-                            {
-                                <li><a href="@Url.Action("Index", "Reporting", new { reportName = table })">@table</a></li>
-                            }
-                        }
-                    </ul>
-                </li>
+    <div class="text-center">
+        <div class="btn-group">
+            <a class="btn btn-primary" href="#"><i class="icon-user icon-white"></i><strong>Select Report</strong></a>
+            <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+
+            <ul class="dropdown-menu">
+                @{
+                    foreach (string table in Model.Reports.Keys)
+                    {
+                        <li><a href="@Url.Action("Index", "Reporting" , new { reportName=table })">@table</a></li>
+                    }
+                }
             </ul>
         </div>
     </div>
-    <br/>
+
+    <br />
+    <br />
+    <br />
     <div id="reportingGrid" style="margin-left:5px !important; margin-right:5px !important"></div>
 
 </body>
 </html>
+
 <script>
     $(document).ready(function () {
         var activeReportName = '@Html.Raw(@Model.ActiveReport)';
@@ -100,7 +100,7 @@
         }
         return cols;
     }
-    
+
     function buildReportingGrid(reportingList) {
         var activeReportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
@@ -118,8 +118,8 @@
                     width: "auto",
                     height: "auto",
                     autoload: false,
-                    paging: true,
-                    pageSize: 10,
+                    paging: false,
+                    pageSize: 15,
                     pageButtonCount: 5,
                     pageIndex: 1,
                     data: reportingList,
