@@ -77,7 +77,6 @@ namespace Main.Controllers
         {
             ViewBag.Title = reportName;
 
-
             var json = new List<IDictionary<string, Object>>();
 
             IQueryable<AssetData> tables = _dbcontext.AssetData.Where(x => x.schemaName.Equals(reportName));
@@ -88,7 +87,7 @@ namespace Main.Controllers
                 var Obj = row.Select(x => new ReportingDisplayItemModel
                 {
                     fieldName = x.fieldName,
-                    strValue = x.ToString(),
+                    strValue = x.ValueOf(),
                 }).ToList();
 
                 foreach(var item in Obj)
@@ -99,6 +98,19 @@ namespace Main.Controllers
             }
 
             return Json(json);
+        }
+
+        [Route("/Reporting/GetReportViewColumns/{reportName}")]
+        public JsonResult GetReportViewColumns(string reportName)
+        {
+            List<string> columnNames = new List<string>();
+            IQueryable<AssetData> tables = _dbcontext.AssetData.Where(x => x.schemaName.Equals(reportName));
+            foreach (IGrouping<int, AssetData> row in tables.GroupBy(y => y.dataEntryID).ToList())
+            {   
+                columnNames = row.Select(x => x.fieldName).ToList();
+                break;
+            }
+            return Json(columnNames);
         }
     }
 }

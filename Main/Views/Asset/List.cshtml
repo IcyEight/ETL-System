@@ -279,58 +279,6 @@
             pageButtonCount: 5,
             pageIndex: 1,
             data: allAssets,
-            editItem: function (item) {
-                showDetailsDialog("Edit", item);
-            },
-            confirmDeleting: false,
-            onItemDeleted: function (arg) {
-                BootstrapDialog.confirm({
-                    title: 'Assets',
-                    message: "The asset \"" + arg.item.assetName + "\" will be removed. Are you sure?",
-                    type: BootstrapDialog.TYPE_PRIMARY,
-                    btnOKLabel: 'OK',
-                    btnOKClass: 'btn-primary',
-                    callback: function (result) {
-                        if (result) {
-                            $.ajax({
-                                async: false,
-                                url: "/Asset/DeleteAsset",
-                                dataType: 'application/json',
-                                data: {
-                                    assetId: arg.item.assetId,
-                                    name: arg.item.assetName,
-                                    shortDescription: arg.item.shortDescription,
-                                    longDescription: arg.item.longDescription,
-                                    isPreferredAsset: arg.item.isPreferredAsset,
-                                    assetType: arg.item.assetType
-                                },
-                                complete: function (data) {
-                                    triggeredAlert = true;
-                                    var button = document.getElementById("sendSignalRAlert");
-                                    button.click();
-
-                                    var response = JSON.parse(data.responseText);
-
-                                    BootstrapDialog.confirm({
-                                        title: 'Assets',
-                                        message: response.message,
-                                        type: BootstrapDialog.TYPE_PRIMARY,
-                                        btnOKLabel: 'OK',
-                                        btnOKClass: 'btn-primary',
-                                        callback: function (result) {
-                                            // refresh assets grid
-                                            $("#allAssetGrid").jsGrid("refresh");
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                        else {
-
-                        }
-                    }
-                });
-            },
             onItemUpdated: function (item) {
                 var assetID = $("#assetId").val();
                 var assetName = $("#assetName").val();
@@ -360,6 +308,19 @@
                         if (response.validOwner == false || response.duplicateAsset == true) {
                             // invalid owner message or duplicate asset message to user
                             showPopup(BootstrapDialog.TYPE_DANGER, "Assets", response.message);
+                        }
+                        else if (response.deletedAsset == true) {
+                            BootstrapDialog.confirm({
+                                title: 'Assets',
+                                message: response.message,
+                                type: BootstrapDialog.TYPE_DANGER,
+                                btnOKLabel: 'OK',
+                                btnOKClass: 'btn-danger',
+                                callback: function (result) {
+                                    // refresh assets grid
+                                    window.location.reload();
+                                }
+                            });
                         }
                         else {
                             if (response.isUpdated == false) {
@@ -465,6 +426,67 @@
                     type: "control",
                     modeSwitchButton: false,
                     editButton: true,
+                    deleteButton: false,
+                    itemTemplate: function (value, item) {
+                        var $customEditButton = $("<button>").attr({ class: "customGridEditbutton jsgrid-button jsgrid-edit-button" })
+                            .click(function (e) {
+                                showDetailsDialog("Edit", item);
+                            });
+
+                        var $customDeleteButton = $("<button>").attr({ class: "customGridDeletebutton jsgrid-button jsgrid-delete-button" })
+                            .click(function (e) {
+                                BootstrapDialog.confirm({
+                                    title: 'Assets',
+                                    message: "The asset \"" + item.assetName + "\" will be removed. Are you sure?",
+                                    type: BootstrapDialog.TYPE_PRIMARY,
+                                    btnOKLabel: 'OK',
+                                    btnOKClass: 'btn-primary',
+                                    callback: function (result) {
+                                        if (result) {
+                                            $.ajax({
+                                                async: false,
+                                                url: "/Asset/DeleteAsset",
+                                                dataType: 'application/json',
+                                                data: {
+                                                    assetId: item.assetId,
+                                                    name: item.assetName,
+                                                    shortDescription: item.shortDescription,
+                                                    longDescription: item.longDescription,
+                                                    isPreferredAsset: item.isPreferredAsset,
+                                                    assetType: item.assetType,
+                                                    assetOwner: item.owner
+                                                },
+                                                complete: function (data) {
+                                                    triggeredAlert = true;
+                                                    var button = document.getElementById("sendSignalRAlert");
+                                                    button.click();
+
+                                                    var response = JSON.parse(data.responseText);
+
+                                                    BootstrapDialog.confirm({
+                                                        title: 'Assets',
+                                                        message: response.message,
+                                                        type: BootstrapDialog.TYPE_PRIMARY,
+                                                        btnOKLabel: 'OK',
+                                                        btnOKClass: 'btn-primary',
+                                                        callback: function (result) {
+                                                            // refresh assets grid
+                                                            window.location.reload();
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                        else {
+
+                                        }
+                                    }
+                                });
+                            });
+
+                        return $("<div>").append($customEditButton).append($customDeleteButton);
+
+                    },
                     headerTemplate: function () {
                         return $("<button>").attr("type", "button").attr("class", "btn btn-default").text("Add")
                             .on("click", function () {

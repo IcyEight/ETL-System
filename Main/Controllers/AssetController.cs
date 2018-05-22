@@ -138,7 +138,7 @@ namespace Main.Controllers
             return Json(assetList);
         }
 
-        public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType)
+        public JsonResult DeleteAsset(int assetId, string name, string shortDescription, string longDescription, Boolean isPreferredAsset, string assetType, string assetOwner)
         {
             try
             {
@@ -149,6 +149,7 @@ namespace Main.Controllers
                 deletedAsset.AssetName = name;
                 deletedAsset.ShortDescription = shortDescription;
                 deletedAsset.LongDescription = longDescription;
+                deletedAsset.Owner = assetOwner;
                 if (findAssetType == null)
                 {
                     deletedAsset.typeName = null;
@@ -204,6 +205,14 @@ namespace Main.Controllers
                             return Json(new { duplicateAsset = true, message = "The asset provided already exists in BAMS.  Please modify the existing asset's record or check you have entered the correct asset information." });
                         }
                     }
+                }
+
+                // check to make sure that the asset a user is modifying hasn't been similtaneously
+                // deleted by another user
+                bool isAssetDeleted = isDeleted(assetId);
+                if (isAssetDeleted == true)
+                {
+                    return Json(new { deletedAsset = true, message = "Unable to modify asset.  The asset you attempted to modify has been deleted by another user." });
                 }
 
                 var findAssetType = _dbcontext.AssetTypes.Where(x => x.typeID == Convert.ToInt32(assetType)).FirstOrDefault();
@@ -426,6 +435,7 @@ namespace Main.Controllers
         #endregion
 
 
+        #region Validation Functions
         public bool CheckDuplicateAsset(string name)
         {
             // search asset table for similar assets
@@ -439,6 +449,24 @@ namespace Main.Controllers
                 return false;
             }
         }
+
+
+        public bool isDeleted(int assetId)
+        {
+            // search asset table for similar assets
+            var asset = _dbcontext.Assets.AsNoTracking().Where(x => x.AssetId == assetId).FirstOrDefault();
+            if (asset != null)
+            {
+                return asset.isDeleted;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
+
+
         public JsonResult FilterAssets(string aNameFilter, string sDescriptionFilter, string lDescriptionFilter, string assetTypeFilter, string ownerFilter)
         {
             if (aNameFilter == null && sDescriptionFilter == null && lDescriptionFilter == null && assetTypeFilter == null && ownerFilter == null)
