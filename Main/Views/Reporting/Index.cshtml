@@ -88,14 +88,15 @@
                 var table = reportingList["table"];
                 item0 = table[0].items;
                 var strValue0 = item0.map(a => a.strValue);
-                console.log(strValue0);
-
-
+                console.log(table[0]["items"]);                            
             }
+
         });
     });
 
-    function buildContent() {
+    
+
+    @*function buildContent() {
         var reportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
             url: "/Reporting/GetReportsView/" + reportName ,
@@ -106,7 +107,7 @@
 
             }
         });
-    }
+    }*@
 
     //function toObject(arr) {
     //    var rv = {};
@@ -122,7 +123,7 @@
 
 
     function buildReportingGrid(allReports) {
-         var reportName = '@Html.Raw(@Model.ActiveReport)';
+        var reportName = '@Html.Raw(@Model.ActiveReport)';
          $.ajax({
                 url: "/Reporting/GetReportsView/" + reportName,
                 dataType: 'application/json',
@@ -134,6 +135,7 @@
                     var strValue0 = item0.map(a => a.strValue);
 
                     var newcolName = colName.map(x => foo(x));
+
                     //for (var i = 0, i < table.length, i++){
                     //    for (j = 0, j < colName.length, j++){
                             
@@ -143,21 +145,14 @@
                     //}
                     $("#reportingGrid").jsGrid({
                         width: "auto",
-                        height: "auto",
+                        height: "100%",
                         autoload: false,
                         paging: true,
                         pageSize: 10,
                         pageButtonCount: 5,
                         pageIndex: 1,
-                        data: allReports,
-
-                    
-
-                        onItemInserted: function (item) {
-                            var fieldName = $("#fieldName").val();
-                            var strValue0 = $("#strValue").val();
-                        },
                         fields: newcolName
+   
                     });
                 }
        });
