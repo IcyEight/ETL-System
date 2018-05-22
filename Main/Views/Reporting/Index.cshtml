@@ -76,54 +76,91 @@
 </html>
 
 <script>
+    var reportingList;
     $(document).ready(function () {
         var reportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
             url: "/Reporting/GetReportsView/" + reportName,
             dataType: 'application/json',
             complete: function (data) {
-                var reportinglist = JSON.parse(data["responseText"]);
-                buildReportingGrid(reportinglist);
+                reportingList = JSON.parse(data["responseText"]);
+                buildReportingGrid(reportingList);
+                var table = reportingList["table"];
+                item0 = table[0].items;
+                var strValue0 = item0.map(a => a.strValue);
+                console.log(strValue0);
+
+
             }
         });
     });
 
-    function makefield(name){
+    function buildContent() {
+        var reportName = '@Html.Raw(@Model.ActiveReport)';
+        $.ajax({
+            url: "/Reporting/GetReportsView/" + reportName ,
+            dataType: 'application/json',
+            complete: function (data) {
+                reportingList = JSON.parse(data["responseText"]);
+                buildReportingGrid(reportingList);
+
+            }
+        });
+    }
+
+    //function toObject(arr) {
+    //    var rv = {};
+    //    for (var i = 0; i < arr.length; i++)
+    //        rv[i] = arr[i];
+    //    return rv;
+    //}
+
+    function foo(name){
         return { "name": name, "title": name };
     }
 
 
-    function format(table)
-    {
-        var formatedTable = [];
-        for(var i = 0; i < table.length; i++)
-        {
-            //console.log(table[i]);
-            //formatedTable.push(JSON.parse(table[i]));
-            //console.log(formatedTable);
-        }
-        return formatedTable;
-    }
-    
-    function buildReportingGrid(reportinglist) {
-        var colName = reportinglist["columnNames"];
-        var table = reportinglist["table"];
-        var formatedtable = format(table);
 
-        var formatedFields = colName.map(x => makefield(x));
-        $("#reportingGrid").jsGrid({
-            width: "auto",
-            height: "auto",
-            autoload: false,
-            paging: true,
-            pageSize: 10,
-            pageButtonCount: 5,
-            pageIndex: 1,
-            data: formatedtable,
-            fields: formatedFields
-            
-        });
-        console.log(formatedFields);
+    function buildReportingGrid(allReports) {
+         var reportName = '@Html.Raw(@Model.ActiveReport)';
+         $.ajax({
+                url: "/Reporting/GetReportsView/" + reportName,
+                dataType: 'application/json',
+                complete: function (data) {
+                    reportingList = JSON.parse(data["responseText"]);
+                    var colName = reportingList["columnNames"];
+                    var table = reportingList["table"];
+                    item0 = table[0].items;
+                    var strValue0 = item0.map(a => a.strValue);
+
+                    var newcolName = colName.map(x => foo(x));
+                    //for (var i = 0, i < table.length, i++){
+                    //    for (j = 0, j < colName.length, j++){
+                            
+
+                    //    }
+
+                    //}
+                    $("#reportingGrid").jsGrid({
+                        width: "auto",
+                        height: "auto",
+                        autoload: false,
+                        paging: true,
+                        pageSize: 10,
+                        pageButtonCount: 5,
+                        pageIndex: 1,
+                        data: allReports,
+
+                    
+
+                        onItemInserted: function (item) {
+                            var fieldName = $("#fieldName").val();
+                            var strValue0 = $("#strValue").val();
+                        },
+                        fields: newcolName
+                    });
+                }
+       });
     }
 
 

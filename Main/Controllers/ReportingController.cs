@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Security.Claims;
 using Main.Data;
@@ -74,53 +75,30 @@ namespace Main.Controllers
         [Route("/Reporting/GetReportsView/{reportName}")]
         public JsonResult GetReportsView(string reportName)
         {
-            ReportingDisplayModel reportModel = new ReportingDisplayModel
-            {
-                ReportName = reportName,
-                ColumnNames = new List<string>(),
-                Table = new List<dynamic>()
-            };
+            ViewBag.Title = reportName;
+
+
+            var json = new List<IDictionary<string, Object>>();
+
             IQueryable<AssetData> tables = _dbcontext.AssetData.Where(x => x.schemaName.Equals(reportName));
 
-            bool is_column_set = false;
-            List<dynamic> results = new List<dynamic>();
             foreach (IGrouping<int, AssetData> row in tables.GroupBy(y => y.dataEntryID).ToList())
             {
-                var jsonResultRow = "{";
-                foreach (var item in row)
+                var jsonObj = new ExpandoObject() as IDictionary<string, Object>;
+                var Obj = row.Select(x => new ReportingDisplayItemModel
                 {
-                    if (item.fieldType == "String") {
-                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.strValue + ", ";
-                    }
-                    else if (item.fieldType == "Integer") {
-                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.intValue.ToString() + ", ";
-                    }
-                    else if (item.fieldType == "Decimal") {
-                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.floatValue.ToString() + ", ";
-                    }
-                    else if (item.fieldType == "Date") {
-                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.dateValue.ToString() + ", ";
-                    }
-                    else if (item.fieldType == "Boolean") {
-                        jsonResultRow = jsonResultRow + item.fieldName + ":" + item.boolValue.ToString() + ", ";
-                    }
+                    fieldName = x.fieldName,
+                    strValue = x.ToString(),
+                }).ToList();
 
-                }
-
-                //jsonResultRow.Substring(jsonResultRow.Length - 2);
-                jsonResultRow = jsonResultRow + "}";
-
-                results.Add(jsonResultRow);
-
-                if(!is_column_set)
+                foreach(var item in Obj)
                 {
-                    reportModel.ColumnNames = row.Select(x => x.fieldName).ToList();
-                    is_column_set = true;
+                    jsonObj.Add(item.fieldName, item.strValue);
                 }
-
-                reportModel.Table = results;
+                json.Add(jsonObj);
             }
-            return Json(reportModel);
+
+            return Json(json);
         }
     }
 }
