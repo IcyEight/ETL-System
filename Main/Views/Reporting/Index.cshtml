@@ -74,73 +74,35 @@
 
 </body>
 </html>
-
 <script>
-    var reportingList;
     $(document).ready(function () {
         var reportName = '@Html.Raw(@Model.ActiveReport)';
         $.ajax({
             url: "/Reporting/GetReportsView/" + reportName,
             dataType: 'application/json',
             complete: function (data) {
-                reportingList = JSON.parse(data["responseText"]);
-                buildReportingGrid(reportingList);
-                var table = reportingList["table"];
-                item0 = table[0].items;
-                var strValue0 = item0.map(a => a.strValue);
-                console.log(strValue0);
-
-
+                var reportinglist = JSON.parse(data["responseText"]);
+                buildReportingGrid(reportinglist);
             }
         });
     });
 
-    function buildContent() {
-        var reportName = '@Html.Raw(@Model.ActiveReport)';
-        $.ajax({
-            url: "/Reporting/GetReportsView/" + reportName ,
-            dataType: 'application/json',
-            complete: function (data) {
-                reportingList = JSON.parse(data["responseText"]);
-                buildReportingGrid(reportingList);
-
-            }
-        });
-    }
-
-    //function toObject(arr) {
-    //    var rv = {};
-    //    for (var i = 0; i < arr.length; i++)
-    //        rv[i] = arr[i];
-    //    return rv;
-    //}
-
-    function foo(name){
+    function makefield(name){
         return { "name": name, "title": name };
     }
+    
+    function buildReportingGrid(reportinglist) {
+        var reportName = '@Html.Raw(@Model.ActiveReport)';
+        $.ajax({
+            url:"/Reporting/GetReportViewColumns/" + reportName,
+            dataType: 'application/json',
+            conplete : function(data)
+            {
+                var columnNames = JSON.parse(data["responseText"]);
+                var formatedFields = colName.map(x => makefield(x));
 
-
-
-    function buildReportingGrid(allReports) {
-         var reportName = '@Html.Raw(@Model.ActiveReport)';
-         $.ajax({
-                url: "/Reporting/GetReportsView/" + reportName,
-                dataType: 'application/json',
-                complete: function (data) {
-                    reportingList = JSON.parse(data["responseText"]);
-                    var colName = reportingList["columnNames"];
-                    var table = reportingList["table"];
-                    item0 = table[0].items;
-                    var strValue0 = item0.map(a => a.strValue);
-
-                    var newcolName = colName.map(x => foo(x));
-                    //for (var i = 0, i < table.length, i++){
-                    //    for (j = 0, j < colName.length, j++){
-                            
-
-                    //    }
-
-                    //}
+                console.log(formatedFields);
+                console.log(reportinglist);
                     $("#reportingGrid").jsGrid({
                         width: "auto",
                         height: "auto",
@@ -149,24 +111,10 @@
                         pageSize: 10,
                         pageButtonCount: 5,
                         pageIndex: 1,
-                        data: allReports,
-
-                    
-
-                        onItemInserted: function (item) {
-                            var fieldName = $("#fieldName").val();
-                            var strValue0 = $("#strValue").val();
-                        },
-                        fields: newcolName
+                        data: reportinglist,
+                        fields: formatedFields
                     });
-                }
-       });
+            }
+        });
     }
-
-
-
-
 </script>
-
-
-
