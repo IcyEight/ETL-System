@@ -52,14 +52,14 @@
     <br />
     <div class="text-center">
         <div class="btn-group">
-            <a class="btn btn-primary" href="#"><i class="icon-user icon-white"></i><strong>Select Report</strong></a>
+            <a class="btn btn-primary" href="#"><i class="icon-user icon-white" id="reportSelect"></i><strong>Select Report</strong></a>
             <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
 
             <ul class="dropdown-menu">
                 @{
                     foreach (string table in Model.Reports.Keys)
                     {
-                        <li><a href="@Url.Action("Index", "Reporting" , new { reportName=table })">@table</a></li>
+                        <li><a id ="reportName" href="@Url.Action("Index", "Reporting" , new { reportName=table })">@table</a></li>
                     }
                 }
             </ul>
@@ -88,7 +88,18 @@
                 buildReportingGrid(reportingList);
             }
         });
+
+        $(function () {
+            $("reportName").click(function () {
+                $("reportSelect").html(activeReportName);
+            });
+        })
+
+
     });
+
+
+
 
     function buildColumns(columnNames) {
         var cols = [];
@@ -100,6 +111,7 @@
         }
         return cols;
     }
+
 
     function buildReportingGrid(reportingList) {
         var activeReportName = '@Html.Raw(@Model.ActiveReport)';

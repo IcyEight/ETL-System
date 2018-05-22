@@ -1,26 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Main.Data;
+using Main.Models;
 using Main.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Main.Controllers
 {
-    [Authorize]
+    [Authorize] // Use tag [AllowAnonymous] for action that does not require authorization.
     public class HomeController : Controller
     {
-		private readonly BamsDbContext _dbcontext;
+        private readonly BamsDbContext _dbcontext;
 
         public HomeController(BamsDbContext dbcontext)
-		{
-            _dbcontext = dbcontext; 
-		}
+        {
+            _dbcontext = dbcontext;
+        }
 
         public IActionResult Index()
         {
@@ -59,6 +58,51 @@ namespace Main.Controllers
             return assetIds;
         }
 
-        // Use tag [AllowAnonymous] for action that does not require authorization.
+        public JsonResult GetAssetTree()
+        {
+            List<AssetType> assetTypes = _dbcontext.AssetTypes.ToList(); // where clause is preferred instead of getting all rows.
+            List<JsonResult> tree = new List<JsonResult>();
+            foreach (AssetType a in assetTypes)
+            {
+                tree.Add(getAssetTypeInfo(a));
+            }
+            return Json(tree);
+        }
+
+        private JsonResult getAssetTypeInfo(AssetType assetType)
+        {
+            List<Module> modules = _dbcontext.Modules.Where(x => x.typeID == assetType.typeName).ToList();
+            if (modules.Count > 0)
+            {
+                List<JsonResult> _nodes = new List<JsonResult>();
+                foreach (Module m in modules)
+                {
+                    _nodes.Add(getModuleInfo(m));
+                }
+                return Json(new { text = assetType.typeName, nodes = _nodes });
+            }
+            else return Json(new { text = assetType.typeName });
+        }
+
+        private JsonResult getModuleInfo(Module m)
+        {
+            List<AssetModule> assetModule = _dbcontext.AssetModules.Where(x => x.moduleID == m.moduleID).ToList();
+            if (assetModule.Count > 0)
+            {
+                List<JsonResult> _nodes = new List<JsonResult>();
+                foreach (AssetModule am in assetModule)
+                {
+                    _nodes.Add(getAssetInfo(am.assetID));
+                }
+                return Json(new { text = m.moduleName, nodes = _nodes });
+            }
+            else return Json(new { text = m.moduleName });
+        }
+
+        private JsonResult getAssetInfo(int assetid)
+        {
+            Asset asset = _dbcontext.Assets.Where(x => x.AssetId == assetid).FirstOrDefault<Asset>();
+            return Json(new { text = asset.AssetName });
+        }
     }
 }
