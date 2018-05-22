@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Security.Claims;
 using Main.Data;
@@ -74,36 +75,30 @@ namespace Main.Controllers
         [Route("/Reporting/GetReportsView/{reportName}")]
         public JsonResult GetReportsView(string reportName)
         {
-            ReportingDisplayModel reportModel = new ReportingDisplayModel
-            {
-                ReportName = reportName,
-                ColumnNames = new List<string>(),
-                Table = new List<ReportingDisplayRowModel>()
-            };
+            ViewBag.Title = reportName;
+
+
+            var json = new List<IDictionary<string, Object>>();
+
             IQueryable<AssetData> tables = _dbcontext.AssetData.Where(x => x.schemaName.Equals(reportName));
 
-            bool is_column_set = false;
             foreach (IGrouping<int, AssetData> row in tables.GroupBy(y => y.dataEntryID).ToList())
             {
-                ReportingDisplayRowModel report_row = new ReportingDisplayRowModel()
+                var jsonObj = new ExpandoObject() as IDictionary<string, Object>;
+                var Obj = row.Select(x => new ReportingDisplayItemModel
                 {
-                    items = row.Select(x => new ReportingDisplayItemModel
-                    {
-                        fieldName = x.fieldName,
-                        strValue = x.ToString(),
-                    }).ToList()
-                };
+                    fieldName = x.fieldName,
+                    strValue = x.ValueOf(),
+                }).ToList();
 
-                if(!is_column_set)
+                foreach(var item in Obj)
                 {
-                    reportModel.ColumnNames = row.Select(x => x.fieldName).ToList();
-                    is_column_set = true;
+                    jsonObj.Add(item.fieldName, item.strValue);
                 }
-
-                reportModel.Table.Add(report_row);
+                json.Add(jsonObj);
             }
 
-            return Json(reportModel);
+            return Json(json);
         }
     }
 }
