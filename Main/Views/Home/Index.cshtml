@@ -101,7 +101,6 @@
             dataType: 'application/json',
             complete: function (data) {
                 var result = JSON.parse(data.responseText);
-                console.log(result);
                 $("#tree").treeview({ data: result });
             }
         });
