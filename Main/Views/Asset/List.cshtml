@@ -425,15 +425,15 @@
                 {
                     type: "control",
                     modeSwitchButton: false,
-                    editButton: true,
+                    editButton: false,
                     deleteButton: false,
                     itemTemplate: function (value, item) {
-                        var $customEditButton = $("<button>").attr({ class: "customGridEditbutton jsgrid-button jsgrid-edit-button" })
+                        var $customEditButton = $("<button>").attr({ class: "jsgrid-button jsgrid-edit-button" })
                             .click(function (e) {
                                 showDetailsDialog("Edit", item);
                             });
 
-                        var $customDeleteButton = $("<button>").attr({ class: "customGridDeletebutton jsgrid-button jsgrid-delete-button" })
+                        var $customDeleteButton = $("<button>").attr({ class: "jsgrid-button jsgrid-delete-button" })
                             .click(function (e) {
                                 BootstrapDialog.confirm({
                                     title: 'Assets',
