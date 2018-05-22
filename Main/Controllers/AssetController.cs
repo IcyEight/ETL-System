@@ -384,7 +384,7 @@ namespace Main.Controllers
         public void UpdateAssetsModule(AssetModule amLink)
         {
             // look for pair in table, if exists update otherwise add new row
-            var assetModulePair = _dbcontext.AssetModules.AsNoTracking().Where(x => x.assetID == amLink.assetID && x.moduleID == amLink.moduleID).FirstOrDefault();
+            var assetModulePair = _dbcontext.AssetModules.AsNoTracking().Where(x => x.assetID == amLink.assetID).FirstOrDefault();
             if (assetModulePair != null)
             {
                 // update existing record

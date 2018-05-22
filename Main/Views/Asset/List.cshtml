@@ -499,6 +499,38 @@
 
 
         var showDetailsDialog = function (dialogType, arg) {
+            if (arg.typeID != null && arg.typeID != "") {
+                // enable asset module
+                $('#assetModule').removeAttr("disabled")
+
+                // remove existing values (necessary if user changes asset type selection)
+                $('#assetModule').find('option').remove().end();
+
+                // add select to option selection
+                $('<option>').val("").text("Select..").appendTo('#assetModule');
+
+                $.ajax({
+                    url: "/Asset/GetAssetModules",
+                    data: {
+                        aType: arg.typeID
+                    },
+                    dataType: 'application/json',
+                    complete: function (data) {
+                        var response = JSON.parse(data.responseText);
+
+                        for (var i = 0; i < response.length; i++) {
+                            var assetModule = response[i]["moduleName"];
+                            var moduleID = response[i]["moduleID"];
+
+                            // add each asset module to dropdown selection for editting asset
+                            $('<option>').val(moduleID).text(assetModule).appendTo('#assetModule');
+                        }
+
+                        $("#assetModule").val(arg.moduleID);
+                    }
+                });
+            }
+
             // dynamically build out dialog depending on add/ modify operation
             $("#modalTitle").html("");
             if (dialogType == "Add") {
@@ -582,11 +614,10 @@
 
                     for (var i = 0; i < response.length; i++) {
                         var assetModule = response[i]["moduleName"];
-
-                        var value = i + 1;
+                        var moduleID = response[i]["moduleID"];
 
                         // add each asset module to dropdown selection for editting asset
-                        $('<option>').val(value).text(assetModule).appendTo('#assetModule');
+                        $('<option>').val(moduleID).text(assetModule).appendTo('#assetModule');
                     }
                 }
             });
